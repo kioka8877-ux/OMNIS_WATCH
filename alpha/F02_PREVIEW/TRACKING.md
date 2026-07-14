@@ -1,7 +1,7 @@
 # F02 PREVIEW — Tracking
 
 ## Etat
-- **Statut :** CODE COMPLETE (placeholder)
+- **Statut :** CODE COMPLETE
 - **Version :** alpha
 - **Date de completion :** 2026-07-14
 
@@ -11,6 +11,7 @@
 | 2026-07-14 | Structure creee | En attente de developpement |
 | 2026-07-14 | App.jsx + main.jsx developpes | Player @remotion/player integre |
 | 2026-07-14 | OmniComposition.jsx copie | Composant identique a F03A |
+| 2026-07-14 | App.jsx rewrite | Chargement dynamique codex + video |
 
 ## Tests
 | # | Date | Codex | Build | Preview | Statut |
@@ -28,11 +29,15 @@
 | Fichier | Role | Statut |
 |---------|------|--------|
 | main.jsx | Entry point React | CODE COMPLETE |
-| App.jsx | Charge codex + video, rend <Player> | PLACEHOLDER (a connecter au runtime) |
+| App.jsx | Charge codex + video dynamiquement, rend <Player> | CODE COMPLETE |
 | preview/OmniComposition.jsx | Copie exacte de F03A | CODE COMPLETE |
 
-## A developper
-- [ ] Chargement dynamique du codex.json (fetch)
-- [ ] Chargement dynamique de la video
-- [ ] Bouton "Valider et rendre" → trigger GitHub Actions
-- [ ] SFX playback dans le preview
+## Fonctionnalites
+- [x] Chargement dynamique du codex.json (fetch)
+- [x] Chargement dynamique de la video
+- [x] Cadre telephone 9:16
+- [x] Bouton "Valider et rendre"
+- [x] Affichage infos codex (textes, zooms, SFX, duree)
+- [x] Liste des textes (debug)
+- [x] Ecran de chargement
+- [x] Ecran d'erreur avec instructions

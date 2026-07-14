@@ -1,5 +1,4 @@
 # F01 ACQUISITION — Decoupe video (FFmpeg)
-# Trigger: workflow_dispatch (manuel, depuis l'executeur)
 name: F01 Acquisition
 
 on:
@@ -12,9 +11,11 @@ on:
       in_timestamp:
         description: 'Timestamp IN (ex: 00:02)'
         required: true
+        default: '00:00'
       out_timestamp:
         description: 'Timestamp OUT (ex: 00:15)'
         required: true
+        default: '00:15'
       format:
         description: 'Format (9:16, 16:9, 1:1)'
         required: true
@@ -40,12 +41,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
-      - name: Run F01
+
+      - name: Run F01 Acquisition
         run: |
-          echo "F01 ACQUISITION — A developper"
-          # python alpha/F01_ACQUISITION/CODEBASE/omnis_f01.py ...
+          cd alpha/F01_ACQUISITION/CODEBASE
+          python3 omnis_f01.py \
+            --input ../IN/ \
+            --output ../OUT/ \
+            --in-timestamp "${{ github.event.inputs.in_timestamp }}" \
+            --out-timestamp "${{ github.event.inputs.out_timestamp }}" \
+            --format "${{ github.event.inputs.format }}" \
+            --blur-pad "${{ github.event.inputs.blur_pad }}" \
+            --speed "${{ github.event.inputs.speed }}" \
+            --volume "${{ github.event.inputs.volume }}"
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:

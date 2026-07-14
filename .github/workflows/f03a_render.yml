@@ -19,20 +19,42 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Install Remotion
+
+      - name: Install dependencies
         run: |
           cd alpha/F03_RENDER/F03A_REMOTION/CODEBASE
           npm install
-      - name: Render
+
+      - name: Copy input files
         run: |
-          echo "F03A RENDER — A developper"
-          # npx remotion render src/index.jsx OmniComposition OUT/video_visuelle.mp4
+          # Copier codex.json et video vers le dossier public de Remotion
+          cp alpha/F03_RENDER/F03A_REMOTION/IN/codex.json alpha/F03_RENDER/F03A_REMOTION/CODEBASE/public/codex.json || true
+          cp alpha/F03_RENDER/F03A_REMOTION/IN/video_coupee.mp4 alpha/F03_RENDER/F03A_REMOTION/CODEBASE/public/video_coupee.mp4 || true
+
+      - name: Render with Remotion
+        run: |
+          cd alpha/F03_RENDER/F03A_REMOTION/CODEBASE
+          # Lire les metadonnees du codex pour les parametres de rendu
+          FPS=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['fps'])")
+          FRAMES=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['total_frames'])")
+          WIDTH=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['width'])")
+          HEIGHT=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['height'])")
+          
+          echo "Rendu: ${FRAMES} frames, ${FPS}fps, ${WIDTH}x${HEIGHT}"
+          
+          npx remotion render src/index.jsx OmniComposition \
+            OUT/video_visuelle.mp4 \
+            --codec h264 \
+            --image-format jpeg \
+            --concurrency 1
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: f03a-output
-          path: alpha/F03_RENDER/F03A_REMOTION/OUT/
+          path: alpha/F03_RENDER/F03A_REMOTION/CODEBASE/OUT/
