@@ -1,0 +1,11 @@
+# F02A VISION — Description Narrative
+# Modele: llama-3.2-11b-vision-instruct:free
+# Frames: 4
+# Date: simulation
+
+A man is sitting on a park bench with his dog, a golden retriever. 
+The dog is resting its head on the man's lap. The man is gently petting 
+the dog's head. The park is empty, with autumn leaves on the ground. 
+The man looks down at the dog with a sad expression. The dog looks 
+up at the man. The man stops petting and looks away toward the 
+empty park. The dog stays still, watching him.

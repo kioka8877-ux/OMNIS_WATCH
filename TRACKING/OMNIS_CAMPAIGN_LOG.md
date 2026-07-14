@@ -11,19 +11,19 @@
 |---------|-----|------|--------|--------------------|
 | F01 | ACQUISITION | FFmpeg coupe + format + vitesse + volume | CODE COMPLETE | 2026-07-14 |
 | F02A | VISION | OpenRouter Vision (description) + MediaPipe (tracking) | CODE COMPLETE | 2026-07-14 |
-| F02B | ORACLE | Metaprompt emotionnel → codex.json | CODE COMPLETE | 2026-07-14 |
+| F02B | ORACLE | Metaprompt emotionnel → codex.json | TEST SIMULATION OK | 2026-07-14 |
 | F02 | PREVIEW | Apercu temps reel @remotion/player | CODE COMPLETE | 2026-07-14 |
 | F03A | REMOTION | Rendu visuel (texte, zoom, tracking, couleurs) | CODE COMPLETE | 2026-07-14 |
 | F03B | MIXER | Mixage SFX | CODE COMPLETE | 2026-07-14 |
 | F04 | CAMOUFLAGE | Wipe metadonnees + Loudnorm | CODE COMPLETE | 2026-07-14 |
 | F05 | LUTHER | Effacement empreinte numerique | HORS SCOPE V1 (heritage CRUSADER) | — |
-| META | METAPROMPTS | Guide operateur (emotion) | CODE COMPLETE | 2026-07-14 |
+| META | METAPROMPTS | Guide operateur (emotion) | TEST SIMULATION OK | 2026-07-14 |
 | EXEC | OMNIS_EXECUTEUR | Orchestrateur (telecommande) | CODE COMPLETE | 2026-07-14 |
 | CUST | OMNIS_CUSTOS | Gardien de flotte (validation) | CODE COMPLETE | 2026-07-14 |
 
 **Compteur de Guerre :**
 [███████░░░] 7/8 fregates code complete (F05 hors scope V1)
-[█] 1/1 metaprompts complete
+[█] 1/1 metaprompts — TEST SIMULATION OK
 [░░░░] 0/4 gates operateur (tests production en attente)
 [██] 2/2 outils orchestration complets (Executeur + Custos)
 
@@ -82,7 +82,7 @@ Construire le pipeline OMNIS-WATCH de bout en bout :
 - **Sortie :** codex.json (texte + timing + zooms + SFX + couleurs)
 - **Role :** Le cerveau. Transforme la realite en recit emotionnel. Le texte dirige la video.
 - **Script :** omnis_f02b_oracle.py (--prepare + --validate)
-- **Tests :** EN ATTENTE (besoin F02A complet en amont)
+- **Tests :** SIMULATION OK — mode TRISTE, 5 textes, 5 zooms, 9 SFX, codex valide
 
 ## F02 PREVIEW
 - **Status :** CODE COMPLETE
