@@ -1,23 +1,22 @@
 # F01 ACQUISITION — Tracking
 
 ## Etat
-- **Statut :** SCELLEE — FONCTIONNELLE
+- **Statut :** CODE COMPLETE — TESTS PENDANT SUR GITHUB ACTIONS
 - **Version :** alpha
-- **Date de scellement :** 2026-07-14
+- **Date de completion :** 2026-07-14
 
 ## Historique
 | Date | Action | Resultat |
 |------|--------|----------|
 | 2026-07-14 | Structure creee | En attente de developpement |
-| 2026-07-14 | Script omnis_f01.py developpe | Code fonctionnel |
-| 2026-07-14 | Test blur-pad 9:16 | OK — 1080x1920, 3.00s, 90 frames |
-| 2026-07-14 | Test sans blur-pad + speed 1.5x + volume 2.0x | OK — 2.00s, 60 frames |
+| 2026-07-14 | Script omnis_f01.py developpe | Code complete, logique verifiee |
+| 2026-07-14 | Tests sandbox | FFmpeg non disponible dans sandbox — tests en attente GitHub Actions |
 
 ## Tests
 | # | Date | Entree | Format | Blur-pad | Speed | Volume | Sortie | Statut |
 |---|------|--------|--------|----------|-------|--------|--------|--------|
-| 1 | 2026-07-14 | test 5s 1280x720 | 9:16 | true | 1.0 | 1.0 | 3.00s 1080x1920 90f | OK |
-| 2 | 2026-07-14 | test 5s 1280x720 | 9:16 | false | 1.5 | 2.0 | 2.00s 1080x1920 60f | OK |
+| 1 | — | test 5s 1280x720 | 9:16 | true | 1.0 | 1.0 | — | EN ATTENTE GH ACTIONS |
+| 2 | — | test 5s 1280x720 | 9:16 | false | 1.5 | 2.0 | — | EN ATTENTE GH ACTIONS |
 
 ## Notes techniques
 - Script : omnis_f01.py (FONCTIONNEL)

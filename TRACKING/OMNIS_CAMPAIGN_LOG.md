@@ -9,7 +9,7 @@
 
 | Fregate | Nom | Role | Statut | Date de Scellement |
 |---------|-----|------|--------|--------------------|
-| F01 | ACQUISITION | FFmpeg coupe + format + vitesse + volume | SCELLEE — FONCTIONNELLE | 2026-07-14 |
+| F01 | ACQUISITION | FFmpeg coupe + format + vitesse + volume | CODE COMPLETE | 2026-07-14 |
 | F02A | VISION | OpenRouter Vision (description) + MediaPipe (tracking) | EN DEVELOPPEMENT | — |
 | F02B | ORACLE | Metaprompt emotionnel → codex.json | EN DEVELOPPEMENT | — |
 | F02 | PREVIEW | Apercu temps reel @remotion/player | EN DEVELOPPEMENT | — |
@@ -20,7 +20,7 @@
 | META | METAPROMPTS | Guide operateur (emotion) | EN DEVELOPPEMENT | — |
 
 **Compteur de Guerre :**
-[█░░░░░░░░░] 1/8 fregates scellees
+[▓░░░░░░░░░] 1/8 (code complete, tests GH Actions) fregates scellees
 [░] 0/1 metaprompts scelles
 [░░░░] 0/4 gates operateur
 
