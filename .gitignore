@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.eggs/
+*.egg-info/
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Remotion build
+out/
+.cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Large media files (use Git LFS or GitHub Releases)
+*.mp4
+*.mp3
+*.wav
+*.mov
+*.avi
+*.mkv
+
+# Exceptions
+!SHARED/IN/sfx/.gitkeep
+!**/.gitkeep
+
+# Sandbox temp
+.tmp/
+*.tmp

@@ -1,0 +1,38 @@
+# F03A REMOTION — Rendu visuel (Docker custom)
+# Trigger: workflow_dispatch (manuel, depuis l'executeur)
+name: F03A Render
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Mode (alpha)'
+        required: true
+        default: 'alpha'
+
+permissions:
+  contents: write
+
+jobs:
+  f03a:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Remotion
+        run: |
+          cd alpha/F03_RENDER/F03A_REMOTION/CODEBASE
+          npm install
+      - name: Render
+        run: |
+          echo "F03A RENDER — A developper"
+          # npx remotion render src/index.jsx OmniComposition OUT/video_visuelle.mp4
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: f03a-output
+          path: alpha/F03_RENDER/F03A_REMOTION/OUT/

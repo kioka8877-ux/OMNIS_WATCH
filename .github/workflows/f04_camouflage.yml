@@ -1,0 +1,32 @@
+# F04 CAMOUFLAGE — Nettoyage + Loudnorm (FFmpeg)
+# Trigger: workflow_dispatch (manuel, depuis l'executeur)
+# Heritage: F04_HELBRECHT (CRUSADER)
+name: F04 Camouflage
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Mode (alpha)'
+        required: true
+        default: 'alpha'
+
+permissions:
+  contents: write
+
+jobs:
+  f04:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Run F04
+        run: |
+          echo "F04 CAMOUFLAGE — A developper (heritage CRUSADER)"
+          # python alpha/F04_CAMOUFLAGE/CODEBASE/omnis_f04.py ...
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: f04-output
+          path: alpha/F04_CAMOUFLAGE/OUT/

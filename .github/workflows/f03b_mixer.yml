@@ -1,0 +1,31 @@
+# F03B MIXER — Mixage SFX (FFmpeg)
+# Trigger: workflow_dispatch (manuel, depuis l'executeur)
+name: F03B Mixer
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Mode (alpha)'
+        required: true
+        default: 'alpha'
+
+permissions:
+  contents: write
+
+jobs:
+  f03b:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Run F03B
+        run: |
+          echo "F03B MIXER — A developper"
+          # python alpha/F03_RENDER/F03B_MIXER/CODEBASE/omnis_f03b_mixer.py ...
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: f03b-output
+          path: alpha/F03_RENDER/F03B_MIXER/OUT/

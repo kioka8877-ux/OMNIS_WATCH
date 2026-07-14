@@ -1,0 +1,23 @@
+# Docker Build — Image Remotion custom pour F03A
+# Trigger: push sur F03A/CODEBASE/Dockerfile
+name: Docker Build
+
+on:
+  push:
+    paths:
+      - 'alpha/F03_RENDER/F03A_REMOTION/CODEBASE/Dockerfile'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: |
+          echo "Docker build — A developper"
+          # docker build -t omnis-remotion:latest alpha/F03_RENDER/F03A_REMOTION/CODEBASE/

@@ -1,0 +1,39 @@
+# F02A VISION — Tracking MediaPipe (la description OpenRouter se fait dans le sandbox)
+# Trigger: workflow_dispatch (manuel, depuis l'executeur)
+name: F02A Tracking
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Mode (alpha)'
+        required: true
+        default: 'alpha'
+      target_type:
+        description: 'Cible (face, hand, dog)'
+        required: true
+        default: 'face'
+
+permissions:
+  contents: write
+
+jobs:
+  f02a:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install MediaPipe
+        run: pip install mediapipe opencv-python
+      - name: Run F02A Tracking
+        run: |
+          echo "F02A TRACKING — A developper"
+          # python alpha/F02_ANALYSIS/F02A_VISION/CODEBASE/omnis_f02a_track.py ...
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: f02a-output
+          path: alpha/F02_ANALYSIS/F02A_VISION/OUT/

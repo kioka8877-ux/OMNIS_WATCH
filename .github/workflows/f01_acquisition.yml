@@ -1,0 +1,53 @@
+# F01 ACQUISITION — Decoupe video (FFmpeg)
+# Trigger: workflow_dispatch (manuel, depuis l'executeur)
+name: F01 Acquisition
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Mode (alpha)'
+        required: true
+        default: 'alpha'
+      in_timestamp:
+        description: 'Timestamp IN (ex: 00:02)'
+        required: true
+      out_timestamp:
+        description: 'Timestamp OUT (ex: 00:15)'
+        required: true
+      format:
+        description: 'Format (9:16, 16:9, 1:1)'
+        required: true
+        default: '9:16'
+      blur_pad:
+        description: 'Blur pad (true/false)'
+        required: false
+        default: 'true'
+      speed:
+        description: 'Vitesse (ex: 1.0)'
+        required: false
+        default: '1.0'
+      volume:
+        description: 'Volume (ex: 1.0)'
+        required: false
+        default: '1.0'
+
+permissions:
+  contents: write
+
+jobs:
+  f01:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Run F01
+        run: |
+          echo "F01 ACQUISITION — A developper"
+          # python alpha/F01_ACQUISITION/CODEBASE/omnis_f01.py ...
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: f01-output
+          path: alpha/F01_ACQUISITION/OUT/
