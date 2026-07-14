@@ -11,7 +11,7 @@
 | 2026-07-14 | Structure creee | En attente de developpement |
 | 2026-07-14 | App.jsx + main.jsx developpes | Player @remotion/player integre |
 | 2026-07-14 | OmniComposition.jsx copie | Composant identique a F03A |
-| 2026-07-14 | App.jsx rewrite | Chargement dynamique codex + video |
+| 2026-07-14 | App.jsx rewrite | Chargement dynamique codex + video via fetch |
 
 ## Tests
 | # | Date | Codex | Build | Preview | Statut |
