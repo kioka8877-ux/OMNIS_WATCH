@@ -11,7 +11,7 @@
 |---------|-----|------|--------|--------------------|
 | F01 | ACQUISITION | FFmpeg coupe + format + vitesse + volume | CODE COMPLETE | 2026-07-14 |
 | F02A | VISION | OpenRouter Vision (description) + MediaPipe (tracking) | CODE COMPLETE | 2026-07-14 |
-| F02B | ORACLE | Metaprompt emotionnel → codex.json | EN DEVELOPPEMENT | — |
+| F02B | ORACLE | Metaprompt emotionnel → codex.json | CODE COMPLETE | 2026-07-14 |
 | F02 | PREVIEW | Apercu temps reel @remotion/player | EN DEVELOPPEMENT | — |
 | F03A | REMOTION | Rendu visuel (texte, zoom, tracking, couleurs) | EN DEVELOPPEMENT | — |
 | F03B | MIXER | Mixage SFX | EN DEVELOPPEMENT | — |
