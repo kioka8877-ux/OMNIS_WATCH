@@ -14,7 +14,7 @@
 | F02B | ORACLE | Metaprompt emotionnel → codex.json | CODE COMPLETE | 2026-07-14 |
 | F02 | PREVIEW | Apercu temps reel @remotion/player | EN DEVELOPPEMENT | — |
 | F03A | REMOTION | Rendu visuel (texte, zoom, tracking, couleurs) | EN DEVELOPPEMENT | — |
-| F03B | MIXER | Mixage SFX | EN DEVELOPPEMENT | — |
+| F03B | MIXER | Mixage SFX | CODE COMPLETE | 2026-07-14 |
 | F04 | CAMOUFLAGE | Wipe metadonnees + Loudnorm | EN DEVELOPPEMENT (heritage CRUSADER) | — |
 | F05 | LUTHER | Effacement empreinte numerique | HORS SCOPE V1 (heritage CRUSADER) | — |
 | META | METAPROMPTS | Guide operateur (emotion) | EN DEVELOPPEMENT | — |
