@@ -264,7 +264,7 @@ def run_ffmpeg(input_path, output_path, in_ts, out_ts, fmt, blur_pad,
     cmd.extend([
         "-c:v", "libx264",
         "-preset", "fast",
-        "-crf", "18",
+        "-crf", "23",
         "-pix_fmt", "yuv420p",
         "-r", str(DEFAULT_FPS),
         "-c:a", "aac",
