@@ -1,27 +1,329 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OMNIS-WATCH — Gate 1 Viewer</title>
-  <script
-    src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.0/dist/index.global.js"
-    integrity="sha384-nWTzRTCY/9V4Bo352ehygr1c4cnst4XN6lMR3fipakEQrhVpc0hEM5Dii3Amz0sT"
-    crossorigin="anonymous"
-  ></script>
-  <style type="text/tailwindcss">
-    @custom-variant dark (&:where(.dark, .dark *));
-  </style>
-  <script>
-    document.documentElement.classList.toggle(
-      'dark',
-      window.matchMedia('(prefers-color-scheme: dark)').matches
-    );
-  </script>
-  <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚔ OMNIS-WATCH — Gate 1 Viewer</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0a; color: #e0e0e0; font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; padding: 20px; max-width: 900px; margin: 0 auto; }
+  .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 12px; margin-bottom: 20px; }
+  .header h1 { font-size: 1.3rem; letter-spacing: 3px; }
+  .header .branch { font-family: 'Courier New', monospace; font-size: 0.7rem; color: #555; }
+  .section { margin-bottom: 20px; }
+  .section-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: #888; margin-bottom: 8px; border-left: 3px solid #8b0000; padding-left: 10px; }
+  .upload-zone { border: 1px dashed #333; background: #111; border-radius: 2px; padding: 30px; text-align: center; cursor: pointer; }
+  .upload-zone:hover { border-color: #8b0000; }
+  .upload-zone.dragover { border-color: #8b0000; background: #1a0a0a; }
+  .upload-zone p { color: #555; font-size: 0.85rem; }
+  .upload-zone input { display: none; }
+  .video-container { display: none; margin-top: 12px; }
+  .video-container video { width: 100%; max-height: 400px; border: 1px solid #333; border-radius: 2px; display: block; background: #000; }
+  .metrics { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+  .metric { background: #111; border: 1px solid #333; border-radius: 2px; padding: 8px 14px; min-width: 90px; }
+  .metric-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 3px; }
+  .metric-value { font-size: 0.9rem; color: #e0e0e0; font-family: 'Courier New', monospace; }
+  .timeline-container { margin-top: 16px; }
+  .timeline-bar { position: relative; height: 50px; background: #111; border: 1px solid #333; border-radius: 2px; cursor: crosshair; overflow: hidden; }
+  .timeline-progress { position: absolute; top: 0; left: 0; height: 100%; background: rgba(139,0,0,0.15); pointer-events: none; }
+  .timeline-selection { position: absolute; top: 0; height: 100%; background: rgba(139,0,0,0.35); border-left: 2px solid #e0e0e0; border-right: 2px solid #e0e0e0; pointer-events: none; display: none; }
+  .timeline-marker { position: absolute; top: 0; height: 100%; width: 2px; background: #8b0000; pointer-events: none; }
+  .timeline-labels { display: flex; justify-content: space-between; margin-top: 6px; font-family: 'Courier New', monospace; font-size: 0.7rem; color: #555; }
+  .marker-btns { display: flex; gap: 8px; margin-top: 10px; }
+  .marker-btn { flex: 1; padding: 10px; background: #111; border: 1px solid #333; border-radius: 2px; color: #c0c0c0; font-size: 0.8rem; cursor: pointer; text-align: center; transition: all 0.15s; }
+  .marker-btn:hover { border-color: #8b0000; color: #e0e0e0; }
+  .marker-btn.in { border-color: #2e7d32; }
+  .marker-btn.in:hover { background: #1b2e1b; }
+  .marker-btn.out { border-color: #c62828; }
+  .marker-btn.out:hover { background: #2e1b1b; }
+  .marker-btn.clear { border-color: #555; }
+  .dur-badge { display: inline-block; background: #1a1a1a; border: 1px solid #333; border-radius: 2px; padding: 6px 14px; font-family: 'Courier New', monospace; font-size: 0.8rem; color: #aaa; margin-top: 10px; }
+  .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 600px) { .config-grid { grid-template-columns: 1fr; } }
+  .format-btns { display: flex; gap: 8px; }
+  .format-btn { flex: 1; padding: 12px; background: #111; border: 1px solid #333; border-radius: 2px; color: #888; font-size: 0.8rem; cursor: pointer; text-align: center; transition: all 0.15s; }
+  .format-btn:hover { border-color: #555; color: #c0c0c0; }
+  .format-btn.active { border-color: #8b0000; background: #1a0a0a; color: #e0e0e0; }
+  .format-btn .res { font-size: 0.65rem; color: #555; margin-top: 4px; }
+  .format-btn.active .res { color: #888; }
+  .toggle-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  .toggle-row label { font-size: 0.8rem; color: #aaa; }
+  .toggle-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: #8b0000; }
+  .slider-row { margin-top: 12px; }
+  .slider-row label { font-size: 0.8rem; color: #aaa; display: flex; justify-content: space-between; margin-bottom: 6px; }
+  .slider-row label .val { color: #e0e0e0; font-family: 'Courier New', monospace; }
+  .slider-row input[type="range"] { width: 100%; accent-color: #8b0000; }
+  .hidden { display: none !important; }
+  .divider { border-top: 1px solid #222; margin: 20px 0; }
+  .generate-btn { width: 100%; padding: 14px; background: #8b0000; border: none; border-radius: 2px; color: #fff; font-size: 0.9rem; font-weight: bold; letter-spacing: 2px; cursor: pointer; transition: background 0.15s; }
+  .generate-btn:hover { background: #a01515; }
+  .json-section { display: none; margin-top: 16px; }
+  .json-box { background: #111; border: 1px solid #333; border-radius: 2px; padding: 14px; font-family: 'Courier New', monospace; font-size: 0.75rem; white-space: pre-wrap; word-break: break-all; color: #4ecca3; max-height: 300px; overflow-y: auto; }
+  .json-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .json-btn { padding: 8px 16px; background: #111; border: 1px solid #333; border-radius: 2px; color: #c0c0c0; font-size: 0.8rem; cursor: pointer; transition: all 0.15s; }
+  .json-btn:hover { border-color: #555; color: #e0e0e0; }
+  .json-instructions { margin-top: 12px; padding: 12px; background: #0d0d0d; border: 1px solid #222; border-radius: 2px; font-size: 0.75rem; color: #777; line-height: 1.6; }
+  .json-instructions strong { color: #aaa; }
+</style>
 </head>
-<body class="min-h-dvh text-sm antialiased bg-gray-950 text-gray-100">
-  <div id="app"></div>
-  <script src="app.js"></script>
+<body>
+
+<div class="header">
+  <h1>⚔ OMNIS-WATCH</h1>
+  <span class="branch">Gate 1 — alpha</span>
+</div>
+
+<!-- Section 1: Upload -->
+<div class="section">
+  <div class="section-title">📥 Source</div>
+  <div class="upload-zone" id="uploadZone">
+    <p>Charger la vidéo (cliquer ou déposer)</p>
+    <p style="margin-top:6px;font-size:0.7rem;color:#444">La vidéo reste 100% locale</p>
+    <input type="file" id="fileInput" accept="video/*">
+  </div>
+  <div class="video-container" id="videoContainer">
+    <video id="video" controls></video>
+    <div class="metrics">
+      <div class="metric"><div class="metric-label">Résolution</div><div class="metric-value" id="mRes">—</div></div>
+      <div class="metric"><div class="metric-label">Durée</div><div class="metric-value" id="mDur">—</div></div>
+      <div class="metric"><div class="metric-label">Audio</div><div class="metric-value" id="mAudio">—</div></div>
+      <div class="metric"><div class="metric-label">Taille</div><div class="metric-value" id="mSize">—</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 2: Timeline -->
+<div class="section hidden" id="timelineSection">
+  <div class="section-title">⏱ Timeline — cliquer sur la barre pour positionner le curseur</div>
+  <div class="timeline-bar" id="timelineBar">
+    <div class="timeline-progress" id="timelineProgress"></div>
+    <div class="timeline-selection" id="timelineSelection"></div>
+    <div class="timeline-marker" id="timelineMarker"></div>
+  </div>
+  <div class="timeline-labels">
+    <span id="labelStart">00:00.0</span>
+    <span id="labelCurrent">00:00.0</span>
+    <span id="labelEnd">00:00.0</span>
+  </div>
+  <div class="marker-btns">
+    <button class="marker-btn in" onclick="setIn()">● IN (début)</button>
+    <button class="marker-btn out" onclick="setOut()">● OUT (fin)</button>
+    <button class="marker-btn clear" onclick="clearSelection()">✕ Effacer</button>
+  </div>
+  <div class="dur-badge" id="durBadge">Sélection: —</div>
+</div>
+
+<div class="divider hidden" id="divider1"></div>
+
+<!-- Section 3: Configuration -->
+<div class="section hidden" id="configSection">
+  <div class="section-title">⚙ Configuration</div>
+  <div class="config-grid">
+    <!-- Format -->
+    <div>
+      <label style="font-size:0.8rem;color:#aaa;display:block;margin-bottom:8px">📐 Format</label>
+      <div class="format-btns">
+        <div class="format-btn active" data-w="1080" data-h="1920" onclick="selectFormat(this)">9:16<div class="res">1080×1920</div></div>
+        <div class="format-btn" data-w="1920" data-h="1080" onclick="selectFormat(this)">16:9<div class="res">1920×1080</div></div>
+        <div class="format-btn" data-w="1080" data-h="1080" onclick="selectFormat(this)">1:1<div class="res">1080×1080</div></div>
+      </div>
+      <div class="toggle-row hidden" id="blurRow">
+        <input type="checkbox" id="blurPad" checked>
+        <label for="blurPad">Blur-pad (fond flouté)</label>
+      </div>
+    </div>
+    <!-- Speed + Volume -->
+    <div>
+      <div class="slider-row">
+        <label>⚡ Speed <span class="val" id="speedVal">1.00x</span></label>
+        <input type="range" id="speedSlider" min="0.25" max="3" step="0.25" value="1.0">
+      </div>
+      <div class="slider-row">
+        <label>🔊 Volume <span class="val" id="volumeVal">100%</span></label>
+        <input type="range" id="volumeSlider" min="0" max="300" step="5" value="100">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider hidden" id="divider2"></div>
+
+<!-- Section 4: Generate -->
+<div class="section hidden" id="generateSection">
+  <div class="section-title">⚔ Générer Config ⚔</div>
+  <button class="generate-btn" onclick="generateJSON()">GÉNÉRER GATE 1 JSON</button>
+  <div class="json-section" id="jsonSection">
+    <div class="section-title" style="margin-top:16px">📋 JSON — copier dans le chat</div>
+    <div class="json-box" id="jsonBox"></div>
+    <div class="json-actions">
+      <button class="json-btn" onclick="copyJSON()">📋 Copier</button>
+      <button class="json-btn" onclick="downloadJSON()">📥 Télécharger</button>
+    </div>
+    <div class="json-instructions">
+      <strong>→ Copie ce JSON</strong><br>
+      <strong>→ Upload ta vidéo dans le chat</strong><br>
+      <strong>→ Colle le JSON dans le chat</strong><br>
+      <strong>→ Le système lance F01 sur GitHub Actions</strong>
+    </div>
+  </div>
+</div>
+
+<script>
+  let video = document.getElementById('video');
+  let timelineBar = document.getElementById('timelineBar');
+  let inPoint = null, outPoint = null;
+  let selectedFormat = { w: 1080, h: 1920 };
+  let duration = 0;
+  let videoFile = null;
+
+  // ── Upload ──
+  const uploadZone = document.getElementById('uploadZone');
+  const fileInput = document.getElementById('fileInput');
+  uploadZone.addEventListener('click', () => fileInput.click());
+  uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+  uploadZone.addEventListener('drop', e => { e.preventDefault(); uploadZone.classList.remove('dragover'); if (e.dataTransfer.files.length) loadFile(e.dataTransfer.files[0]); });
+  fileInput.addEventListener('change', e => { if (e.target.files.length) loadFile(e.target.files[0]); });
+
+  function loadFile(file) {
+    videoFile = file;
+    video.src = URL.createObjectURL(file);
+    video.load();
+    video.addEventListener('loadedmetadata', () => {
+      duration = video.duration;
+      document.getElementById('mRes').textContent = video.videoWidth + '×' + video.videoHeight;
+      document.getElementById('mDur').textContent = duration.toFixed(1) + 's';
+      document.getElementById('mSize').textContent = (file.size/1024/1024).toFixed(1) + ' MB';
+      document.getElementById('mAudio').textContent = 'OUI';
+      document.getElementById('labelEnd').textContent = formatTime(duration);
+      document.getElementById('labelStart').textContent = '00:00.0';
+
+      uploadZone.classList.add('hidden');
+      document.getElementById('videoContainer').classList.remove('hidden');
+      document.getElementById('videoContainer').style.display = 'block';
+      document.getElementById('timelineSection').classList.remove('hidden');
+      document.getElementById('configSection').classList.remove('hidden');
+      document.getElementById('divider1').classList.remove('hidden');
+      document.getElementById('generateSection').classList.remove('hidden');
+    }, { once: true });
+  }
+
+  // ── Timeline ──
+  video.addEventListener('timeupdate', () => {
+    if (duration > 0) {
+      const pct = (video.currentTime / duration) * 100;
+      document.getElementById('timelineProgress').style.width = pct + '%';
+      document.getElementById('timelineMarker').style.left = pct + '%';
+      document.getElementById('labelCurrent').textContent = formatTime(video.currentTime);
+    }
+  });
+
+  timelineBar.addEventListener('click', (e) => {
+    const rect = timelineBar.getBoundingClientRect();
+    const pct = (e.clientX - rect.left) / rect.width;
+    video.currentTime = pct * duration;
+  });
+
+  function setIn() {
+    inPoint = video.currentTime;
+    updateSelection();
+  }
+
+  function setOut() {
+    outPoint = video.currentTime;
+    updateSelection();
+  }
+
+  function clearSelection() {
+    inPoint = null;
+    outPoint = null;
+    document.getElementById('timelineSelection').style.display = 'none';
+    document.getElementById('durBadge').textContent = 'Sélection: —';
+  }
+
+  function updateSelection() {
+    if (inPoint !== null && outPoint !== null && outPoint > inPoint) {
+      const leftPct = (inPoint / duration) * 100;
+      const widthPct = ((outPoint - inPoint) / duration) * 100;
+      const sel = document.getElementById('timelineSelection');
+      sel.style.left = leftPct + '%';
+      sel.style.width = widthPct + '%';
+      sel.style.display = 'block';
+      document.getElementById('durBadge').textContent = 'Sélection: ' + inPoint.toFixed(1) + 's → ' + outPoint.toFixed(1) + 's (' + (outPoint-inPoint).toFixed(1) + 's)';
+    } else if (inPoint !== null) {
+      document.getElementById('durBadge').textContent = 'IN: ' + inPoint.toFixed(1) + 's — clique OUT';
+    } else if (outPoint !== null) {
+      document.getElementById('durBadge').textContent = 'OUT: ' + outPoint.toFixed(1) + 's — clique IN';
+    }
+  }
+
+  function formatTime(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return String(m).padStart(2,'0') + ':' + s.toFixed(1).padStart(4,'0');
+  }
+
+  // ── Format ──
+  function selectFormat(el) {
+    document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    selectedFormat = { w: parseInt(el.dataset.w), h: parseInt(el.dataset.h) };
+    const blurRow = document.getElementById('blurRow');
+    if (selectedFormat.w === 1080 && selectedFormat.h === 1920) {
+      blurRow.classList.remove('hidden');
+    } else {
+      blurRow.classList.add('hidden');
+      document.getElementById('blurPad').checked = false;
+    }
+  }
+
+  // ── Sliders ──
+  document.getElementById('speedSlider').addEventListener('input', e => { document.getElementById('speedVal').textContent = parseFloat(e.target.value).toFixed(2) + 'x'; });
+  document.getElementById('volumeSlider').addEventListener('input', e => { document.getElementById('volumeVal').textContent = e.target.value + '%'; });
+
+  // ── Generate JSON ──
+  function generateJSON() {
+    if (inPoint === null || outPoint === null) {
+      alert('Clique sur IN et OUT sur la timeline d\'abord !');
+      return;
+    }
+
+    const config = {
+      source_file: videoFile ? videoFile.name : 'video_raw.mp4',
+      in_timestamp: inPoint.toFixed(3),
+      out_timestamp: outPoint.toFixed(3),
+      format: selectedFormat.w + ':' + selectedFormat.h,
+      width: selectedFormat.w,
+      height: selectedFormat.h,
+      blur_pad: document.getElementById('blurPad').checked,
+      speed: parseFloat(document.getElementById('speedSlider').value),
+      volume: parseInt(document.getElementById('volumeSlider').value) / 100,
+      selection_duration: parseFloat((outPoint - inPoint).toFixed(2)),
+      video_duration: parseFloat(duration.toFixed(2))
+    };
+
+    document.getElementById('jsonBox').textContent = JSON.stringify(config, null, 2);
+    document.getElementById('jsonSection').style.display = 'block';
+    document.getElementById('jsonSection').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function copyJSON() {
+    navigator.clipboard.writeText(document.getElementById('jsonBox').textContent).then(() => {
+      event.target.textContent = '✅ Copié !';
+      setTimeout(() => { event.target.textContent = '📋 Copier'; }, 2000);
+    });
+  }
+
+  function downloadJSON() {
+    const json = document.getElementById('jsonBox').textContent;
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'gate1_config.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+</script>
 </body>
 </html>
