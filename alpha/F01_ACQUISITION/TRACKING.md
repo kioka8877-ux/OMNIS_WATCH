@@ -29,6 +29,7 @@
 - Volume : volume= filter
 - FPS cible : 30 (configurable)
 - Manifest : JSON avec meta (fps, duree, frames, resolution) + input + output
+- Viewer Gate 1 : HTML/JS dans VIEWER/ (upload + IN/OUT + format + blur-pad + vitesse + volume)
 
 ## Fonctionnalites validees
 - [x] Coupe IN/OUT
