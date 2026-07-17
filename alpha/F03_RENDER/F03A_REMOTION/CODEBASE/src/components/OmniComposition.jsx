@@ -21,8 +21,14 @@ export const OmniComposition = ({ codex, videoSrc }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames, width, height } = useVideoConfig();
 
-  // Guard: si le codex n'est pas chargé, ne rien rendre
-  if (!codex) return null;
+  // Guard: si le codex n'est pas chargé, afficher un message d'erreur visible
+  if (!codex) {
+    return (
+      <AbsoluteFill style={{ background: '#ff0000', justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{ color: '#fff', fontSize: 48, fontWeight: 900 }}>CODEX MANQUANT</div>
+      </AbsoluteFill>
+    );
+  }
 
   // Calculer le zoom actuel basé sur les keyframes
   const currentZoom = getCurrentZoom(frame, codex.zoom_keyframes || []);
