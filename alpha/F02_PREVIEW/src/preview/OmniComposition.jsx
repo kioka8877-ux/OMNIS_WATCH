@@ -7,7 +7,6 @@ import {
   OffthreadVideo,
   Sequence,
 } from 'remotion';
-import { BloomText } from './BloomText';
 
 /* ──────────────────────────────────────────────────────────────
  * OmniComposition — Composition principale OMNIS-WATCH
@@ -94,7 +93,7 @@ export const OmniComposition = ({ codex, videoSrc }) => {
         </AbsoluteFill>
       )}
 
-      {/* Layer 4: Text overlays — BloomText (SVG bloom + CSS 3D) */}
+      {/* Layer 4: Text overlays */}
       {(codex.text_overlays || []).map((overlay, index) => {
         const startFrame = overlay.start_frame || 0;
         const endFrame = overlay.end_frame || durationInFrames;
@@ -102,12 +101,7 @@ export const OmniComposition = ({ codex, videoSrc }) => {
         if (frame < startFrame || frame > endFrame) return null;
 
         return (
-          <BloomText
-            key={overlay.id || index}
-            overlay={overlay}
-            frame={frame}
-            fps={fps}
-          />
+          <TextOverlay key={overlay.id || index} overlay={overlay} frame={frame} fps={fps} />
         );
       })}
     </AbsoluteFill>
