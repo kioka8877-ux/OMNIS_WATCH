@@ -7,6 +7,7 @@ import {
   OffthreadVideo,
   Sequence,
 } from 'remotion';
+import { BloomText } from './BloomText';
 
 /* ──────────────────────────────────────────────────────────────
  * OmniComposition — Composition principale OMNIS-WATCH
