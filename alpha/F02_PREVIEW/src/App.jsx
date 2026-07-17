@@ -179,6 +179,12 @@ export default function App() {
             >
               🎨 Effets
             </button>
+            <button
+              style={activeTab === 'sharp' ? styles.tabActive : styles.tab}
+              onClick={() => setActiveTab('sharp')}
+            >
+              🔍 Netteté
+            </button>
           </div>
 
           {/* Text panel */}
@@ -355,8 +361,7 @@ export default function App() {
 
           {/* Effects panel */}
           {activeTab === 'effects' && (
-            <div style={styles.panelContent}>
-              {/* Color preset */}
+            <div style={styles.panelContent}>              {/* Color preset */}
               <label style={styles.label}>Color preset</label>
               <select
                 style={styles.select}
@@ -449,6 +454,67 @@ export default function App() {
                   setCodex(newCodex);
                 }}
               />
+            </div>
+          )}
+
+          {/* Sharpness panel */}
+          {activeTab === 'sharp' && (
+            <div style={styles.panelContent}>
+              <label style={styles.label}>
+                Sharpening: {codex.sharpening || 0}%
+              </label>
+              <input
+                style={styles.slider}
+                type="range"
+                min="0"
+                max="100"
+                value={codex.sharpening || 0}
+                onChange={(e) => updateCodexField('sharpening', parseInt(e.target.value))}
+              />
+
+              <label style={styles.label}>
+                Débruitage: {codex.denoising || 0}%
+              </label>
+              <input
+                style={styles.slider}
+                type="range"
+                min="0"
+                max="100"
+                value={codex.denoising || 0}
+                onChange={(e) => updateCodexField('denoising', parseInt(e.target.value))}
+              />
+
+              <label style={styles.label}>
+                Grain: {Math.round((codex.grain_intensity || 0) * 100)}%
+              </label>
+              <input
+                style={styles.slider}
+                type="range"
+                min="0"
+                max="100"
+                value={Math.round((codex.grain_intensity || 0) * 100)}
+                onChange={(e) =>
+                  updateCodexField('grain_intensity', parseInt(e.target.value) / 100)
+                }
+              />
+
+              <label style={styles.label}>
+                <input
+                  type="checkbox"
+                  checked={codex.enhance_4k || false}
+                  onChange={(e) => updateCodexField('enhance_4k', e.target.checked)}
+                  style={{ marginRight: '8px' }}
+                />
+                Enhance 4K
+              </label>
+
+              <div style={{ marginTop: '12px', padding: '10px', background: '#1a1a1a', borderRadius: '8px', fontSize: '12px', color: '#888' }}>
+                <strong style={{ color: '#00ff88' }}>Valeurs de référence (vidéo analysée) :</strong>
+                <br />
+                Sharpening: 75% | Débruitage: 15% | Grain: 15%
+                <br />
+                En production (F01) : unsharp=5:5:1.5 + hqdn3d=1.5:1.5:6
+              </div>
             </div>
           )}
 

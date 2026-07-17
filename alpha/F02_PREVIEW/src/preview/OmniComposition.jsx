@@ -29,7 +29,17 @@ export const OmniComposition = ({ codex, videoSrc }) => {
   const enhanceFilter = codex.enhance_4k
     ? ' contrast(1.15) saturate(1.2) brightness(1.08)'
     : '';
-  const fullFilter = (colorFilter + enhanceFilter).trim();
+
+  // Sharpening (simulé via CSS drop-shadow + contrast)
+  const sharpening = codex.sharpening || 0;
+  const denoising = codex.denoising || 0;
+  let sharpFilter = '';
+  if (sharpening > 0) {
+    const s = sharpening / 100;
+    sharpFilter = ` contrast(${1 + s * 0.15}) drop-shadow(0 0 ${s * 0.5}px rgba(255,255,255,${s * 0.15}))`;
+  }
+
+  const fullFilter = (colorFilter + enhanceFilter + sharpFilter).trim();
 
   // Vignette
   const vignetteOpacity = codex.vignette || 0;
