@@ -54,24 +54,23 @@ export const OmniComposition = ({ codex, videoSrc }) => {
   const isSlowmo = frame >= slowmoStart && slowmoSpeed < 1.0;
   const playbackRate = isSlowmo ? slowmoSpeed : 1.0;
 
-  // Camera shake au moment du cut (pas un flash blanc)
-  const shakeIntensity = codex.cut_flash_frames || 0; // on réutilise ce champ
+  // Camera shake au moment du cut — purement vertical, fluide
+  const shakePower = codex.shake_power || 50; // 0-100%
   const shakeFrame = slowmoStart;
-  const isShaking = shakeIntensity > 0 && frame >= shakeFrame && frame < shakeFrame + shakeIntensity * 3;
+  const shakeDuration = 20; // frames de shake
+  const isShaking = shakePower > 0 && frame >= shakeFrame && frame < shakeFrame + shakeDuration;
   let shakeX = 0, shakeY = 0;
   if (isShaking) {
-    const shakeProgress = (frame - shakeFrame) / (shakeIntensity * 3);
-    const shakeAmp = (1 - shakeProgress) * (shakeIntensity / 3); // décroissant
-    shakeX = Math.sin(frame * 1.5) * shakeAmp * 15;
-    shakeY = Math.cos(frame * 2.3) * shakeAmp * 10;
+    const shakeProgress = (frame - shakeFrame) / shakeDuration;
+    // Amplitude décroissante smooth (ease-out)
+    const decay = Math.pow(1 - shakeProgress, 2);
+    const amp = (shakePower / 100) * decay * 20; // max 20px à 100%
+    // Onde sinusoïdale pure verticale — fluide, pas saccadé
+    shakeY = Math.sin((frame - shakeFrame) * 0.8) * amp;
+    shakeX = 0; // pas de mouvement horizontal
   }
 
-  // Flash blanc au moment du cut
-  const flashFrame = slowmoStart;
-  const showFlash = cutFlashFrames > 0 && frame >= flashFrame && frame < flashFrame + cutFlashFrames;
-  const flashOpacity = showFlash
-    ? interpolate(frame - flashFrame, [0, cutFlashFrames], [0.8, 0], { extrapolateRight: 'clamp' })
-    : 0;
+  // Pas de flash blanc — juste le shake
 
   return (
     <AbsoluteFill style={{ background: '#000', overflow: 'hidden' }}>
@@ -91,19 +90,7 @@ export const OmniComposition = ({ codex, videoSrc }) => {
         />
       </AbsoluteFill>
 
-      {/* Layer 2: Flash blanc léger au moment du cut */}
-      {flashOpacity > 0 && (
-        <AbsoluteFill
-          style={{
-            background: '#FFFFFF',
-            opacity: flashOpacity * 0.3,
-            pointerEvents: 'none',
-            zIndex: 5,
-          }}
-        />
-      )}
-
-      {/* Layer 2b: Badge SLOW MOTION */}
+      {/* Layer 2: Badge SLOW MOTION */}
       {isSlowmo && (
         <div
           style={{

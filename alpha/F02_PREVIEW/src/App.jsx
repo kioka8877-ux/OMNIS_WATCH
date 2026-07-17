@@ -457,15 +457,15 @@ export default function App() {
                 />
 
                 <label style={styles.label}>
-                  Camera shake: {codex.cut_flash_frames || 0} frames
+                  Puissance du shake: {codex.shake_power || 0}%
                 </label>
                 <input
                   style={styles.slider}
                   type="range"
                   min="0"
-                  max="10"
-                  value={codex.cut_flash_frames || 0}
-                  onChange={(e) => updateCodexField('cut_flash_frames', parseInt(e.target.value))}
+                  max="100"
+                  value={codex.shake_power || 0}
+                  onChange={(e) => updateCodexField('shake_power', parseInt(e.target.value))}
                 />
               </div>
 
