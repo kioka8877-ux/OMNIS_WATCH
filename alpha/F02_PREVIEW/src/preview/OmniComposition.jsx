@@ -7,6 +7,7 @@ import {
   OffthreadVideo,
   Sequence,
 } from 'remotion';
+import { Text3DLayer } from './Text3DLayer';
 
 /* ──────────────────────────────────────────────────────────────
  * OmniComposition — Composition principale OMNIS-WATCH
@@ -99,6 +100,18 @@ export const OmniComposition = ({ codex, videoSrc }) => {
         const endFrame = overlay.end_frame || durationInFrames;
 
         if (frame < startFrame || frame > endFrame) return null;
+
+        // Utiliser Text3DLayer si glow ou depth_3d > 0, sinon TextOverlay 2D
+        if ((overlay.glow_intensity || 0) > 0 || (overlay.depth_3d || 0) > 0) {
+          return (
+            <Text3DLayer
+              key={overlay.id || index}
+              overlay={overlay}
+              frame={frame}
+              fps={fps}
+            />
+          );
+        }
 
         return (
           <TextOverlay key={overlay.id || index} overlay={overlay} frame={frame} fps={fps} />
