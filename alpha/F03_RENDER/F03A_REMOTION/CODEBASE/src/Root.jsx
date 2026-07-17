@@ -1,15 +1,7 @@
 import React from 'react';
-import { Composition } from 'remotion';
+import { Composition, staticFile } from 'remotion';
 import { OmniComposition } from './components/OmniComposition';
-
-/**
- * Root — Enregistre les compositions Remotion
- * 
- * Lit le codex.json depuis public/ et le passe a OmniComposition.
- */
 import codex from '../public/codex.json';
-
-const VIDEO_SRC = '../public/video_coupee.mp4';
 
 export const Root = () => {
   const fps = codex.video?.fps || 30;
@@ -28,7 +20,7 @@ export const Root = () => {
         height={height}
         props={{
           codex,
-          videoSrc: VIDEO_SRC,
+          videoSrc: staticFile('video_coupee.mp4'),
         }}
       />
     </>
