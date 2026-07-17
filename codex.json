@@ -127,6 +127,7 @@
   ],
   "slowmo_start_frame": 720,
   "slowmo_speed": 0.4,
+  "shake_power": 60,
   "cut_flash_frames": 3,
   "tracking_source": "tracking_data.json",
   "grain_intensity": 0.15
