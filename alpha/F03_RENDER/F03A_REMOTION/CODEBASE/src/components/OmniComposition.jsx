@@ -6,6 +6,7 @@ import {
   interpolate,
   OffthreadVideo,
   Sequence,
+  staticFile,
 } from 'remotion';
 import { codex as codexData } from '../codexData';
 
@@ -18,12 +19,15 @@ import { codex as codexData } from '../codexData';
  *   videoSrc: string — chemin vers video_coupee.mp4
  * ────────────────────────────────────────────────────────────── */
 
-export const OmniComposition = ({ codex: codexProp, videoSrc }) => {
+export const OmniComposition = ({ codex: codexProp }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames, width, height } = useVideoConfig();
 
   // Utiliser le codex importé directement (plus fiable que les props)
   const codex = codexProp || codexData;
+
+  // Video source hardcodé — staticFile résoud le chemin vers public/
+  const videoSrc = staticFile('video_coupee.mp4');
 
   // Guard: si le codex n'est pas chargé, afficher un message d'erreur visible
   if (!codex) {
