@@ -94,7 +94,7 @@ export const OmniComposition = ({ codex, videoSrc }) => {
         </AbsoluteFill>
       )}
 
-      {/* Layer 4: Text overlays */}
+      {/* Layer 4: Text overlays — BloomText (SVG bloom + CSS 3D) */}
       {(codex.text_overlays || []).map((overlay, index) => {
         const startFrame = overlay.start_frame || 0;
         const endFrame = overlay.end_frame || durationInFrames;
@@ -102,7 +102,12 @@ export const OmniComposition = ({ codex, videoSrc }) => {
         if (frame < startFrame || frame > endFrame) return null;
 
         return (
-          <TextOverlay key={overlay.id || index} overlay={overlay} frame={frame} fps={fps} />
+          <BloomText
+            key={overlay.id || index}
+            overlay={overlay}
+            frame={frame}
+            fps={fps}
+          />
         );
       })}
     </AbsoluteFill>
