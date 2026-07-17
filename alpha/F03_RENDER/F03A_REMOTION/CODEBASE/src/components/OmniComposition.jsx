@@ -21,6 +21,9 @@ export const OmniComposition = ({ codex, videoSrc }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames, width, height } = useVideoConfig();
 
+  // Guard: si le codex n'est pas chargé, ne rien rendre
+  if (!codex) return null;
+
   // Calculer le zoom actuel basé sur les keyframes
   const currentZoom = getCurrentZoom(frame, codex.zoom_keyframes || []);
 
