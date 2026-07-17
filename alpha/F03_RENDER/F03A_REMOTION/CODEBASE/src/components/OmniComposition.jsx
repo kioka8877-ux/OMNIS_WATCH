@@ -7,6 +7,7 @@ import {
   OffthreadVideo,
   Sequence,
 } from 'remotion';
+import { codex as codexData } from './codexData';
 
 /* ──────────────────────────────────────────────────────────────
  * OmniComposition — Composition principale OMNIS-WATCH
@@ -17,9 +18,12 @@ import {
  *   videoSrc: string — chemin vers video_coupee.mp4
  * ────────────────────────────────────────────────────────────── */
 
-export const OmniComposition = ({ codex, videoSrc }) => {
+export const OmniComposition = ({ codex: codexProp, videoSrc }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames, width, height } = useVideoConfig();
+
+  // Utiliser le codex importé directement (plus fiable que les props)
+  const codex = codexProp || codexData;
 
   // Guard: si le codex n'est pas chargé, afficher un message d'erreur visible
   if (!codex) {
