@@ -54,6 +54,18 @@ export const OmniComposition = ({ codex, videoSrc }) => {
   const isSlowmo = frame >= slowmoStart && slowmoSpeed < 1.0;
   const playbackRate = isSlowmo ? slowmoSpeed : 1.0;
 
+  // Camera shake au moment du cut (pas un flash blanc)
+  const shakeIntensity = codex.cut_flash_frames || 0; // on réutilise ce champ
+  const shakeFrame = slowmoStart;
+  const isShaking = shakeIntensity > 0 && frame >= shakeFrame && frame < shakeFrame + shakeIntensity * 3;
+  let shakeX = 0, shakeY = 0;
+  if (isShaking) {
+    const shakeProgress = (frame - shakeFrame) / (shakeIntensity * 3);
+    const shakeAmp = (1 - shakeProgress) * (shakeIntensity / 3); // décroissant
+    shakeX = Math.sin(frame * 1.5) * shakeAmp * 15;
+    shakeY = Math.cos(frame * 2.3) * shakeAmp * 10;
+  }
+
   // Flash blanc au moment du cut
   const flashFrame = slowmoStart;
   const showFlash = cutFlashFrames > 0 && frame >= flashFrame && frame < flashFrame + cutFlashFrames;
@@ -63,12 +75,12 @@ export const OmniComposition = ({ codex, videoSrc }) => {
 
   return (
     <AbsoluteFill style={{ background: '#000', overflow: 'hidden' }}>
-      {/* Layer 1: Vidéo source avec zoom + colorimétrie + slow motion */}
+      {/* Layer 1: Vidéo source avec zoom + colorimétrie + slow motion + shake */}
       <AbsoluteFill
         style={{
           transform: `scale(${currentZoom.scale}) translate(${
-            (0.5 - currentZoom.target_x) * -100
-          }%, ${(0.5 - currentZoom.target_y) * -100}%)`,
+            (0.5 - currentZoom.target_x) * -100 + shakeX
+          }%, ${(0.5 - currentZoom.target_y) * -100 + shakeY}%)`,
           filter: fullFilter || undefined,
         }}
       >
@@ -79,16 +91,38 @@ export const OmniComposition = ({ codex, videoSrc }) => {
         />
       </AbsoluteFill>
 
-      {/* Layer 2: Flash blanc au moment du cut brutal */}
+      {/* Layer 2: Flash blanc léger au moment du cut */}
       {flashOpacity > 0 && (
         <AbsoluteFill
           style={{
             background: '#FFFFFF',
-            opacity: flashOpacity,
+            opacity: flashOpacity * 0.3,
             pointerEvents: 'none',
             zIndex: 5,
           }}
         />
+      )}
+
+      {/* Layer 2b: Badge SLOW MOTION */}
+      {isSlowmo && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '5%',
+            right: '5%',
+            background: 'rgba(0,0,0,0.7)',
+            color: '#00ff88',
+            padding: '4px 12px',
+            borderRadius: '4px',
+            fontSize: '14px',
+            fontWeight: 900,
+            fontFamily: 'sans-serif',
+            pointerEvents: 'none',
+            zIndex: 20,
+          }}
+        >
+          SLOW MOTION
+        </div>
       )}
 
       {/* Layer 3: Vignette */}

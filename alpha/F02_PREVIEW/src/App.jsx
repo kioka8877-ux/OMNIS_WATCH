@@ -457,7 +457,7 @@ export default function App() {
                 />
 
                 <label style={styles.label}>
-                  Flash blanc: {codex.cut_flash_frames || 0} frames
+                  Camera shake: {codex.cut_flash_frames || 0} frames
                 </label>
                 <input
                   style={styles.slider}
