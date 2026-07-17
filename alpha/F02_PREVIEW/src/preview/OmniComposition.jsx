@@ -244,18 +244,19 @@ const TextOverlay = ({ overlay, frame, fps }) => {
             );
 
             return (
-              <span
-                key={i}
-                style={{
-                  display: 'inline-block',
-                  opacity: wordOpacity,
-                  transform: `scale(${wordScale})`,
-                  transition: 'none',
-                  marginRight: i < words.length - 1 ? '0.25em' : '0',
-                }}
-              >
-                {word}
-              </span>
+              <React.Fragment key={i}>
+                <span
+                  style={{
+                    display: 'inline-block',
+                    opacity: wordOpacity,
+                    transform: `scale(${wordScale})`,
+                    transition: 'none',
+                  }}
+                >
+                  {word}
+                </span>
+                {i < words.length - 1 ? '\u00A0' : ''}
+              </React.Fragment>
             );
           })}
         </div>
