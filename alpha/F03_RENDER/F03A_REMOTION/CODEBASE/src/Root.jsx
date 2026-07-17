@@ -1,13 +1,7 @@
 import React from 'react';
-import { Composition, staticFile, continueRender, delayRender } from 'remotion';
+import { Composition, staticFile } from 'remotion';
 import { OmniComposition } from './components/OmniComposition';
-import fs from 'fs';
-import path from 'path';
-
-// Read codex.json at build time
-const codexPath = path.join(process.cwd(), 'public', 'codex.json');
-const codexRaw = fs.readFileSync(codexPath, 'utf-8');
-const codex = JSON.parse(codexRaw);
+import { codex } from './codexData';
 
 export const Root = () => {
   const fps = codex.video?.fps || 30;

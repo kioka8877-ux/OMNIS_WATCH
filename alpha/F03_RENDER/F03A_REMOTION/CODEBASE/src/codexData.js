@@ -1,0 +1,195 @@
+export const codex = {
+  "version": "1.0",
+  "emotion_mode": "WHOLESOME",
+  "narrative_arc": "setup → context → emotional_peak → twist → resolution",
+  "video": {
+    "source": "video_coupee.mp4",
+    "fps": 30,
+    "total_frames": 900,
+    "width": 1080,
+    "height": 1920
+  },
+  "text_overlays": [
+    {
+      "id": "txt_01",
+      "content": "He's only five.",
+      "start_frame": 0,
+      "end_frame": 90,
+      "animation": "word_by_word",
+      "emotion_weight": "setup",
+      "font": "Impact, Arial Black, sans-serif",
+      "size": 96,
+      "color": "#FFFFFF",
+      "stroke_color": "#000000",
+      "stroke_width": 3,
+      "shadow": "2px 4px 8px rgba(0,0,0,0.8)",
+      "position": "center",
+      "letter_spacing": "0em",
+      "glow_intensity": 0,
+      "depth_3d": 0
+    },
+    {
+      "id": "txt_02",
+      "content": "Saved his candy all day.",
+      "start_frame": 90,
+      "end_frame": 210,
+      "animation": "word_by_word",
+      "emotion_weight": "context",
+      "font": "Impact, Arial Black, sans-serif",
+      "size": 112,
+      "color": "#FFFFFF",
+      "stroke_color": "#000000",
+      "stroke_width": 3,
+      "shadow": "2px 4px 8px rgba(0,0,0,0.8)",
+      "position": "center_bottom",
+      "letter_spacing": "0em",
+      "glow_intensity": 0,
+      "depth_3d": 0
+    },
+    {
+      "id": "txt_03",
+      "content": "To propose to mom.",
+      "start_frame": 210,
+      "end_frame": 360,
+      "animation": "word_by_word",
+      "emotion_weight": "emotional_peak",
+      "font": "Impact, Arial Black, sans-serif",
+      "size": 120,
+      "color": "#FFFFFF",
+      "stroke_color": "#000000",
+      "stroke_width": 3,
+      "shadow": "2px 4px 8px rgba(0,0,0,0.8)",
+      "position": "top",
+      "letter_spacing": "0em",
+      "glow_intensity": 0,
+      "depth_3d": 0
+    },
+    {
+      "id": "txt_04",
+      "content": "She said yes.",
+      "start_frame": 360,
+      "end_frame": 540,
+      "animation": "word_by_word",
+      "emotion_weight": "twist",
+      "font": "Impact, Arial Black, sans-serif",
+      "size": 134,
+      "color": "#FFFFFF",
+      "stroke_color": "#000000",
+      "stroke_width": 3,
+      "shadow": "2px 4px 8px rgba(0,0,0,0.8)",
+      "position": "center",
+      "letter_spacing": "0em",
+      "glow_intensity": 0,
+      "depth_3d": 0
+    },
+    {
+      "id": "txt_05",
+      "content": "Love has no age.",
+      "start_frame": 540,
+      "end_frame": 900,
+      "animation": "fade_in_slow",
+      "emotion_weight": "resolution",
+      "font": "Impact, Arial Black, sans-serif",
+      "size": 112,
+      "color": "#FFFFFF",
+      "stroke_color": "#000000",
+      "stroke_width": 3,
+      "shadow": "2px 4px 8px rgba(0,0,0,0.8)",
+      "position": "center_bottom",
+      "letter_spacing": "0em",
+      "glow_intensity": 0,
+      "depth_3d": 0
+    }
+  ],
+  "zoom_keyframes": [
+    {
+      "frame": 0,
+      "scale": 1.05,
+      "target_x": 0.5,
+      "target_y": 0.35
+    },
+    {
+      "frame": 90,
+      "scale": 1.08,
+      "target_x": 0.52,
+      "target_y": 0.38
+    },
+    {
+      "frame": 210,
+      "scale": 1.1,
+      "target_x": 0.48,
+      "target_y": 0.4
+    },
+    {
+      "frame": 360,
+      "scale": 1.12,
+      "target_x": 0.5,
+      "target_y": 0.42
+    },
+    {
+      "frame": 540,
+      "scale": 1.15,
+      "target_x": 0.5,
+      "target_y": 0.4
+    }
+  ],
+  "color_preset": "warm_vibrant",
+  "color_css_filter": "contrast(1.5) saturate(1.3) brightness(1.0)",
+  "enhance_4k": true,
+  "vignette": 0.35,
+  "sharpening": 90,
+  "denoising": 35,
+  "sfx_timeline": [
+    {
+      "frame": 0,
+      "type": "keyboard",
+      "volume": 0.3
+    },
+    {
+      "frame": 90,
+      "type": "keyboard",
+      "volume": 0.35
+    },
+    {
+      "frame": 90,
+      "type": "whoosh",
+      "volume": 0.2
+    },
+    {
+      "frame": 210,
+      "type": "keyboard",
+      "volume": 0.4
+    },
+    {
+      "frame": 210,
+      "type": "whoosh",
+      "volume": 0.25
+    },
+    {
+      "frame": 360,
+      "type": "keyboard",
+      "volume": 0.5
+    },
+    {
+      "frame": 360,
+      "type": "whoosh",
+      "volume": 0.3
+    },
+    {
+      "frame": 540,
+      "type": "keyboard",
+      "volume": 0.3
+    },
+    {
+      "frame": 540,
+      "type": "whoosh",
+      "volume": 0.2
+    }
+  ],
+  "slowmo_start_frame": 720,
+  "slowmo_speed": 0.4,
+  "shake_power": 60,
+  "cut_flash_frames": 3,
+  "tracking_source": "tracking_data.json",
+  "grain_intensity": 0.26
+};
