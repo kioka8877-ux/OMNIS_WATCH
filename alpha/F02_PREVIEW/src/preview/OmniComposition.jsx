@@ -251,10 +251,10 @@ const TextOverlay = ({ overlay, frame, fps }) => {
                   opacity: wordOpacity,
                   transform: `scale(${wordScale})`,
                   transition: 'none',
+                  marginRight: i < words.length - 1 ? '0.25em' : '0',
                 }}
               >
                 {word}
-                {i < words.length - 1 ? ' ' : ''}
               </span>
             );
           })}
