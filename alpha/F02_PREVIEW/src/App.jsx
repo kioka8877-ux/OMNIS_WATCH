@@ -425,6 +425,50 @@ export default function App() {
                 }
               />
 
+              {/* Slow motion */}
+              <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #333' }}>
+                <label style={{ ...styles.label, color: '#00ff88', fontSize: '14px' }}>
+                  ⏩ Slow Motion + Cut brutal
+                </label>
+
+                <label style={styles.label}>
+                  Cut start: {((codex.slowmo_start_frame || 0) / fps).toFixed(1)}s
+                </label>
+                <input
+                  style={styles.slider}
+                  type="range"
+                  min="0"
+                  max={totalFrames}
+                  step={fps}
+                  value={codex.slowmo_start_frame || 0}
+                  onChange={(e) => updateCodexField('slowmo_start_frame', parseInt(e.target.value))}
+                />
+
+                <label style={styles.label}>
+                  Vitesse: {Math.round((codex.slowmo_speed || 1.0) * 100)}%
+                </label>
+                <input
+                  style={styles.slider}
+                  type="range"
+                  min="10"
+                  max="100"
+                  value={Math.round((codex.slowmo_speed || 1.0) * 100)}
+                  onChange={(e) => updateCodexField('slowmo_speed', parseInt(e.target.value) / 100)}
+                />
+
+                <label style={styles.label}>
+                  Flash blanc: {codex.cut_flash_frames || 0} frames
+                </label>
+                <input
+                  style={styles.slider}
+                  type="range"
+                  min="0"
+                  max="10"
+                  value={codex.cut_flash_frames || 0}
+                  onChange={(e) => updateCodexField('cut_flash_frames', parseInt(e.target.value))}
+                />
+              </div>
+
               {/* Zoom intensity */}
               <label style={styles.label}>
                 Zoom max:{' '}

@@ -47,9 +47,23 @@ export const OmniComposition = ({ codex, videoSrc }) => {
   // Grain
   const grainIntensity = codex.grain_intensity || 0;
 
+  // Slow motion
+  const slowmoStart = codex.slowmo_start_frame || 0;
+  const slowmoSpeed = codex.slowmo_speed || 1.0;
+  const cutFlashFrames = codex.cut_flash_frames || 0;
+  const isSlowmo = frame >= slowmoStart && slowmoSpeed < 1.0;
+  const playbackRate = isSlowmo ? slowmoSpeed : 1.0;
+
+  // Flash blanc au moment du cut
+  const flashFrame = slowmoStart;
+  const showFlash = cutFlashFrames > 0 && frame >= flashFrame && frame < flashFrame + cutFlashFrames;
+  const flashOpacity = showFlash
+    ? interpolate(frame - flashFrame, [0, cutFlashFrames], [0.8, 0], { extrapolateRight: 'clamp' })
+    : 0;
+
   return (
     <AbsoluteFill style={{ background: '#000', overflow: 'hidden' }}>
-      {/* Layer 1: Vidéo source avec zoom + colorimétrie */}
+      {/* Layer 1: Vidéo source avec zoom + colorimétrie + slow motion */}
       <AbsoluteFill
         style={{
           transform: `scale(${currentZoom.scale}) translate(${
@@ -58,10 +72,26 @@ export const OmniComposition = ({ codex, videoSrc }) => {
           filter: fullFilter || undefined,
         }}
       >
-        <OffthreadVideo src={videoSrc} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <OffthreadVideo
+          src={videoSrc}
+          playbackRate={playbackRate}
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
       </AbsoluteFill>
 
-      {/* Layer 2: Vignette */}
+      {/* Layer 2: Flash blanc au moment du cut brutal */}
+      {flashOpacity > 0 && (
+        <AbsoluteFill
+          style={{
+            background: '#FFFFFF',
+            opacity: flashOpacity,
+            pointerEvents: 'none',
+            zIndex: 5,
+          }}
+        />
+      )}
+
+      {/* Layer 3: Vignette */}
       {vignetteOpacity > 0 && (
         <AbsoluteFill
           style={{
@@ -74,7 +104,7 @@ export const OmniComposition = ({ codex, videoSrc }) => {
         />
       )}
 
-      {/* Layer 3: Grain cinématique (SVG feTurbulence — style CRUSADER) */}
+      {/* Layer 4: Grain cinématique (SVG feTurbulence — style CRUSADER) */}
       {grainIntensity > 0 && (
         <AbsoluteFill style={{ pointerEvents: 'none', mixBlendMode: 'overlay' }}>
           <svg width="100%" height="100%" style={{ opacity: grainIntensity * 0.15 }}>
@@ -93,7 +123,7 @@ export const OmniComposition = ({ codex, videoSrc }) => {
         </AbsoluteFill>
       )}
 
-      {/* Layer 4: Text overlays */}
+      {/* Layer 5: Text overlays */}
       {(codex.text_overlays || []).map((overlay, index) => {
         const startFrame = overlay.start_frame || 0;
         const endFrame = overlay.end_frame || durationInFrames;
