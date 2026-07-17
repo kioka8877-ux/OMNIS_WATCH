@@ -7,7 +7,7 @@ import {
   OffthreadVideo,
   Sequence,
 } from 'remotion';
-import { codex as codexData } from './codexData';
+import { codex as codexData } from '../codexData';
 
 /* ──────────────────────────────────────────────────────────────
  * OmniComposition — Composition principale OMNIS-WATCH
