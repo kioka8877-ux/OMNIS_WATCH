@@ -2,19 +2,23 @@
 omnis_f03b_mixer.py — F03B : Mixeur Audio
 ==========================================
 Prend la video muette de F03A et lui greffe les SFX aux bonnes frames.
+Les SFX sont synchronises avec les text_overlays du codex.
 
 Usage:
   python omnis_f03b_mixer.py --input /path/IN/ --output /path/OUT/ \
     --sfx-dir /path/to/sfx/
 
-Entree: video_visuelle.mp4 + codex.json (sfx_timeline) + sfx/
+Entree: video_visuelle.mp4 + codex.json (sfx_timeline + text_overlays) + sfx/
 Sortie: video_complete.mp4
 
 Le script:
-  1. Lit le codex.json (section sfx_timeline)
+  1. Lit le codex.json (section sfx_timeline + text_overlays)
   2. Pour chaque SFX, calcule le timestamp (frame / fps)
-  3. Cree un fichier audio mix avec tous les SFX aux bons timestamps
-  4. FFmpeg mixe le SFX audio sur la video
+  3. Croise les SFX avec les text_overlays pour determiner la duree exacte
+     - keyboard: joue pendant toute la duree du texte, s'arrete quand le texte disparait
+     - whoosh/pop/ding: duree naturelle (impacts courts)
+  4. Cree un fichier audio mix avec tous les SFX aux bons timestamps
+  5. FFmpeg mixe le SFX audio sur la video
 """
 
 import argparse
@@ -25,13 +29,16 @@ import sys
 import tempfile
 from pathlib import Path
 
-# ── Constantes ──────────────────────────────────────────────────────────────
+# ── Constantes ────────────────────────────────────────────────────────────────
 
 INPUT_VIDEO = "video_visuelle.mp4"
 INPUT_CODEX = "codex.json"
 OUTPUT_VIDEO = "video_complete.mp4"
 
-# ── Logging ─────────────────────────────────────────────────────────────────
+# SFX types qui sont des impacts courts (duree naturelle, pas de troncature)
+SHORT_SFX_TYPES = {"whoosh", "pop", "ding", "impact", "swish", "thump"}
+
+# ── Logging ───────────────────────────────────────────────────────────────────
 
 def log_ok(msg): print(f"  [OK] {msg}")
 def log_fail(msg): print(f"  [FAIL] {msg}")
@@ -42,7 +49,7 @@ def section(title):
     bar = "─" * max(0, 50 - len(title))
     print(f"\n── {title} {bar}")
 
-# ── Helpers ────────────────────────────────────────────────────────────────
+# ── Helpers ───────────────────────────────────────────────────────────────────
 
 def probe_duration(path):
     """Retourne la duree de la video en secondes."""
@@ -56,20 +63,37 @@ def probe_duration(path):
     data = json.loads(result.stdout)
     return float(data["format"]["duration"])
 
-# ── Mixage SFX ──────────────────────────────────────────────────────────────
+def find_text_duration(sfx_frame, text_overlays, fps):
+    """
+    Trouve la duree du texte correspondant a un SFX donne.
+    Match par start_frame: si un text_overlay commence a la meme frame que le SFX,
+    on retourne la duree (end_frame - start_frame) / fps.
+    Si aucun texte ne correspond, retourne 0 (duree naturelle du SFX).
+    """
+    if not text_overlays:
+        return 0
 
-def create_sfx_mix(sfx_timeline, sfx_dir, fps, total_duration, output_path):
+    for text in text_overlays:
+        text_start = text.get("start_frame", -1)
+        text_end = text.get("end_frame", -1)
+        if text_start == sfx_frame and text_end > text_start:
+            duration_sec = (text_end - text_start) / fps
+            return duration_sec
+
+    return 0
+
+# ── Mixage SFX ────────────────────────────────────────────────────────────────
+
+def create_sfx_mix(sfx_timeline, text_overlays, sfx_dir, fps, total_duration, output_path):
     """
     Cree un fichier audio contenant tous les SFX mixes aux bons timestamps.
-    Utilise FFmpeg amix pour combiner les pistes.
+    Les SFX 'keyboard' sont tronques a la duree du texte correspondant.
+    Les SFX courts (whoosh, pop, ding) gardent leur duree naturelle.
     """
     if not sfx_timeline:
         log_info("Aucun SFX dans le codex — copie de la video sans modification")
         return False
 
-    # Verifier que tous les fichiers SFX existent
-    sfx_inputs = []
-    sfx_delays = []
     valid_sfx = []
 
     for sfx in sfx_timeline:
@@ -87,39 +111,69 @@ def create_sfx_mix(sfx_timeline, sfx_dir, fps, total_duration, output_path):
         timestamp = sfx["frame"] / fps
         volume = sfx.get("volume", 0.8)
 
+        # ── SYNCHRO TEXTE ────────────────────────────────────────────────────
+        # Trouver la duree du texte correspondant a ce SFX
+        text_duration = find_text_duration(sfx["frame"], text_overlays, fps)
+
+        # Determiner la duree du SFX:
+        # - keyboard: tronque a la duree du texte (joue pendant tout le texte)
+        # - whoosh/pop/ding: duree naturelle (impacts courts)
+        if sfx_type in SHORT_SFX_TYPES:
+            # SFX court: duree naturelle, pas de troncature
+            sfx_duration = 0  # 0 = pas de troncature
+            log_info(f"SFX: {sfx_type} a {timestamp:.3f}s (frame {sfx['frame']}), volume={volume} [impact court]")
+        else:
+            # SFX long (keyboard, etc.): tronque a la duree du texte
+            if text_duration > 0:
+                sfx_duration = text_duration
+                log_info(f"SFX: {sfx_type} a {timestamp:.3f}s (frame {sfx['frame']}), volume={volume}, duree={sfx_duration:.2f}s [synchro texte]")
+            else:
+                # Pas de texte correspondant: duree naturelle
+                sfx_duration = 0
+                log_info(f"SFX: {sfx_type} a {timestamp:.3f}s (frame {sfx['frame']}), volume={volume} [pas de texte correspondant]")
+
         valid_sfx.append({
             "file": sfx_file,
             "timestamp": timestamp,
             "volume": volume,
-            "type": sfx_type
+            "type": sfx_type,
+            "duration": sfx_duration
         })
-        log_info(f"SFX: {sfx_type} a {timestamp:.3f}s (frame {sfx['frame']}), volume={volume}")
 
     if not valid_sfx:
         log_warn("Aucun SFX valide trouve — video sans son ajoute")
         return False
 
-    # Construire la commande FFmpeg
-    # Strategie: pour chaque SFX, on crée une entrée avec un delay
-    # puis on mixe tout avec amix
-
     with tempfile.TemporaryDirectory() as tmpdir:
-        # Etape 1: Pour chaque SFX, creer un fichier audio avec le bon delay et volume
+        # Etape 1: Pour chaque SFX, creer un fichier audio avec delay + volume + troncature
         delayed_files = []
 
         for i, sfx in enumerate(valid_sfx):
             delayed_path = os.path.join(tmpdir, f"sfx_{i:02d}.mp3")
 
-            # FFmpeg: ajouter du silence au debut (delay) + ajuster le volume
             delay_ms = int(sfx["timestamp"] * 1000)
 
+            # Construire le filtre audio: delay + volume
+            audio_filter = f"adelay={delay_ms}|{delay_ms},volume={sfx['volume']}"
+
+            # Commande FFmpeg de base
             cmd = [
                 "ffmpeg", "-y",
                 "-i", sfx["file"],
-                "-af", f"adelay={delay_ms}|{delay_ms},volume={sfx['volume']}",
-                "-t", str(total_duration),
-                delayed_path
+                "-af", audio_filter,
             ]
+
+            # Si le SFX a une duree definie (keyboard synchro texte), tronquer
+            if sfx["duration"] > 0:
+                # Tronquer le SFX a sa duree + le delay initial
+                # La duree totale = delay + duree du SFX
+                total_sfx_duration = sfx["timestamp"] + sfx["duration"]
+                cmd.extend(["-t", str(total_sfx_duration)])
+            else:
+                # Duree naturelle, mais on limite a la duree totale de la video
+                cmd.extend(["-t", str(total_duration)])
+
+            cmd.append(delayed_path)
 
             result = subprocess.run(cmd, capture_output=True, text=True)
             if result.returncode != 0:
@@ -134,7 +188,6 @@ def create_sfx_mix(sfx_timeline, sfx_dir, fps, total_duration, output_path):
 
         # Etape 2: Mixer tous les SFX ensemble
         if len(delayed_files) == 1:
-            # Un seul SFX — pas besoin de amix
             cmd = [
                 "ffmpeg", "-y",
                 "-i", delayed_files[0],
@@ -142,12 +195,10 @@ def create_sfx_mix(sfx_timeline, sfx_dir, fps, total_duration, output_path):
                 output_path
             ]
         else:
-            # Multiple SFX — utiliser amix
             cmd = ["ffmpeg", "-y"]
             for f in delayed_files:
                 cmd.extend(["-i", f])
 
-            # amix avec normalize=0 pour ne pas reduire le volume
             inputs_count = len(delayed_files)
             cmd.extend([
                 "-filter_complex",
@@ -164,7 +215,7 @@ def create_sfx_mix(sfx_timeline, sfx_dir, fps, total_duration, output_path):
         log_ok(f"Mix SFX cree: {output_path}")
         return True
 
-# ── Main ────────────────────────────────────────────────────────────────────
+# ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
     parser = argparse.ArgumentParser(
@@ -197,7 +248,11 @@ def main():
 
     with open(codex_path, "r", encoding="utf-8") as f:
         codex = json.load(f)
-    log_ok(f"Codex lu: {len(codex.get('sfx_timeline', []))} SFX")
+
+    sfx_timeline = codex.get("sfx_timeline", [])
+    text_overlays = codex.get("text_overlays", [])
+
+    log_ok(f"Codex lu: {len(sfx_timeline)} SFX, {len(text_overlays)} textes")
 
     if not sfx_dir.exists():
         log_fail(f"Dossier SFX introuvable: {sfx_dir}")
@@ -212,6 +267,23 @@ def main():
     fps = codex["video"]["fps"]
     log_ok(f"Video: {total_duration:.2f}s, {fps}fps")
 
+    # ── Afficher la synchro texte/SFX ──
+    section("Synchro SFX ↔ Textes")
+    for sfx in sfx_timeline:
+        sfx_type = sfx["type"]
+        sfx_frame = sfx["frame"]
+        matched_text = None
+        for text in text_overlays:
+            if text.get("start_frame") == sfx_frame:
+                matched_text = text
+                break
+
+        if matched_text:
+            text_dur = (matched_text["end_frame"] - matched_text["start_frame"]) / fps
+            log_info(f"  {sfx_type}@frame{sfx_frame} → texte '{matched_text.get('content','')[:30]}' ({text_dur:.1f}s)")
+        else:
+            log_info(f"  {sfx_type}@frame{sfx_frame} → aucun texte correspondant")
+
     # ── Creation du mix SFX ──
     section("Creation du mix SFX")
 
@@ -219,7 +291,8 @@ def main():
         sfx_mix_path = os.path.join(tmpdir, "sfx_mix.mp3")
 
         has_sfx = create_sfx_mix(
-            codex.get("sfx_timeline", []),
+            sfx_timeline,
+            text_overlays,
             str(sfx_dir),
             fps,
             total_duration,
@@ -232,7 +305,6 @@ def main():
         output_path = output_dir / OUTPUT_VIDEO
 
         if has_sfx:
-            # Mixer la video avec le mix SFX
             cmd = [
                 "ffmpeg", "-y",
                 "-i", str(video_path),
@@ -246,7 +318,6 @@ def main():
                 str(output_path)
             ]
         else:
-            # Pas de SFX — copier la video telle quelle
             cmd = [
                 "ffmpeg", "-y",
                 "-i", str(video_path),
@@ -269,7 +340,8 @@ def main():
     print()
     print("═" * 52)
     print(" F03B MIXER — MISSION ACCOMPLIE")
-    print(f" SFX       : {len(codex.get('sfx_timeline', []))} dans le codex")
+    print(f" SFX       : {len(sfx_timeline)} dans le codex")
+    print(f" Textes    : {len(text_overlays)} dans le codex")
     print(f" SFX mix   : {'oui' if has_sfx else 'aucun'}")
     print(f" Duree     : {out_duration:.2f}s")
     print(f" Taille    : {out_size:.1f} MB")
