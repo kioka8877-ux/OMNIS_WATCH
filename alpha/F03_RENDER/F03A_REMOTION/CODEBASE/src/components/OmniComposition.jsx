@@ -9,6 +9,9 @@ import {
   staticFile,
 } from 'remotion';
 import { codex as codexData } from '../codexData';
+import { loadFont } from '@remotion/google-fonts/Anton';
+
+const { fontFamily: antonFont } = loadFont();
 
 /* ────────────────────────────────────────────────────────────────────────────
  * OmniComposition — Composition principale OMNIS-WATCH
@@ -130,7 +133,7 @@ export const OmniComposition = ({ codex: codexProp }) => {
             fontWeight: 'bold',
             padding: '8px 20px',
             borderRadius: 8,
-            fontFamily: 'Impact, Arial Black, sans-serif',
+            fontFamily: antonFont,
             letterSpacing: '0.1em',
           }}>
             SLOW MOTION
@@ -207,7 +210,7 @@ const TextOverlay = ({ overlay, frame, fps }) => {
   const {
     content,
     animation = 'word_by_word',
-    font = 'Impact, Arial Black, sans-serif',
+    font = antonFont,
     size = 96,
     color = '#FFFFFF',
     stroke_color = '#000000',
