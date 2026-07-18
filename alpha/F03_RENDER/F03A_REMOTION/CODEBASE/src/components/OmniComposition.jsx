@@ -10,14 +10,14 @@ import {
 } from 'remotion';
 import { codex as codexData } from '../codexData';
 
-/* ──────────────────────────────────────────────────────────────
+/* ────────────────────────────────────────────────────────────────────────────
  * OmniComposition — Composition principale OMNIS-WATCH
  * Lit le codex.json et orchestre tous les layers.
  *
  * Props:
  *   codex: object — le codex.json généré par F02B
  *   videoSrc: string — chemin vers video_coupee.mp4
- * ────────────────────────────────────────────────────────────── */
+ * ──────────────────────────────────────────────────────────────────────────── */
 
 export const OmniComposition = ({ codex: codexProp }) => {
   const frame = useCurrentFrame();
@@ -32,8 +32,8 @@ export const OmniComposition = ({ codex: codexProp }) => {
   // Guard: si le codex n'est pas chargé, afficher un message d'erreur visible
   if (!codex) {
     return (
-      <AbsoluteFill style={{ background: '#ff0000', justifyContent: 'center', alignItems: 'center' }}>
-        <div style={{ color: '#fff', fontSize: 48, fontWeight: 900 }}>CODEX MANQUANT</div>
+      <AbsoluteFill style={{ backgroundColor: '#ff4400', justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{ color: 'white', fontSize: 64, fontWeight: 'bold' }}>CODEX MANQUANT</div>
       </AbsoluteFill>
     );
   }
@@ -56,6 +56,9 @@ export const OmniComposition = ({ codex: codexProp }) => {
     sharpFilter = ` contrast(${1 + s * 0.15}) drop-shadow(0 0 ${s * 0.5}px rgba(255,255,255,${s * 0.15}))`;
   }
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // LE FILTRE COMPLET — c'est cette variable qui était calculée mais JAMAIS appliquée
+  // ═══════════════════════════════════════════════════════════════════════════
   const fullFilter = (colorFilter + enhanceFilter + sharpFilter).trim();
 
   // Vignette
@@ -89,54 +92,57 @@ export const OmniComposition = ({ codex: codexProp }) => {
 
   // Pas de flash blanc — juste le shake
 
+  // Calcul du transform pour le zoom + shake
+  const zoomTransform = `scale(${currentZoom.scale}) translate(${
+    (0.5 - currentZoom.target_x) * 100
+  }%, ${(0.5 - currentZoom.target_y) * 100}%)`;
+
   return (
-    <AbsoluteFill style={{ background: '#000', overflow: 'hidden' }}>
+    <AbsoluteFill style={{ backgroundColor: '#000' }}>
       {/* Layer 1: Vidéo source avec zoom + colorimétrie + slow motion + shake */}
       <AbsoluteFill
         style={{
-          transform: `scale(${currentZoom.scale}) translate(${
-            (0.5 - currentZoom.target_x) * -100 + shakeX
-          }%, ${(0.5 - currentZoom.target_y) * -100 + shakeY}%)`,
+          // ═══════════════════════════════════════════════════════════════════
+          // FIX: fullFilter est maintenant APPLIQUÉ ici
+          // ═══════════════════════════════════════════════════════════════════
           filter: fullFilter || undefined,
         }}
       >
         <OffthreadVideo
           src={videoSrc}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            transform: `${zoomTransform} translate(${shakeX}px, ${shakeY}px)`,
+          }}
           playbackRate={playbackRate}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />
       </AbsoluteFill>
 
       {/* Layer 2: Badge SLOW MOTION */}
       {isSlowmo && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '5%',
-            right: '5%',
-            background: 'rgba(0,0,0,0.7)',
-            color: '#00ff88',
-            padding: '4px 12px',
-            borderRadius: '4px',
-            fontSize: '14px',
-            fontWeight: 900,
-            fontFamily: 'sans-serif',
-            pointerEvents: 'none',
-            zIndex: 20,
-          }}
-        >
-          SLOW MOTION
-        </div>
+        <AbsoluteFill style={{ justifyContent: 'flex-start', alignItems: 'flex-end', padding: 40 }}>
+          <div style={{
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            color: '#FF4444',
+            fontSize: 32,
+            fontWeight: 'bold',
+            padding: '8px 20px',
+            borderRadius: 8,
+            fontFamily: 'Impact, Arial Black, sans-serif',
+            letterSpacing: '0.1em',
+          }}>
+            SLOW MOTION
+          </div>
+        </AbsoluteFill>
       )}
 
       {/* Layer 3: Vignette */}
       {vignetteOpacity > 0 && (
         <AbsoluteFill
           style={{
-            background:
-              'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,' +
-              vignetteOpacity +
-              ') 100%)',
+            background: `radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,${vignetteOpacity}) 100%)`,
             pointerEvents: 'none',
           }}
         />
@@ -144,19 +150,25 @@ export const OmniComposition = ({ codex: codexProp }) => {
 
       {/* Layer 4: Grain cinématique (SVG feTurbulence — style CRUSADER) */}
       {grainIntensity > 0 && (
-        <AbsoluteFill style={{ pointerEvents: 'none', mixBlendMode: 'overlay' }}>
-          <svg width="100%" height="100%" style={{ opacity: grainIntensity * 0.15 }}>
-            <filter id="grain">
+        <AbsoluteFill style={{ opacity: grainIntensity, pointerEvents: 'none' }}>
+          <svg
+            width="100%"
+            height="100%"
+            style={{ position: 'absolute', top: 0, left: 0 }}
+          >
+            <filter id="grainFilter">
               <feTurbulence
                 type="fractalNoise"
                 baseFrequency="0.9"
                 numOctaves="2"
-                seed={frame % 100}
                 stitchTiles="stitch"
               />
-              <feColorMatrix type="saturate" values="0" />
+              <feColorMatrix
+                type="matrix"
+                values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0"
+              />
             </filter>
-            <rect width="100%" height="100%" filter="url(#grain)" />
+            <rect width="100%" height="100%" filter="url(#grainFilter)" />
           </svg>
         </AbsoluteFill>
       )}
@@ -169,21 +181,27 @@ export const OmniComposition = ({ codex: codexProp }) => {
         if (frame < startFrame || frame > endFrame) return null;
 
         return (
-          <TextOverlay key={overlay.id || index} overlay={overlay} frame={frame} fps={fps} />
+          <Sequence
+            key={overlay.id || index}
+            from={startFrame}
+            durationInFrames={endFrame - startFrame + 1}
+          >
+            <TextOverlay overlay={overlay} frame={frame - startFrame} fps={fps} />
+          </Sequence>
         );
       })}
     </AbsoluteFill>
   );
 };
 
-/* ──────────────────────────────────────────────────────────────
+/* ────────────────────────────────────────────────────────────────────────────
  * TextOverlay — Affiche un texte avec animation mot par mot
  * Style concurrent 140M vues :
- *   - Mot par mot (chaque mot = span avec fade + scale)
- *   - Glow néon multi-couches si glow_intensity > 0
- *   - Contour noir (WebkitTextStroke)
- *   - Positions variées (center, top, center_bottom, center_left)
- * ────────────────────────────────────────────────────────────── */
+ * - Mot par mot (chaque mot = span avec fade + scale)
+ * - Glow néon multi-couches si glow_intensity > 0
+ * - Contour noir (WebkitTextStroke)
+ * - Positions variées (center, top, center_bottom, center_left)
+ * ──────────────────────────────────────────────────────────────────────────── */
 
 const TextOverlay = ({ overlay, frame, fps }) => {
   const {
@@ -202,7 +220,7 @@ const TextOverlay = ({ overlay, frame, fps }) => {
     start_frame = 0,
   } = overlay;
 
-  const localFrame = frame - start_frame;
+  const localFrame = frame;
   const words = content.split(' ');
 
   // Calculer le timing d'apparition des mots
@@ -285,24 +303,14 @@ const TextOverlay = ({ overlay, frame, fps }) => {
   if (animation === 'word_by_word') {
     // Mot par mot : chaque mot est un span animé individuellement
     return (
-      <div
-        style={{
-          ...positionStyle,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          pointerEvents: 'none',
-          zIndex: 10,
-        }}
-      >
+      <div style={positionStyle}>
         <div
           style={{
             ...baseTextStyle,
-            opacity: 1,
-            transform: 'none',
-            display: 'inline',
-            whiteSpace: 'pre-wrap',
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
           {words.map((word, i) => {
@@ -322,19 +330,18 @@ const TextOverlay = ({ overlay, frame, fps }) => {
             );
 
             return (
-              <React.Fragment key={i}>
-                <span
-                  style={{
-                    display: 'inline-block',
-                    opacity: wordOpacity,
-                    transform: `scale(${wordScale})`,
-                    transition: 'none',
-                  }}
-                >
-                  {word}
-                </span>
+              <span
+                key={i}
+                style={{
+                  opacity: wordOpacity,
+                  transform: `scale(${wordScale})`,
+                  display: 'inline-block',
+                  transition: 'none',
+                }}
+              >
+                {word}
                 {i < words.length - 1 ? '\u00A0' : ''}
-              </React.Fragment>
+              </span>
             );
           })}
         </div>
@@ -344,34 +351,7 @@ const TextOverlay = ({ overlay, frame, fps }) => {
 
   // Animations bloc entier (pop, fade_in, fade_in_slow)
   return (
-    <div
-      style={{
-        ...positionStyle,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        pointerEvents: 'none',
-        zIndex: 10,
-      }}
-    >
-      {/* Couches 3D depth (si depth_3d > 0) */}
-      {depthLayers.map((d) => (
-        <div
-          key={`depth-${d}`}
-          style={{
-            ...baseTextStyle,
-            position: 'absolute',
-            transform: `translate(${d}px, ${d}px)`,
-            opacity: blockOpacity * 0.3,
-            color: 'rgba(0,0,0,0.5)',
-            WebkitTextStroke: '0px transparent',
-            textShadow: 'none',
-          }}
-        >
-          {content}
-        </div>
-      ))}
+    <div style={positionStyle}>
       <div
         style={{
           ...baseTextStyle,
@@ -379,15 +359,32 @@ const TextOverlay = ({ overlay, frame, fps }) => {
           transform: `scale(${blockScale})`,
         }}
       >
+        {/* Couches 3D depth (si depth_3d > 0) */}
+        {depthLayers.map((d) => (
+          <div
+            key={d}
+            style={{
+              ...baseTextStyle,
+              position: 'absolute',
+              top: `${d}px`,
+              left: `${d}px`,
+              color: 'rgba(0,0,0,0.3)',
+              WebkitTextStroke: '0px transparent',
+              textShadow: 'none',
+            }}
+          >
+            {content}
+          </div>
+        ))}
         {content}
       </div>
     </div>
   );
 };
 
-/* ──────────────────────────────────────────────────────────────
+/* ────────────────────────────────────────────────────────────────────────────
  * Helper: Position styles
- * ────────────────────────────────────────────────────────────── */
+ * ──────────────────────────────────────────────────────────────────────────── */
 
 function getPositionStyle(position) {
   switch (position) {
@@ -441,9 +438,9 @@ function getPositionStyle(position) {
   }
 }
 
-/* ──────────────────────────────────────────────────────────────
+/* ────────────────────────────────────────────────────────────────────────────
  * Helper: Zoom interpolation
- * ────────────────────────────────────────────────────────────── */
+ * ──────────────────────────────────────────────────────────────────────────── */
 
 function getCurrentZoom(frame, keyframes) {
   if (!keyframes || keyframes.length === 0) {
