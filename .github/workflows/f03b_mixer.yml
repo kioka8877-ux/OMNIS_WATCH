@@ -27,7 +27,7 @@ jobs:
           python3 omnis_f03b_mixer.py \
             --input ../IN/ \
             --output ../OUT/ \
-            --sfx-dir ../../SHARED/IN/sfx/
+            --sfx-dir ../../../SHARED/IN/sfx/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
