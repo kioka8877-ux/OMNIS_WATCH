@@ -1,6 +1,5 @@
-# F03A REMOTION — Rendu visuel
-# Trigger: workflow_dispatch (manuel)
-name: F03A Render
+# F03A Render — V2 Voix Off
+name: F03A Render V2
 
 on:
   workflow_dispatch:
@@ -30,30 +29,29 @@ jobs:
           cd alpha/F03_RENDER/F03A_REMOTION/CODEBASE
           npm install
 
-      - name: Copy input files
+      - name: Verify video exists
         run: |
-          mkdir -p alpha/F03_RENDER/F03A_REMOTION/CODEBASE/public
-          cp alpha/F03_RENDER/F03A_REMOTION/IN/codex.json alpha/F03_RENDER/F03A_REMOTION/CODEBASE/public/codex.json
-          cp alpha/F03_RENDER/F03A_REMOTION/IN/video_coupee.mp4 alpha/F03_RENDER/F03A_REMOTION/CODEBASE/public/video_coupee.mp4
+          VIDEO="alpha/F03_RENDER/F03A_REMOTION/CODEBASE/public/video_coupee.mp4"
+          if [ -f "$VIDEO" ]; then
+            SIZE=$(stat -c%s "$VIDEO")
+            echo "Video found: $(du -h $VIDEO | cut -f1)"
+            if [ "$SIZE" -lt 10240 ]; then
+              echo "ERROR: Video too small (<10KB) — aborting"
+              exit 1
+            fi
+          else
+            echo "ERROR: video_coupee.mp4 not found at $VIDEO"
+            exit 1
+          fi
 
-      - name: Render with Remotion
+      - name: Render
         run: |
           cd alpha/F03_RENDER/F03A_REMOTION/CODEBASE
-          FPS=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['fps'])")
-          FRAMES=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['total_frames'])")
-          WIDTH=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['width'])")
-          HEIGHT=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['height'])")
-          
-          echo "Rendu: ${FRAMES} frames, ${FPS}fps, ${WIDTH}x${HEIGHT}"
-          
-          npx remotion render src/index.jsx OmniComposition \
-            OUT/video_visuelle.mp4 \
-            --codec h264 \
-            --image-format jpeg \
-            --concurrency 1
+          mkdir -p OUT
+          npx remotion render src/index.jsx OmniComposition OUT/video_visuelle.mp4
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: f03a-output
-          path: alpha/F03_RENDER/F03A_REMOTION/CODEBASE/OUT/
+          path: alpha/F03_RENDER/F03A_REMOTION/CODEBASE/OUT/video_visuelle.mp4
