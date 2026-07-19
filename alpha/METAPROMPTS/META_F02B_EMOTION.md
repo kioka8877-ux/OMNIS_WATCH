@@ -1,105 +1,108 @@
-# META_F02B — CREATEUR D'EMOTION
-## Metaprompt OMNIS-WATCH — Transformation Emotionnelle de Video
+# META_F02B_V2 — SYNCHRONISATEUR VOIX OFF
+## Metaprompt OMNIS-WATCH V2 — Voix Off Dirige
 
 > **Outil cible :** Oracle Sandbox (modele IA puissant gratuit)
-> L'Oracle recoit la description factuelle de F02A et le mode emotionnel choisi par l'operateur.
+> L'Oracle recoit timing.json (Whisper) + description F02A + mode emotionnel.
+
+---
+
+## CE QUI CHANGE EN V2
+
+En V1, l'Oracle INVENTAIT l'histoire (texte + timing).
+En V2, l'Oracle ne invente PLUS — il SYNCHRONISE.
+
+La voix off existe deja (audio_clean.mp3). Whisper a deja transcrit chaque mot
+avec son timestamp exact. L'Oracle ne fait que:
+  1. Regrouper les mots en sous-titres lisibles (groupes de 2-5 mots)
+  2. Assigner les zooms sur les mots forts (is_strong: true)
+  3. Assigner les SFX sur les transitions de segments
+  4. Appliquer la colorimetrie selon le mode emotionnel
 
 ---
 
 ## MODE D'EMPLOI
 
 1. L'operateur choisit le **MODE EMOTIONNEL** (TRISTE, WHOLESOME, ...)
-2. F02A fourit la **description factuelle** (narrative.txt)
-3. F02A fourit les **donnees de tracking** (tracking_data.json)
-4. L'Oracle lit le metaprompt + les entrees
-5. L'Oracle **invente** une histoire emotionnelle
-6. L'Oracle genere le **codex.json** (texte + timing + zooms + SFX + couleurs)
+2. F01B fourit **timing.json** (mots + timestamps + mots forts)
+3. F02A fourit **narrative.txt** (description visuelle, pour info)
+4. L'Oracle lit timing.json + le metaprompt
+5. L'Oracle genere le **codex.json** (sous-titres + zooms + SFX + couleurs)
 
 ---
 
 ## LE PRINCIPE
 
-Le metaprompt F02B n'est pas un generateur de texte percutant.
-C'est un **transformateur d'emotion**.
-
-Il prend une realite banale (un chien qui s'entraine) et la transforme en **recit emotionnel** qui n'est pas forcement la realite de la video — c'est l'histoire que le texte raconte a l'ecran qui donne son sens a la video.
-
-### Exemple
-
 ```
-REALITE (F02A) : "Un homme lance une balle a son chien dans un parc."
-MODE : TRISTE
-
-TRANSFORMATION (F02B) :
-  "This is Max."                    → setup
-  "His owner passed away last week." → twist
-  "But today, he asked to train one last time." → emotional_peak
-  "Good boy, Max."                  → resolution
-
-RESULTAT : Les gens pleurent. Partages massifs. Monetisation active.
-```
-
-```
-REALITE (F02A) : "Un homme lance une balle a son chien dans un parc."
-MODE : WHOLESOME
-
-TRANSFORMATION (F02B) :
-  "This dog was rescued from a shelter."  → setup
-  "He had never played before."           → context
-  "Today, he learned what joy feels like." → peak
-  "Every dog deserves a second chance."   → resolution
-
-RESULTAT : Les gens commentent "quelle lecon". Engagement maximal.
+timing.json (Whisper)              codex.json (F02B)
+┌──────────────────────┐          ┌──────────────────────────┐
+│ "This" 0.0s-0.3s     │          │ text_overlays:           │
+│ "is"   0.3s-0.5s     │──→──→──→ │   "This is Max"          │
+│ "Max"  0.5s-0.8s     │  groupe  │   start_frame: 0         │
+│                      │          │   end_frame: 24          │
+│ "His"  1.0s-1.2s     │          │                          │
+│ "owner" 1.2s-1.6s    │──→──→──→ │   "His owner passed"     │
+│ "passed" 1.6s-2.0s   │  groupe  │   start_frame: 30        │
+│                      │          │   end_frame: 60          │
+│ is_strong: "Max"     │──→──→──→ │ zoom_keyframes:          │
+│ is_strong: "passed"  │  zoom    │   frame 15: zoom 1.3x    │
+└──────────────────────┘          └──────────────────────────┘
 ```
 
 ---
 
-## LES MODES EMOTIONNELS
+## LES MODES EMOTIONNELS (inchanges V1)
 
-| Mode | Effet recherche | Reaction audience | Colorimetrie | Vitesse texte | Type de zoom |
-|------|----------------|-------------------|--------------|---------------|--------------|
-| TRISTE | Tristesse, empathie | "Je pleure" | Froid, desature | Lent (fade) | Lent sur le visage |
-| WHOLESOME | Chaleur, bienveillance | "Quelle lecon" | Chaud, vibrant | Moyen (typewriter) | Doux, progressif |
-| *(extensible)* | | | | | |
+| Mode | Colorimetrie | Vitesse zoom | Type SFX |
+|------|-------------|-------------|----------|
+| TRISTE | Froid, desature | Lent | Keyboard doux |
+| WHOLESOME | Chaud, vibrant | Doux, progressif | Keyboard + whoosh |
+| *(extensible)* | | | |
 
 ---
 
-## PROMPT (A AFFINER PAR L'OPERATEUR)
+## PROMPT
 
 ```
-Tu es un CREATEUR D'EMOTION pour YouTube Shorts.
+Tu es un SYNCHRONISATEUR de sous-titres pour YouTube Shorts.
 
 Tu recois :
-1. Une description factuelle d'une video (ce qu'on y voit reellement)
+1. timing.json — la transcription mot par mot avec timestamps exacts
 2. Un mode emotionnel (TRISTE / WHOLESOME / ...)
-3. La duree de la video et son nombre de frames
-4. Les donnees de tracking (ou se trouve la cible dans l'image)
+3. La description visuelle de F02A (pour info seulement)
 
 TA MISSION :
-Transformer cette realite banale en un REcit EMOTIONNEL via le texte a l'ecran.
-Le texte n'est pas la realite — c'est l'HISTOIRE que tu inventes pour donner
-un sens emotionnel a la video.
+Transformer timing.json en codex.json avec des sous-titres synchronises.
 
-REGLES :
-- Chaque texte fait 2-6 mots (court, percutant)
-- Le texte dirige la video : son timing dicte le rythme
-- 4-6 textes maximum pour un Short de 10-15s
-- Structure narrative : setup → twist/context → emotional_peak → resolution
-- Le timing (start_frame/end_frame) cree l'emotion :
-  * Un texte qui reste longtemps = poids emotionnel
-  * Un texte qui claque vite = tension
-- Les zooms suivent les textes (pas l'inverse)
-- Les SFX suivent les textes (keyboard a chaque apparition, whoosh sur les zooms)
-- La colorimetrie suit le mode emotionnel
+REGLES DE GROUPAGE :
+- Regroupe les mots en blocs de 2-5 mots maximum (lisibilite ecran)
+- Chaque bloc = un text_overlay avec start_frame et end_frame exacts
+- Les blocs se suivent sans chevauchement
+- Un mot fort (is_strong: true) debute un nouveau bloc si possible
 
-SORTIE : codex.json au format defini (voir OMNIS_TRANSFER_LOG.md)
+REGLES DE ZOOM :
+- Zoom sur chaque mot fort (is_strong: true)
+- Zoom progressif: 1.0x → 1.2x-1.5x → retour 1.0x
+- Le zoom dure la duree du bloc contenant le mot fort
+- Mode TRISTE: zoom lent (10 frames pour atteindre le pic)
+- Mode WHOLESOME: zoom doux (6 frames pour atteindre le pic)
+
+REGLES DE SFX :
+- keyboard: a chaque apparition de sous-titre (start_frame du bloc)
+- whoosh: a chaque zoom (start_frame du zoom)
+- Le volume suit le mode: TRISTE=doux (0.2), WHOLESOME=normal (0.4)
+
+REGLES DE COLORIMETRIE :
+- TRISTE: contrast(0.9) saturate(0.7) brightness(0.95) — froid, desature
+- WHOLESOME: contrast(1.3) saturate(1.4) brightness(1.05) — chaud, vibrant
+
+SORTIE : codex.json au format defini
 ```
 
 ---
 
 ## NOTES
 
-- **Le metaprompt sera affine par l'operateur** au fil des productions
-- De nouveaux modes emotionnels peuvent etre ajoutes (TENSION, SURPRISE, NOSTALGIE, ...)
-- L'Oracle ne voit pas la video — il ne fait que transformer le texte de F02A
-- OpenRouter Vision (F02A) = les yeux ; Oracle (F02B) = le cerveau
+- L'Oracle ne voit pas la video — il ne fait que synchroniser timing.json
+- La voix off existe deja (audio_clean.mp3 de F01A)
+- Les sous-titres sont EXACTS (mots de Whisper), pas inventes
+- Les mots forts (is_strong) sont la cle des zooms automatiques
