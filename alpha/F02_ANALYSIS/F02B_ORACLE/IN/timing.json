@@ -1,0 +1,1257 @@
+{
+  "meta": {
+    "fps": 30,
+    "duration_seconds": 16.12,
+    "total_frames": 484,
+    "audio_path": "../IN/audio_clean.mp3",
+    "model": "base",
+    "language": "en",
+    "language_probability": 0.995,
+    "word_count": 65,
+    "strong_word_count": 6
+  },
+  "words": [
+    {
+      "word": "It's",
+      "start": 0.0,
+      "end": 0.22,
+      "start_frame": 0,
+      "end_frame": 7,
+      "probability": 0.8233,
+      "is_strong": false
+    },
+    {
+      "word": "only",
+      "start": 0.22,
+      "end": 0.42,
+      "start_frame": 7,
+      "end_frame": 13,
+      "probability": 0.9842,
+      "is_strong": false
+    },
+    {
+      "word": "three,",
+      "start": 0.42,
+      "end": 0.76,
+      "start_frame": 13,
+      "end_frame": 23,
+      "probability": 0.7772,
+      "is_strong": false
+    },
+    {
+      "word": "and",
+      "start": 1.04,
+      "end": 1.1,
+      "start_frame": 31,
+      "end_frame": 33,
+      "probability": 0.9931,
+      "is_strong": false
+    },
+    {
+      "word": "tonight",
+      "start": 1.1,
+      "end": 1.36,
+      "start_frame": 33,
+      "end_frame": 41,
+      "probability": 0.9919,
+      "is_strong": true
+    },
+    {
+      "word": "he",
+      "start": 1.36,
+      "end": 1.62,
+      "start_frame": 41,
+      "end_frame": 49,
+      "probability": 0.7449,
+      "is_strong": false
+    },
+    {
+      "word": "asked",
+      "start": 1.62,
+      "end": 1.76,
+      "start_frame": 49,
+      "end_frame": 53,
+      "probability": 0.791,
+      "is_strong": false
+    },
+    {
+      "word": "the",
+      "start": 1.76,
+      "end": 1.92,
+      "start_frame": 53,
+      "end_frame": 58,
+      "probability": 0.9713,
+      "is_strong": false
+    },
+    {
+      "word": "question,",
+      "start": 1.92,
+      "end": 2.28,
+      "start_frame": 58,
+      "end_frame": 68,
+      "probability": 0.9982,
+      "is_strong": true
+    },
+    {
+      "word": "Mommy,",
+      "start": 2.7,
+      "end": 2.88,
+      "start_frame": 81,
+      "end_frame": 86,
+      "probability": 0.0759,
+      "is_strong": false
+    },
+    {
+      "word": "will",
+      "start": 3.04,
+      "end": 3.1,
+      "start_frame": 91,
+      "end_frame": 93,
+      "probability": 0.8739,
+      "is_strong": false
+    },
+    {
+      "word": "you",
+      "start": 3.1,
+      "end": 3.22,
+      "start_frame": 93,
+      "end_frame": 97,
+      "probability": 0.9973,
+      "is_strong": false
+    },
+    {
+      "word": "marry",
+      "start": 3.22,
+      "end": 3.44,
+      "start_frame": 97,
+      "end_frame": 103,
+      "probability": 0.9975,
+      "is_strong": false
+    },
+    {
+      "word": "me?",
+      "start": 3.44,
+      "end": 3.64,
+      "start_frame": 103,
+      "end_frame": 109,
+      "probability": 0.9889,
+      "is_strong": false
+    },
+    {
+      "word": "She",
+      "start": 3.96,
+      "end": 4.1,
+      "start_frame": 119,
+      "end_frame": 123,
+      "probability": 0.9365,
+      "is_strong": false
+    },
+    {
+      "word": "didn't",
+      "start": 4.1,
+      "end": 4.52,
+      "start_frame": 123,
+      "end_frame": 136,
+      "probability": 0.9965,
+      "is_strong": true
+    },
+    {
+      "word": "laugh,",
+      "start": 4.52,
+      "end": 4.72,
+      "start_frame": 136,
+      "end_frame": 142,
+      "probability": 0.9983,
+      "is_strong": false
+    },
+    {
+      "word": "she",
+      "start": 4.9,
+      "end": 4.98,
+      "start_frame": 147,
+      "end_frame": 149,
+      "probability": 0.9865,
+      "is_strong": false
+    },
+    {
+      "word": "didn't",
+      "start": 4.98,
+      "end": 5.18,
+      "start_frame": 149,
+      "end_frame": 155,
+      "probability": 0.9989,
+      "is_strong": false
+    },
+    {
+      "word": "say",
+      "start": 5.18,
+      "end": 5.34,
+      "start_frame": 155,
+      "end_frame": 160,
+      "probability": 0.998,
+      "is_strong": false
+    },
+    {
+      "word": "no.",
+      "start": 5.34,
+      "end": 5.56,
+      "start_frame": 160,
+      "end_frame": 167,
+      "probability": 0.9793,
+      "is_strong": false
+    },
+    {
+      "word": "She",
+      "start": 5.82,
+      "end": 5.98,
+      "start_frame": 175,
+      "end_frame": 179,
+      "probability": 0.9922,
+      "is_strong": false
+    },
+    {
+      "word": "took",
+      "start": 5.98,
+      "end": 6.14,
+      "start_frame": 179,
+      "end_frame": 184,
+      "probability": 0.9992,
+      "is_strong": false
+    },
+    {
+      "word": "his",
+      "start": 6.14,
+      "end": 6.3,
+      "start_frame": 184,
+      "end_frame": 189,
+      "probability": 0.9714,
+      "is_strong": false
+    },
+    {
+      "word": "little",
+      "start": 6.3,
+      "end": 6.44,
+      "start_frame": 189,
+      "end_frame": 193,
+      "probability": 0.9975,
+      "is_strong": false
+    },
+    {
+      "word": "hand",
+      "start": 6.44,
+      "end": 6.74,
+      "start_frame": 193,
+      "end_frame": 202,
+      "probability": 0.9992,
+      "is_strong": false
+    },
+    {
+      "word": "and",
+      "start": 6.74,
+      "end": 6.94,
+      "start_frame": 202,
+      "end_frame": 208,
+      "probability": 0.9471,
+      "is_strong": false
+    },
+    {
+      "word": "placed",
+      "start": 6.94,
+      "end": 7.2,
+      "start_frame": 208,
+      "end_frame": 216,
+      "probability": 0.9913,
+      "is_strong": false
+    },
+    {
+      "word": "a",
+      "start": 7.2,
+      "end": 7.38,
+      "start_frame": 216,
+      "end_frame": 221,
+      "probability": 0.7911,
+      "is_strong": false
+    },
+    {
+      "word": "ring",
+      "start": 7.38,
+      "end": 7.52,
+      "start_frame": 221,
+      "end_frame": 226,
+      "probability": 0.9978,
+      "is_strong": false
+    },
+    {
+      "word": "on",
+      "start": 7.52,
+      "end": 7.66,
+      "start_frame": 226,
+      "end_frame": 230,
+      "probability": 0.9986,
+      "is_strong": false
+    },
+    {
+      "word": "his",
+      "start": 7.66,
+      "end": 7.8,
+      "start_frame": 230,
+      "end_frame": 234,
+      "probability": 0.9843,
+      "is_strong": false
+    },
+    {
+      "word": "finger.",
+      "start": 7.8,
+      "end": 8.1,
+      "start_frame": 234,
+      "end_frame": 243,
+      "probability": 0.9951,
+      "is_strong": false
+    },
+    {
+      "word": "Pink",
+      "start": 8.44,
+      "end": 8.66,
+      "start_frame": 253,
+      "end_frame": 260,
+      "probability": 0.5321,
+      "is_strong": false
+    },
+    {
+      "word": "one,",
+      "start": 8.66,
+      "end": 9.0,
+      "start_frame": 260,
+      "end_frame": 270,
+      "probability": 0.3898,
+      "is_strong": false
+    },
+    {
+      "word": "the",
+      "start": 9.16,
+      "end": 9.22,
+      "start_frame": 275,
+      "end_frame": 277,
+      "probability": 0.9345,
+      "is_strong": false
+    },
+    {
+      "word": "most",
+      "start": 9.22,
+      "end": 9.42,
+      "start_frame": 277,
+      "end_frame": 283,
+      "probability": 0.9908,
+      "is_strong": false
+    },
+    {
+      "word": "precious",
+      "start": 9.42,
+      "end": 9.72,
+      "start_frame": 283,
+      "end_frame": 292,
+      "probability": 0.9977,
+      "is_strong": true
+    },
+    {
+      "word": "ring",
+      "start": 9.72,
+      "end": 9.96,
+      "start_frame": 292,
+      "end_frame": 299,
+      "probability": 0.9878,
+      "is_strong": false
+    },
+    {
+      "word": "in",
+      "start": 9.96,
+      "end": 10.06,
+      "start_frame": 299,
+      "end_frame": 302,
+      "probability": 0.9656,
+      "is_strong": false
+    },
+    {
+      "word": "the",
+      "start": 10.06,
+      "end": 10.14,
+      "start_frame": 302,
+      "end_frame": 304,
+      "probability": 0.9979,
+      "is_strong": false
+    },
+    {
+      "word": "world,",
+      "start": 10.14,
+      "end": 10.38,
+      "start_frame": 304,
+      "end_frame": 311,
+      "probability": 0.9986,
+      "is_strong": false
+    },
+    {
+      "word": "he",
+      "start": 10.52,
+      "end": 10.6,
+      "start_frame": 316,
+      "end_frame": 318,
+      "probability": 0.9722,
+      "is_strong": false
+    },
+    {
+      "word": "held",
+      "start": 10.6,
+      "end": 10.84,
+      "start_frame": 318,
+      "end_frame": 325,
+      "probability": 0.9982,
+      "is_strong": false
+    },
+    {
+      "word": "his",
+      "start": 10.84,
+      "end": 10.98,
+      "start_frame": 325,
+      "end_frame": 329,
+      "probability": 0.9851,
+      "is_strong": false
+    },
+    {
+      "word": "snacks,",
+      "start": 10.98,
+      "end": 11.28,
+      "start_frame": 329,
+      "end_frame": 338,
+      "probability": 0.9216,
+      "is_strong": false
+    },
+    {
+      "word": "she",
+      "start": 11.64,
+      "end": 11.76,
+      "start_frame": 349,
+      "end_frame": 353,
+      "probability": 0.9686,
+      "is_strong": false
+    },
+    {
+      "word": "held",
+      "start": 11.76,
+      "end": 11.92,
+      "start_frame": 353,
+      "end_frame": 358,
+      "probability": 0.9994,
+      "is_strong": false
+    },
+    {
+      "word": "her",
+      "start": 11.92,
+      "end": 12.04,
+      "start_frame": 358,
+      "end_frame": 361,
+      "probability": 0.9807,
+      "is_strong": false
+    },
+    {
+      "word": "tears",
+      "start": 12.04,
+      "end": 12.3,
+      "start_frame": 361,
+      "end_frame": 369,
+      "probability": 0.9917,
+      "is_strong": false
+    },
+    {
+      "word": "one",
+      "start": 12.3,
+      "end": 12.62,
+      "start_frame": 369,
+      "end_frame": 379,
+      "probability": 0.6556,
+      "is_strong": false
+    },
+    {
+      "word": "day,",
+      "start": 12.62,
+      "end": 12.9,
+      "start_frame": 379,
+      "end_frame": 387,
+      "probability": 0.9971,
+      "is_strong": false
+    },
+    {
+      "word": "he'll",
+      "start": 13.26,
+      "end": 13.38,
+      "start_frame": 398,
+      "end_frame": 401,
+      "probability": 0.9909,
+      "is_strong": false
+    },
+    {
+      "word": "understand,",
+      "start": 13.38,
+      "end": 13.8,
+      "start_frame": 401,
+      "end_frame": 414,
+      "probability": 0.9988,
+      "is_strong": true
+    },
+    {
+      "word": "but",
+      "start": 13.92,
+      "end": 14.0,
+      "start_frame": 418,
+      "end_frame": 420,
+      "probability": 0.9877,
+      "is_strong": false
+    },
+    {
+      "word": "tonight",
+      "start": 14.0,
+      "end": 14.24,
+      "start_frame": 420,
+      "end_frame": 427,
+      "probability": 0.996,
+      "is_strong": true
+    },
+    {
+      "word": "he's",
+      "start": 14.24,
+      "end": 14.52,
+      "start_frame": 427,
+      "end_frame": 436,
+      "probability": 0.9586,
+      "is_strong": false
+    },
+    {
+      "word": "just",
+      "start": 14.52,
+      "end": 14.62,
+      "start_frame": 436,
+      "end_frame": 439,
+      "probability": 0.9916,
+      "is_strong": false
+    },
+    {
+      "word": "a",
+      "start": 14.62,
+      "end": 14.74,
+      "start_frame": 439,
+      "end_frame": 442,
+      "probability": 0.9858,
+      "is_strong": false
+    },
+    {
+      "word": "boy",
+      "start": 14.74,
+      "end": 14.9,
+      "start_frame": 442,
+      "end_frame": 447,
+      "probability": 0.9865,
+      "is_strong": false
+    },
+    {
+      "word": "in",
+      "start": 14.9,
+      "end": 15.04,
+      "start_frame": 447,
+      "end_frame": 451,
+      "probability": 0.879,
+      "is_strong": false
+    },
+    {
+      "word": "love",
+      "start": 15.04,
+      "end": 15.22,
+      "start_frame": 451,
+      "end_frame": 457,
+      "probability": 0.998,
+      "is_strong": false
+    },
+    {
+      "word": "with",
+      "start": 15.22,
+      "end": 15.46,
+      "start_frame": 457,
+      "end_frame": 464,
+      "probability": 0.9963,
+      "is_strong": false
+    },
+    {
+      "word": "his",
+      "start": 15.46,
+      "end": 15.62,
+      "start_frame": 464,
+      "end_frame": 469,
+      "probability": 0.9983,
+      "is_strong": false
+    },
+    {
+      "word": "mom.",
+      "start": 15.62,
+      "end": 15.84,
+      "start_frame": 469,
+      "end_frame": 475,
+      "probability": 0.6415,
+      "is_strong": false
+    }
+  ],
+  "segments": [
+    {
+      "id": 0,
+      "text": "It's only three, and tonight he asked the question,",
+      "start": 0.0,
+      "end": 2.28,
+      "start_frame": 0,
+      "end_frame": 68,
+      "words": [
+        {
+          "word": "It's",
+          "start": 0.0,
+          "end": 0.22,
+          "start_frame": 0,
+          "end_frame": 7,
+          "probability": 0.8233,
+          "is_strong": false
+        },
+        {
+          "word": "only",
+          "start": 0.22,
+          "end": 0.42,
+          "start_frame": 7,
+          "end_frame": 13,
+          "probability": 0.9842,
+          "is_strong": false
+        },
+        {
+          "word": "three,",
+          "start": 0.42,
+          "end": 0.76,
+          "start_frame": 13,
+          "end_frame": 23,
+          "probability": 0.7772,
+          "is_strong": false
+        },
+        {
+          "word": "and",
+          "start": 1.04,
+          "end": 1.1,
+          "start_frame": 31,
+          "end_frame": 33,
+          "probability": 0.9931,
+          "is_strong": false
+        },
+        {
+          "word": "tonight",
+          "start": 1.1,
+          "end": 1.36,
+          "start_frame": 33,
+          "end_frame": 41,
+          "probability": 0.9919,
+          "is_strong": true
+        },
+        {
+          "word": "he",
+          "start": 1.36,
+          "end": 1.62,
+          "start_frame": 41,
+          "end_frame": 49,
+          "probability": 0.7449,
+          "is_strong": false
+        },
+        {
+          "word": "asked",
+          "start": 1.62,
+          "end": 1.76,
+          "start_frame": 49,
+          "end_frame": 53,
+          "probability": 0.791,
+          "is_strong": false
+        },
+        {
+          "word": "the",
+          "start": 1.76,
+          "end": 1.92,
+          "start_frame": 53,
+          "end_frame": 58,
+          "probability": 0.9713,
+          "is_strong": false
+        },
+        {
+          "word": "question,",
+          "start": 1.92,
+          "end": 2.28,
+          "start_frame": 58,
+          "end_frame": 68,
+          "probability": 0.9982,
+          "is_strong": true
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "text": "Mommy, will you marry me?",
+      "start": 2.7,
+      "end": 3.64,
+      "start_frame": 81,
+      "end_frame": 109,
+      "words": [
+        {
+          "word": "Mommy,",
+          "start": 2.7,
+          "end": 2.88,
+          "start_frame": 81,
+          "end_frame": 86,
+          "probability": 0.0759,
+          "is_strong": false
+        },
+        {
+          "word": "will",
+          "start": 3.04,
+          "end": 3.1,
+          "start_frame": 91,
+          "end_frame": 93,
+          "probability": 0.8739,
+          "is_strong": false
+        },
+        {
+          "word": "you",
+          "start": 3.1,
+          "end": 3.22,
+          "start_frame": 93,
+          "end_frame": 97,
+          "probability": 0.9973,
+          "is_strong": false
+        },
+        {
+          "word": "marry",
+          "start": 3.22,
+          "end": 3.44,
+          "start_frame": 97,
+          "end_frame": 103,
+          "probability": 0.9975,
+          "is_strong": false
+        },
+        {
+          "word": "me?",
+          "start": 3.44,
+          "end": 3.64,
+          "start_frame": 103,
+          "end_frame": 109,
+          "probability": 0.9889,
+          "is_strong": false
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "text": "She didn't laugh, she didn't say no.",
+      "start": 3.96,
+      "end": 5.56,
+      "start_frame": 119,
+      "end_frame": 167,
+      "words": [
+        {
+          "word": "She",
+          "start": 3.96,
+          "end": 4.1,
+          "start_frame": 119,
+          "end_frame": 123,
+          "probability": 0.9365,
+          "is_strong": false
+        },
+        {
+          "word": "didn't",
+          "start": 4.1,
+          "end": 4.52,
+          "start_frame": 123,
+          "end_frame": 136,
+          "probability": 0.9965,
+          "is_strong": true
+        },
+        {
+          "word": "laugh,",
+          "start": 4.52,
+          "end": 4.72,
+          "start_frame": 136,
+          "end_frame": 142,
+          "probability": 0.9983,
+          "is_strong": false
+        },
+        {
+          "word": "she",
+          "start": 4.9,
+          "end": 4.98,
+          "start_frame": 147,
+          "end_frame": 149,
+          "probability": 0.9865,
+          "is_strong": false
+        },
+        {
+          "word": "didn't",
+          "start": 4.98,
+          "end": 5.18,
+          "start_frame": 149,
+          "end_frame": 155,
+          "probability": 0.9989,
+          "is_strong": false
+        },
+        {
+          "word": "say",
+          "start": 5.18,
+          "end": 5.34,
+          "start_frame": 155,
+          "end_frame": 160,
+          "probability": 0.998,
+          "is_strong": false
+        },
+        {
+          "word": "no.",
+          "start": 5.34,
+          "end": 5.56,
+          "start_frame": 160,
+          "end_frame": 167,
+          "probability": 0.9793,
+          "is_strong": false
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "text": "She took his little hand and placed a ring on his finger.",
+      "start": 5.82,
+      "end": 8.1,
+      "start_frame": 175,
+      "end_frame": 243,
+      "words": [
+        {
+          "word": "She",
+          "start": 5.82,
+          "end": 5.98,
+          "start_frame": 175,
+          "end_frame": 179,
+          "probability": 0.9922,
+          "is_strong": false
+        },
+        {
+          "word": "took",
+          "start": 5.98,
+          "end": 6.14,
+          "start_frame": 179,
+          "end_frame": 184,
+          "probability": 0.9992,
+          "is_strong": false
+        },
+        {
+          "word": "his",
+          "start": 6.14,
+          "end": 6.3,
+          "start_frame": 184,
+          "end_frame": 189,
+          "probability": 0.9714,
+          "is_strong": false
+        },
+        {
+          "word": "little",
+          "start": 6.3,
+          "end": 6.44,
+          "start_frame": 189,
+          "end_frame": 193,
+          "probability": 0.9975,
+          "is_strong": false
+        },
+        {
+          "word": "hand",
+          "start": 6.44,
+          "end": 6.74,
+          "start_frame": 193,
+          "end_frame": 202,
+          "probability": 0.9992,
+          "is_strong": false
+        },
+        {
+          "word": "and",
+          "start": 6.74,
+          "end": 6.94,
+          "start_frame": 202,
+          "end_frame": 208,
+          "probability": 0.9471,
+          "is_strong": false
+        },
+        {
+          "word": "placed",
+          "start": 6.94,
+          "end": 7.2,
+          "start_frame": 208,
+          "end_frame": 216,
+          "probability": 0.9913,
+          "is_strong": false
+        },
+        {
+          "word": "a",
+          "start": 7.2,
+          "end": 7.38,
+          "start_frame": 216,
+          "end_frame": 221,
+          "probability": 0.7911,
+          "is_strong": false
+        },
+        {
+          "word": "ring",
+          "start": 7.38,
+          "end": 7.52,
+          "start_frame": 221,
+          "end_frame": 226,
+          "probability": 0.9978,
+          "is_strong": false
+        },
+        {
+          "word": "on",
+          "start": 7.52,
+          "end": 7.66,
+          "start_frame": 226,
+          "end_frame": 230,
+          "probability": 0.9986,
+          "is_strong": false
+        },
+        {
+          "word": "his",
+          "start": 7.66,
+          "end": 7.8,
+          "start_frame": 230,
+          "end_frame": 234,
+          "probability": 0.9843,
+          "is_strong": false
+        },
+        {
+          "word": "finger.",
+          "start": 7.8,
+          "end": 8.1,
+          "start_frame": 234,
+          "end_frame": 243,
+          "probability": 0.9951,
+          "is_strong": false
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "text": "Pink one, the most precious ring in the world, he held his snacks,",
+      "start": 8.44,
+      "end": 11.28,
+      "start_frame": 253,
+      "end_frame": 338,
+      "words": [
+        {
+          "word": "Pink",
+          "start": 8.44,
+          "end": 8.66,
+          "start_frame": 253,
+          "end_frame": 260,
+          "probability": 0.5321,
+          "is_strong": false
+        },
+        {
+          "word": "one,",
+          "start": 8.66,
+          "end": 9.0,
+          "start_frame": 260,
+          "end_frame": 270,
+          "probability": 0.3898,
+          "is_strong": false
+        },
+        {
+          "word": "the",
+          "start": 9.16,
+          "end": 9.22,
+          "start_frame": 275,
+          "end_frame": 277,
+          "probability": 0.9345,
+          "is_strong": false
+        },
+        {
+          "word": "most",
+          "start": 9.22,
+          "end": 9.42,
+          "start_frame": 277,
+          "end_frame": 283,
+          "probability": 0.9908,
+          "is_strong": false
+        },
+        {
+          "word": "precious",
+          "start": 9.42,
+          "end": 9.72,
+          "start_frame": 283,
+          "end_frame": 292,
+          "probability": 0.9977,
+          "is_strong": true
+        },
+        {
+          "word": "ring",
+          "start": 9.72,
+          "end": 9.96,
+          "start_frame": 292,
+          "end_frame": 299,
+          "probability": 0.9878,
+          "is_strong": false
+        },
+        {
+          "word": "in",
+          "start": 9.96,
+          "end": 10.06,
+          "start_frame": 299,
+          "end_frame": 302,
+          "probability": 0.9656,
+          "is_strong": false
+        },
+        {
+          "word": "the",
+          "start": 10.06,
+          "end": 10.14,
+          "start_frame": 302,
+          "end_frame": 304,
+          "probability": 0.9979,
+          "is_strong": false
+        },
+        {
+          "word": "world,",
+          "start": 10.14,
+          "end": 10.38,
+          "start_frame": 304,
+          "end_frame": 311,
+          "probability": 0.9986,
+          "is_strong": false
+        },
+        {
+          "word": "he",
+          "start": 10.52,
+          "end": 10.6,
+          "start_frame": 316,
+          "end_frame": 318,
+          "probability": 0.9722,
+          "is_strong": false
+        },
+        {
+          "word": "held",
+          "start": 10.6,
+          "end": 10.84,
+          "start_frame": 318,
+          "end_frame": 325,
+          "probability": 0.9982,
+          "is_strong": false
+        },
+        {
+          "word": "his",
+          "start": 10.84,
+          "end": 10.98,
+          "start_frame": 325,
+          "end_frame": 329,
+          "probability": 0.9851,
+          "is_strong": false
+        },
+        {
+          "word": "snacks,",
+          "start": 10.98,
+          "end": 11.28,
+          "start_frame": 329,
+          "end_frame": 338,
+          "probability": 0.9216,
+          "is_strong": false
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "text": "she held her tears one day, he'll understand,",
+      "start": 11.64,
+      "end": 13.8,
+      "start_frame": 349,
+      "end_frame": 414,
+      "words": [
+        {
+          "word": "she",
+          "start": 11.64,
+          "end": 11.76,
+          "start_frame": 349,
+          "end_frame": 353,
+          "probability": 0.9686,
+          "is_strong": false
+        },
+        {
+          "word": "held",
+          "start": 11.76,
+          "end": 11.92,
+          "start_frame": 353,
+          "end_frame": 358,
+          "probability": 0.9994,
+          "is_strong": false
+        },
+        {
+          "word": "her",
+          "start": 11.92,
+          "end": 12.04,
+          "start_frame": 358,
+          "end_frame": 361,
+          "probability": 0.9807,
+          "is_strong": false
+        },
+        {
+          "word": "tears",
+          "start": 12.04,
+          "end": 12.3,
+          "start_frame": 361,
+          "end_frame": 369,
+          "probability": 0.9917,
+          "is_strong": false
+        },
+        {
+          "word": "one",
+          "start": 12.3,
+          "end": 12.62,
+          "start_frame": 369,
+          "end_frame": 379,
+          "probability": 0.6556,
+          "is_strong": false
+        },
+        {
+          "word": "day,",
+          "start": 12.62,
+          "end": 12.9,
+          "start_frame": 379,
+          "end_frame": 387,
+          "probability": 0.9971,
+          "is_strong": false
+        },
+        {
+          "word": "he'll",
+          "start": 13.26,
+          "end": 13.38,
+          "start_frame": 398,
+          "end_frame": 401,
+          "probability": 0.9909,
+          "is_strong": false
+        },
+        {
+          "word": "understand,",
+          "start": 13.38,
+          "end": 13.8,
+          "start_frame": 401,
+          "end_frame": 414,
+          "probability": 0.9988,
+          "is_strong": true
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "text": "but tonight he's just a boy in love with his mom.",
+      "start": 13.92,
+      "end": 15.84,
+      "start_frame": 418,
+      "end_frame": 475,
+      "words": [
+        {
+          "word": "but",
+          "start": 13.92,
+          "end": 14.0,
+          "start_frame": 418,
+          "end_frame": 420,
+          "probability": 0.9877,
+          "is_strong": false
+        },
+        {
+          "word": "tonight",
+          "start": 14.0,
+          "end": 14.24,
+          "start_frame": 420,
+          "end_frame": 427,
+          "probability": 0.996,
+          "is_strong": true
+        },
+        {
+          "word": "he's",
+          "start": 14.24,
+          "end": 14.52,
+          "start_frame": 427,
+          "end_frame": 436,
+          "probability": 0.9586,
+          "is_strong": false
+        },
+        {
+          "word": "just",
+          "start": 14.52,
+          "end": 14.62,
+          "start_frame": 436,
+          "end_frame": 439,
+          "probability": 0.9916,
+          "is_strong": false
+        },
+        {
+          "word": "a",
+          "start": 14.62,
+          "end": 14.74,
+          "start_frame": 439,
+          "end_frame": 442,
+          "probability": 0.9858,
+          "is_strong": false
+        },
+        {
+          "word": "boy",
+          "start": 14.74,
+          "end": 14.9,
+          "start_frame": 442,
+          "end_frame": 447,
+          "probability": 0.9865,
+          "is_strong": false
+        },
+        {
+          "word": "in",
+          "start": 14.9,
+          "end": 15.04,
+          "start_frame": 447,
+          "end_frame": 451,
+          "probability": 0.879,
+          "is_strong": false
+        },
+        {
+          "word": "love",
+          "start": 15.04,
+          "end": 15.22,
+          "start_frame": 451,
+          "end_frame": 457,
+          "probability": 0.998,
+          "is_strong": false
+        },
+        {
+          "word": "with",
+          "start": 15.22,
+          "end": 15.46,
+          "start_frame": 457,
+          "end_frame": 464,
+          "probability": 0.9963,
+          "is_strong": false
+        },
+        {
+          "word": "his",
+          "start": 15.46,
+          "end": 15.62,
+          "start_frame": 464,
+          "end_frame": 469,
+          "probability": 0.9983,
+          "is_strong": false
+        },
+        {
+          "word": "mom.",
+          "start": 15.62,
+          "end": 15.84,
+          "start_frame": 469,
+          "end_frame": 475,
+          "probability": 0.6415,
+          "is_strong": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,11 +1,45 @@
-# F02A VISION — Description Narrative
-# Modele: llama-3.2-11b-vision-instruct:free
-# Frames: 4
-# Date: simulation
+**1. SONS PROBABLEMENT PRÉSENTS**  
+- **Musique de fond** : piste continue, dynamique légère (ukulélé/piano/soft synth).  
+- **SFX “whoosh / pop”** : chaque apparition de texte animé (≈ 1.5 s, 2.9 s, 4.4 s, 5.9 s, 7.4 s, 8.8 s, 10.3 s).  
+- **Effet “keyboard typing”** : synchronisé avec le *déroulement* du texte (souvent dès le premier caractère qui apparaît).  
+- **Giggle / rire du bébé** : audible dès que le bébé sourit ou éclate de rire (≈ 2.9 s, 4.4 s, 5.9 s, 7.4 s, 8.8 s).  
+- **Petits “pop” ou “click”** : lorsqu’un accessoire (le petit pinceau rose) touche le visage du père (≈ 5.9 s, 7.4 s).  
+- **Ambiance de salon** : léger bourdonnement de la télévision ou du feu de cheminée en fond (très subtil).  
 
-A man is sitting on a park bench with his dog, a golden retriever. 
-The dog is resting its head on the man's lap. The man is gently petting 
-the dog's head. The park is empty, with autumn leaves on the ground. 
-The man looks down at the dog with a sad expression. The dog looks 
-up at the man. The man stops petting and looks away toward the 
-empty park. The dog stays still, watching him.
+**2. MOMENTS D’APPARITION DES SFX (texte / transition)**  
+| Timestamp | Événement visuel | SFX attendu |
+|-----------|------------------|------------|
+| **0.0 s** | Ouverture, aucune légende | *Whoosh* d’introduction (fade‑in de la musique). |
+| **1.5 s** | Texte “*A FATHER DOING” apparaît | *Pop* + *whoosh* + *keyboard typing* (début du texte). |
+| **2.9 s** | Texte “*A FATHER DOING FUNNY” ajouté | *Whoosh* + *pop* (nouvelle ligne). |
+| **4.4 s** | Texte “*A FATHER DOING FUNNY THINGS FOR” | *Whoosh* + *pop*. |
+| **5.9 s** | Texte complet “*A FATHER DOING FUNNY THINGS FOR BABY*” | *Whoosh* + *pop* + léger *ding* (accentuation du mot “BABY”). |
+| **7.4 s** | Texte vert “HIS” apparaît | *Whoosh* + *pop* (couleur change). |
+| **8.8 s** | Texte vert “HIS BABY SMILE MEANS” | *Whoosh* + *pop*. |
+| **10.3 s** | Texte vert final “HIS BABY SMILE MEANS EVERYTHING TO HIM” | *Whoosh* + *pop* + *ding* final. |
+
+**3. SYNCHRONISATION MUSIQUE / ACTION VISUELLE**  
+- La musique suit un **rythme régulier d’environ 100 BPM** (un battement toutes les 0,6 s).  
+- Chaque **nouvelle phrase texte** coïncide avec le **down‑beat** (le premier temps fort) de la mesure suivante, créant un effet de « punch » qui met en valeur le texte.  
+- Le **volume de la musique** reste constant, mais **augmente légèrement** (≈ +3 dB) aux timestamps 5.9 s et 10.3 s pour souligner le climax émotionnel (« BABY », « EVERYTHING TO HIM »).  
+- Le **bruit du pinceau** (léger « swish ») se synchronise avec le mouvement de la main du père, ajoutant un **SFX rythmique** qui renforce le timing de la musique.
+
+**4. RHYTHME DE LA VIDÉO**  
+- **Cuts rapides** : chaque image clé (texte qui apparaît) représente un **cut** d’environ 1,5 – 2 s.  
+- **Transitions** : majoritairement des **cuts directs** (pas de fondu), ce qui donne un **rythme saccadé** typique des Shorts.  
+- **Pace** : le montage accélère légèrement à partir de 5 s (plus de texte en moins de temps), créant un **accélération du tempo perçu**.
+
+**5. TRANSITIONS VISUELLES REQUISES EN SFX**  
+- **Whoosh / Swipe** : chaque fois que le texte change de couleur ou de contenu (vert → blanc, ou ajout d’une ligne).  
+- **Pop / Click** : au moment exact où le texte **déclenche** (premier caractère qui apparaît).  
+- **Impact léger** : lorsqu’un geste physique (pinceau sur la moustache, main qui touche le visage) se produit (≈ 5.9 s, 7.4 s) → SFX “pop” ou “thump” pour accentuer le mouvement.  
+
+**6. TYPE DE MUSIQUE PROBABLE**  
+- **Genre** : *Acoustic Pop* / *Feel‑good Indie* (ukulélé, piano léger, percussions douces).  
+- **Tempo** : **≈ 100–110 BPM**, assez entraînant pour garder l’attention du spectateur tout en restant chaleureux.  
+- **Ambiance** : **optimiste, chaleureuse, légère**, avec une dynamique qui monte légèrement aux moments clés (textes finals) afin de renforcer le lien émotionnel père‑enfant.  
+
+---
+
+**Résumé**  
+La vidéo utilise une musique de fond upbeat (≈ 100 BPM) qui reste en boucle, ponctuée de *whoosh* et *pop* à chaque apparition de texte, ainsi que de petits *clicks* rythmés qui suivent le mouvement du pinceau. Les cuts sont rapides (≈ 1,5 – 2 s) et les transitions visuelles nécessitent des SFX de type « whoosh » et « pop ». Le tout crée une ambiance joyeuse et émouvante, typique des YouTube Shorts « feel‑good ».
