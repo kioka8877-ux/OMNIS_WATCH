@@ -6,6 +6,24 @@
 
 ---
 
+## Versions
+
+| Mode | Statut | Description |
+|------|--------|-------------|
+| `alpha/` | Development | Base de developpement (V1 texte a l'ecran) |
+| `beta/` | **CANONISEE 2026-07-20** | Pipeline V2 voix off — valide bout en bout en production |
+| `v2-voix-off` (branche) | Backup intact | Sauvegarde de la branche de travail V2 |
+
+### Beta — Pipeline V2 Voix Off (canonisee)
+
+Pipeline complet valide en production le 2026-07-20 :
+F01 (coupe) → F02A (analyse NVIDIA + tracking) → F02B (codex emotionnel) → F02_PREVIEW (validation visuelle) → F03A (rendu Remotion) → F03B (mixage voix off + SFX) → F04 (camouflage) → F05 (Luther — empreinte effacee)
+
+Video test : enfant demandant "Can you marry me mummy?" — mode WHOLESOME
+Output : clean_final.mp4 (1080x1920, 16.1s, indetectable)
+
+---
+
 ## VICTORIA AETERNA
 
 ```

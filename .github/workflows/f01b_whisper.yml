@@ -29,11 +29,6 @@ jobs:
       - name: Install faster-whisper
         run: pip install faster-whisper --quiet
 
-      - name: Copy audio_clean to F01B input
-        run: |
-          mkdir -p alpha/F01_AUDIO/F01B_WHISPER/IN
-          cp alpha/F01_AUDIO/F01A_CASTELLAN/OUT/audio_clean.mp3 alpha/F01_AUDIO/F01B_WHISPER/IN/
-
       - name: Run F01B Whisper
         run: |
           cd alpha/F01_AUDIO/F01B_WHISPER/CODEBASE
