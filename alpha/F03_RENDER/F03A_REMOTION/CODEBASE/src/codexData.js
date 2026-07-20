@@ -1,4 +1,4 @@
-export default {
+export const codex = {
   "version": "2.0",
   "emotion_mode": "WHOLESOME",
   "narrative_arc": "setup → context → climax → emotional_peak → action → resolution",
