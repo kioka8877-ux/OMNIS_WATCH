@@ -1,0 +1,38 @@
+# F01A Castellan — Nettoyage Audio
+name: F01A Audio Clean
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Mode (alpha)'
+        required: true
+        default: 'alpha'
+
+permissions:
+  contents: write
+
+jobs:
+  f01a:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Run F01A Castellan
+        run: |
+          cd alpha/F01_AUDIO/F01A_CASTELLAN/CODEBASE
+          python3 omnis_f01a_castellan.py \
+            --input ../IN/ \
+            --output ../OUT/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: f01a-output
+          path: |
+            alpha/F01_AUDIO/F01A_CASTELLAN/OUT/audio_clean.mp3
+            alpha/F01_AUDIO/F01A_CASTELLAN/OUT/silence_map.json
