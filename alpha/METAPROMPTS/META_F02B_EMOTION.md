@@ -1,108 +1,146 @@
-# META_F02B_V2 — SYNCHRONISATEUR VOIX OFF
-## Metaprompt OMNIS-WATCH V2 — Voix Off Dirige
+# META_F02B V2 — CREATEUR D'EMOTION (VOIX OFF)
+## Metaprompt OMNIS-WATCH V2 — Script Voix Off
 
 > **Outil cible :** Oracle Sandbox (modele IA puissant gratuit)
-> L'Oracle recoit timing.json (Whisper) + description F02A + mode emotionnel.
+> L'Oracle recoit la description F02A + le mode emotionnel + la duree video.
+> Il genere un SCRIPT VOIX OFF (pas du texte d'ecran).
 
 ---
 
 ## CE QUI CHANGE EN V2
 
-En V1, l'Oracle INVENTAIT l'histoire (texte + timing).
-En V2, l'Oracle ne invente PLUS — il SYNCHRONISE.
+En V1, l'Oracle generait du TEXTE A L'ECRAN qui racontait l'histoire.
+En V2, l'Oracle genere un SCRIPT VOIX OFF que l'operateur transforme en audio.
 
-La voix off existe deja (audio_clean.mp3). Whisper a deja transcrit chaque mot
-avec son timestamp exact. L'Oracle ne fait que:
-  1. Regrouper les mots en sous-titres lisibles (groupes de 2-5 mots)
-  2. Assigner les zooms sur les mots forts (is_strong: true)
-  3. Assigner les SFX sur les transitions de segments
-  4. Appliquer la colorimetrie selon le mode emotionnel
-
----
-
-## MODE D'EMPLOI
-
-1. L'operateur choisit le **MODE EMOTIONNEL** (TRISTE, WHOLESOME, ...)
-2. F01B fourit **timing.json** (mots + timestamps + mots forts)
-3. F02A fourit **narrative.txt** (description visuelle, pour info)
-4. L'Oracle lit timing.json + le metaprompt
-5. L'Oracle genere le **codex.json** (sous-titres + zooms + SFX + couleurs)
+Le script voix off est ensuite:
+  1. Converti en audio_raw.mp3 (outil externe de l'operateur)
+  2. Nettoye par F01A (silences supprimes)
+  3. Transcrit par F01B Whisper (timing.json mot par mot)
+  4. Synchronise en sous-titres par F02B (auto, sur timing.json)
 
 ---
 
 ## LE PRINCIPE
 
 ```
-timing.json (Whisper)              codex.json (F02B)
-┌──────────────────────┐          ┌──────────────────────────┐
-│ "This" 0.0s-0.3s     │          │ text_overlays:           │
-│ "is"   0.3s-0.5s     │──→──→──→ │   "This is Max"          │
-│ "Max"  0.5s-0.8s     │  groupe  │   start_frame: 0         │
-│                      │          │   end_frame: 24          │
-│ "His"  1.0s-1.2s     │          │                          │
-│ "owner" 1.2s-1.6s    │──→──→──→ │   "His owner passed"     │
-│ "passed" 1.6s-2.0s   │  groupe  │   start_frame: 30        │
-│                      │          │   end_frame: 60          │
-│ is_strong: "Max"     │──→──→──→ │ zoom_keyframes:          │
-│ is_strong: "passed"  │  zoom    │   frame 15: zoom 1.3x    │
-└──────────────────────┘          └──────────────────────────┘
+DESCRIPTION F02A (ce qu'on voit)     SCRIPT VOIX OFF (ce qu'on entend)
+┌──────────────────────────────┐    ┌──────────────────────────────────┐
+│ "Un homme fait des choses    │    │ "Il s'appelle Max.              │
+│  amusantes pour son bebe"    │──→ │  Il a seulement cinq ans.       │
+│                              │    │  Chaque jour, il gardait        │
+│ Mode: WHOLESOME              │    │  son bonbon..."                 │
+│ Duree: 30s                   │    │                                  │
+│                              │    │  → L'operateur genere l'audio   │
+│                              │    │  → Whisper transcrit mot par mot│
+│                              │    │  → F02B sync en sous-titres     │
+└──────────────────────────────┘    └──────────────────────────────────┘
 ```
 
 ---
 
-## LES MODES EMOTIONNELS (inchanges V1)
+## MODE D'EMPLOI
 
-| Mode | Colorimetrie | Vitesse zoom | Type SFX |
-|------|-------------|-------------|----------|
-| TRISTE | Froid, desature | Lent | Keyboard doux |
-| WHOLESOME | Chaud, vibrant | Doux, progressif | Keyboard + whoosh |
-| *(extensible)* | | | |
+1. L'operateur choisit le **MODE EMOTIONNEL** (TRISTE, WHOLESOME, ...)
+2. F02A fourit la **description factuelle** (narrative.txt)
+3. L'Oracle lit le metaprompt + la description + le mode + la duree
+4. L'Oracle **invente** une histoire emotionnelle
+5. L'Oracle genere un **SCRIPT VOIX OFF** (texte a lire par une voix)
+6. L'operateur convertit le script en audio_raw.mp3 (outil externe)
+7. F01A nettoie l'audio, F01B transcrit, F02B synchronise
+
+---
+
+## LES MODES EMOTIONNELS
+
+| Mode | Tonalite voix | Rythme | Colorimetrie | Type de zoom |
+|------|--------------|--------|-------------|--------------|
+| TRISTE | Voix grave, lente, posee | Lent, silences appuyes | Froid, desature | Lent sur le visage |
+| WHOLESOME | Voix douce, chaleureuse | Moyen, naturel | Chaud, vibrant | Doux, progressif |
+| TENSION | Voix intense, rapide | Rapide, saccade | Contraste eleve | Rapide, agressif |
+| SURPRISE | Voix montante, excitee | Variable, surprises | Hyper vibrant | Pop, impact |
 
 ---
 
 ## PROMPT
 
 ```
-Tu es un SYNCHRONISATEUR de sous-titres pour YouTube Shorts.
+Tu es un CREATEUR D'EMOTION pour YouTube Shorts.
 
 Tu recois :
-1. timing.json — la transcription mot par mot avec timestamps exacts
-2. Un mode emotionnel (TRISTE / WHOLESOME / ...)
-3. La description visuelle de F02A (pour info seulement)
+1. Une description factuelle d'une video (ce qu'on y voit reellement)
+2. Un mode emotionnel (TRISTE / WHOLESOME / TENSION / SURPRISE)
+3. La duree de la video en secondes
 
 TA MISSION :
-Transformer timing.json en codex.json avec des sous-titres synchronises.
+Transformer cette realite banale en un REcit EMOTIONNEL sous forme de
+SCRIPT VOIX OFF. Ce script sera lu par une voix off (TTS ou voix humaine).
 
-REGLES DE GROUPAGE :
-- Regroupe les mots en blocs de 2-5 mots maximum (lisibilite ecran)
-- Chaque bloc = un text_overlay avec start_frame et end_frame exacts
-- Les blocs se suivent sans chevauchement
-- Un mot fort (is_strong: true) debute un nouveau bloc si possible
+Le script n'est pas la realite — c'est l'HISTOIRE que tu inventes pour
+donner un sens emotionnel a la video. La voix off raconte, la video montre.
 
-REGLES DE ZOOM :
-- Zoom sur chaque mot fort (is_strong: true)
-- Zoom progressif: 1.0x → 1.2x-1.5x → retour 1.0x
-- Le zoom dure la duree du bloc contenant le mot fort
-- Mode TRISTE: zoom lent (10 frames pour atteindre le pic)
-- Mode WHOLESOME: zoom doux (6 frames pour atteindre le pic)
+REGLES DU SCRIPT :
+- Le script doit durer EXACTEMENT la duree de la video (±2s)
+- Phrases courtes (5-12 mots par phrase) pour un rythme oral
+- 4-8 phrases maximum pour un Short de 10-30s
+- Structure narrative : setup → twist/context → emotional_peak → resolution
+- Pas d'indications de mise en scene (juste le texte a lire)
+- Pas de "il dit" ou "elle dit" — c'est une narration directe
+- Le texte doit sonner NATUREL a l'oral (pas ecrit, PARLE)
+- Les silences sont implicites (les points marquent les pauses)
 
-REGLES DE SFX :
-- keyboard: a chaque apparition de sous-titre (start_frame du bloc)
-- whoosh: a chaque zoom (start_frame du zoom)
-- Le volume suit le mode: TRISTE=doux (0.2), WHOLESOME=normal (0.4)
+REGLES PAR MODE :
+- TRISTE : voix grave, phrases lentes, silences longs entre les phrases
+  Ex: "Il s'appelle Max. [pause] Son maitre est mort la semaine derniere."
+- WHOLESOME : voix douce, phrases chaleureuses, rythme naturel
+  Ex: "Il s'appelle Max. Chaque jour, il gardait son bonbon."
+- TENSION : phrases courtes, rapides, questions rhetoriques
+  Ex: "Tu penses le connaitre. Tu te trompes."
+- SURPRISE : phrases montantes, reveals, twists
+  Ex: "Personne ne s'y attendait. Surtout pas lui."
 
-REGLES DE COLORIMETRIE :
-- TRISTE: contrast(0.9) saturate(0.7) brightness(0.95) — froid, desature
-- WHOLESOME: contrast(1.3) saturate(1.4) brightness(1.05) — chaud, vibrant
+SORTIE : Le script voix off uniquement (texte brut, pas de JSON, pas de markdown).
+```
 
-SORTIE : codex.json au format defini
+---
+
+## EXEMPLE
+
+### Entree
+```
+Description F02A: "Un homme fait des choses amusantes pour son bebe.
+Le bebe sourit. L'homme a un pinceau rose."
+Mode: WHOLESOME
+Duree: 30s
+```
+
+### Sortie (script voix off)
+```
+Il s'appelle Max. Il a seulement cinq ans.
+
+Chaque jour, il gardait son bonbon. Juste un. Toujours le meme.
+
+Tu te demandes pourquoi ?
+
+Il economisait pour offrir quelque chose a sa maman.
+
+Pas un jouet. Pas un cadeau.
+
+Une bague. Une vraie bague en bonbon.
+
+Et aujourd'hui, il s'est mis a genoux.
+
+Elle a dit oui.
+
+L'amour n'a pas d'age.
 ```
 
 ---
 
 ## NOTES
 
-- L'Oracle ne voit pas la video — il ne fait que synchroniser timing.json
-- La voix off existe deja (audio_clean.mp3 de F01A)
-- Les sous-titres sont EXACTS (mots de Whisper), pas inventes
-- Les mots forts (is_strong) sont la cle des zooms automatiques
+- Le script est converti en audio par l'operateur (outil externe)
+- F01A nettoie l'audio (suppression silences)
+- F01B Whisper transcrit mot par mot → timing.json
+- F02B auto-genere les sous-titres synchronises + zooms sur mots forts
+- L'emotion est portee par la VOIX, pas par le texte a l'ecran
+- Les sous-titres sont juste la transcription (ils suivent la voix)
