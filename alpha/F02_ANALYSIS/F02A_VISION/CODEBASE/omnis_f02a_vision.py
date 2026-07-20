@@ -39,15 +39,13 @@ OUTPUT_FILENAME = "narrative.txt"
 MANIFEST_FILENAME = "f01_manifest.json"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-# Modeles vision gratuits sur OpenRouter (par ordre de preference)
+# Modele vision NVIDIA Omni (text + audio + image + video, gratuit)
 VISION_MODELS = [
-    "meta-llama/llama-3.2-11b-vision-instruct:free",
-    "qwen/qwen-2-vl-7b-instruct:free",
-    "google/gemini-2.0-flash-exp:free",
+    "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
 ]
 
-DEFAULT_MODEL = "auto"  # Essaie les modeles dans l'ordre
-NUM_KEYFRAMES = 4  # Nombre de frames cles a extraire
+DEFAULT_MODEL = "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
+NUM_KEYFRAMES = 8  # 8 frames pour une meilleure analyse
 
 # ── Logging ─────────────────────────────────────────────────────────────────
 

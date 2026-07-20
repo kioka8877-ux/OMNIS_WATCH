@@ -23,8 +23,12 @@ Usage:
   python omnis_f02b_oracle.py --input /path/IN/ --output /path/OUT/ \
     --emotion-mode WHOLESOME --auto
 
+  # Generer le script voix off (Oracle sandbox AI)
+  python omnis_f02b_oracle.py --input /path/IN/ --output /path/OUT/ \
+    --emotion-mode WHOLESOME --generate-script
+
 Entree V2: timing.json + narrative.txt (optionnel) + f01_manifest.json
-Sortie: codex.json
+Sortie: codex.json (ou script_voix_off.txt si --generate-script)
 """
 
 import argparse
@@ -343,6 +347,7 @@ def main():
     parser.add_argument("--prepare", action="store_true", help="Preparer le prompt pour l'Oracle")
     parser.add_argument("--validate", metavar="CODEX_PATH", help="Valider un codex genere")
     parser.add_argument("--auto", action="store_true", help="Generation automatique (sans Oracle)")
+    parser.add_argument("--generate-script", action="store_true", help="Generer le script voix off (pour Oracle sandbox)")
     args = parser.parse_args()
 
     input_dir = Path(args.input)
@@ -410,7 +415,71 @@ def main():
         validate_codex(args.validate, output_dir, args.emotion_mode)
         return
 
-    log_fail("Usage: --prepare, --auto, ou --validate <codex_path> requis")
+    # ── Mode generate-script ──
+    if args.generate_script:
+        section("Preparation du script voix off")
+
+        # Lire la brouillie (narrative.txt de F02A)
+        narrative_path = input_dir / "narrative.txt"
+        if not narrative_path.exists():
+            # Essayer F02A OUT
+            narrative_path = input_dir.parent / "F02A_VISION" / "OUT" / "narrative.txt"
+
+        narrative = ""
+        if narrative_path.exists():
+            with open(narrative_path, "r", encoding="utf-8") as f:
+                narrative = f.read()
+            log_ok(f"Brouillie lue: {len(narrative)} chars")
+        else:
+            log_warn("Pas de narrative.txt — l'Oracle devra improviser")
+
+        # Lire le metaprompt
+        metaprompt_path = input_dir.parent.parent.parent / "METAPROMPTS" / "META_F02B_EMOTION.md"
+        metaprompt = ""
+        if metaprompt_path.exists():
+            with open(metaprompt_path, "r", encoding="utf-8") as f:
+                metaprompt = f.read()
+
+        # Infos video
+        fps = timing["meta"]["fps"]
+        total_frames = timing["meta"]["total_frames"]
+        duration = timing["meta"]["duration_seconds"]
+
+        # Construire le prompt pour l'Oracle
+        prompt = f"""{metaprompt}
+
+---
+
+## DONNEES D'ENTREE
+
+### Mode emotionnel: {args.emotion_mode}
+
+### Description F02A (brouillie):
+{narrative}
+
+### Informations video:
+- FPS: {fps}
+- Total frames: {total_frames}
+- Duree: {duration}s
+
+---
+
+## TA SORTIE
+
+Genere un SCRIPT VOIX OFF pour cette video en mode {args.emotion_mode}.
+Le script doit durer environ {duration:.0f} secondes a l'oral.
+Texte brut uniquement, pas de JSON, pas de markdown.
+"""
+
+        prompt_path = output_dir / "oracle_script_prompt.txt"
+        with open(prompt_path, "w", encoding="utf-8") as f:
+            f.write(prompt)
+
+        log_ok(f"Prompt prepare: {prompt_path}")
+        log_info("L'Oracle (sandbox AI) va generer le script voix off")
+        return
+
+    log_fail("Usage: --prepare, --auto, --generate-script, ou --validate <codex_path> requis")
     sys.exit(1)
 
 if __name__ == "__main__":
