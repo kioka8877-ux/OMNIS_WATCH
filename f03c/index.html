@@ -43,15 +43,23 @@ h2{color:#A6CF98;font-size:1.05em;margin:16px 0 10px}
 
 /* Timeline 2 — rendu final */
 .render-timeline{background:#13132a;border:1px solid #2a2a3e;border-radius:8px;padding:16px;margin:16px 0}
-.render-bar{display:flex;height:50px;border-radius:6px;overflow:hidden;border:1px solid #2a2a3e;margin-top:8px}
-.render-seg{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.75em;font-weight:bold;color:#0d0d1a;transition:flex .3s;cursor:default;position:relative;overflow:hidden}
+.render-bar{display:flex;height:50px;border-radius:6px;overflow:hidden;border:1px solid #2a2a3e;margin-top:8px;cursor:pointer}
+.render-seg{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.75em;font-weight:bold;color:#0d0d1a;transition:flex .3s;position:relative;overflow:hidden}
 .render-seg.queue{background:#58C4DD}
 .render-seg.loop{background:#A6CF98}
 .render-seg.tete{background:#FFF1B6}
 .render-seg .seg-name{font-size:.9em}
 .render-seg .seg-detail{font-size:.7em;opacity:.7;margin-top:2px}
+.render-seg .loop-divider{position:absolute;top:0;width:1px;height:100%;background:rgba(0,0,0,0.3)}
+.render-playhead{position:absolute;top:0;width:3px;height:100%;background:#FF6B6B;box-shadow:0 0 8px #FF6B6B;pointer-events:none;z-index:10;display:none}
+.video-target-line{position:absolute;top:0;width:2px;height:100%;background:#FF6B6B;box-shadow:0 0 6px #FF6B6B;pointer-events:none;z-index:9;display:none}
+.video-target-line::after{content:'vidéo 16.1s';position:absolute;top:-18px;left:4px;font-size:.65em;color:#FF6B6B;white-space:nowrap}
 .render-info{display:flex;gap:16px;margin-top:8px;font-size:.8em;color:#90A4AE;flex-wrap:wrap}
 .render-info span strong{color:#ECEFF1}
+.sync-indicator{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:4px;font-size:.85em;font-weight:bold;margin-top:8px}
+.sync-ok{background:rgba(166,207,152,0.15);color:#A6CF98;border:1px solid #A6CF98}
+.sync-warn{background:rgba(255,217,61,0.15);color:#FFD93D;border:1px solid #FFD93D}
+.sync-err{background:rgba(255,107,107,0.15);color:#FF6B6B;border:1px solid #FF6B6B}
 
 /* Segment selectors */
 .segments{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:18px 0}
@@ -145,19 +153,21 @@ h2{color:#A6CF98;font-size:1.05em;margin:16px 0 10px}
   <span>BPM : <strong>112.35</strong></span>
   <span>Durée : <strong>265.45s</strong> (4min 25s)</span>
   <span>Beats : <strong>483</strong></span>
+  <span>Vidéo cible : <strong>16.1s</strong></span>
 </div>
 
 <div class="instructions">
   <strong>Comment choisir tes segments :</strong><br>
   <span class="step">1.</span> Clique sur un segment (QUEUE / LOOP / TETE) pour le sélectionner<br>
-  <span class="step">2.</span> Clique <strong>IN</strong> → puis clique sur la timeline à l'endroit voulu<br>
-  <span class="step">3.</span> Clique <strong>OUT</strong> → puis clique sur la timeline<br>
+  <span class="step">2.</span> Clique <strong>IN</strong> → puis clique sur la Timeline 1 à l'endroit voulu<br>
+  <span class="step">3.</span> Clique <strong>OUT</strong> → puis clique sur la Timeline 1<br>
   <span class="step">4.</span> Ajuste la vitesse (0.5x-2x), le reverse, et les loops (LOOP seulement)<br>
-  <span class="step">5.</span> <strong>▶ Écouter</strong> pour vérifier le segment à sa vitesse<br>
-  <span class="step">6.</span> Quand les 3 segments sont bons → <strong>Générer JSON</strong> → <strong>Copier</strong>
+  <span class="step">5.</span> Clique <strong>▶ Play rendu</strong> sur la Timeline 2 pour entendre l'assemblé complet<br>
+  <span class="step">6.</span> Vérifie l'indicateur de sync — l'assemblé doit faire ~16.1s<br>
+  <span class="step">7.</span> Quand c'est bon → <strong>Générer JSON</strong> → <strong>Copier</strong>
 </div>
 
-<!-- PLAYER -->
+<!-- PLAYER — Timeline 1 -->
 <div class="player">
   <div class="player-header">
     <span class="player-title">▶ Timeline 1 — Musique source (clique pour naviguer ou placer des bornes)</span>
@@ -196,18 +206,24 @@ h2{color:#A6CF98;font-size:1.05em;margin:16px 0 10px}
 
 <!-- Timeline 2 — Rendu final -->
 <div class="render-timeline">
-  <h2>🎬 Timeline 2 — Rendu final du Short</h2>
-  <p class="hint">Aperçu de l'enchaînement QUEUE → LOOP (×loops) → TETE dans ta vidéo finale</p>
-  <div class="render-bar" id="renderBar">
-    <div class="render-seg queue" style="flex:1"><span class="seg-name">—</span><span class="seg-detail">QUEUE</span></div>
-    <div class="render-seg loop" style="flex:1"><span class="seg-name">—</span><span class="seg-detail">LOOP</span></div>
-    <div class="render-seg tete" style="flex:1"><span class="seg-name">—</span><span class="seg-detail">TETE</span></div>
+  <h2>🎬 Timeline 2 — Rendu final assemblé</h2>
+  <p class="hint">Clique ▶ Play rendu pour entendre l'enchaînement complet. Clique sur la barre pour sauter.</p>
+  <div style="position:relative">
+    <div class="render-bar" id="renderBar" onclick="seekRender(event)">
+      <div class="render-seg queue" style="flex:1"><span class="seg-name">—</span><span class="seg-detail">QUEUE</span></div>
+      <div class="render-seg loop" style="flex:1"><span class="seg-name">—</span><span class="seg-detail">LOOP</span></div>
+      <div class="render-seg tete" style="flex:1"><span class="seg-name">—</span><span class="seg-detail">TETE</span></div>
+      <div class="render-playhead" id="renderPlayhead"></div>
+      <div class="video-target-line" id="videoTargetLine"></div>
+    </div>
   </div>
   <div class="render-info" id="renderInfo">
     <span>Durée totale : <strong>—</strong></span>
-    <span>QUEUE : <strong>—</strong></span>
-    <span>LOOP : <strong>—</strong></span>
-    <span>TETE : <strong>—</strong></span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap">
+    <button class="btn-play" id="renderPlayBtn" onclick="toggleRenderPlay()">▶ Play rendu</button>
+    <span class="time-display" id="renderTimeDisplay" style="font-size:.95em">0:00 / 0:00</span>
+    <div id="syncIndicator"></div>
   </div>
 </div>
 
@@ -261,7 +277,7 @@ h2{color:#A6CF98;font-size:1.05em;margin:16px 0 10px}
     <div class="loops-row">
       <label>Loops :</label>
       <button class="loops-btn" onclick="changeLoops(-1)">−</button>
-      <input type="number" class="loops-input" id="loops-loop" value="2" min="1" max="4" onchange="updateRender()">
+      <input type="number" class="loops-input" id="loops-loop" value="2" min="1" max="4" onchange="updateAll()">
       <button class="loops-btn" onclick="changeLoops(1)">+</button>
     </div>
     <div class="seg-preview" id="prev-loop">Non défini</div>
@@ -311,6 +327,7 @@ audio.webkitPreservesPitch = true;
 
 const BPM = 112.35;
 const DURATION = 265.45;
+const VIDEO_DURATION = 16.1;
 const BEATS = [
   0.766,1.3,1.834,2.368,2.902,3.437,3.971,4.505,5.039,5.573,
   6.107,6.641,7.175,7.709,8.243,8.777,9.311,9.845,10.379,10.913,
@@ -337,6 +354,13 @@ let segments = {
   loop:{in:null,out:null,speed:1.0,reverse:false,loops:2},
   tete:{in:null,out:null,speed:1.0,reverse:false}
 };
+
+// === Render playback state ===
+let isRendering = false;      // playing assembled render
+let renderPos = 0;            // current position in assembled time (seconds)
+let renderSequence = [];      // computed sequence of playback chunks
+let currentChunkIdx = 0;
+let renderRAF = null;         // requestAnimationFrame ID
 
 // === Energy bar ===
 const ebar = document.getElementById('energyBar');
@@ -391,7 +415,7 @@ function drawWave() {
 setTimeout(drawWave, 100);
 window.addEventListener('resize', drawWave);
 
-// === Timeline interaction ===
+// === Timeline 1 interaction ===
 const timeline = document.getElementById('timeline');
 const tooltip = document.getElementById('timeTooltip');
 
@@ -406,6 +430,7 @@ timeline.addEventListener('mousemove', (e) => {
 timeline.addEventListener('mouseleave', () => { tooltip.style.display='none'; });
 
 timeline.addEventListener('click', (e) => {
+  if (isRendering) stopRender();
   const rect = timeline.getBoundingClientRect();
   const pct = Math.max(0, Math.min(1, (e.clientX-rect.left)/rect.width));
   const t = Math.round(pct*DURATION*10)/10;
@@ -414,9 +439,9 @@ timeline.addEventListener('click', (e) => {
     segments[selectedSeg][mode] = t;
     updateSegmentUI(selectedSeg);
     updateOverlays();
-    updateRender();
-    setMode(null, null);
+    updateAll();
 
+    setMode(null, null);
     if (segments[selectedSeg].in === null) {
       setMode(selectedSeg, 'in');
     } else if (segments[selectedSeg].out === null) {
@@ -424,7 +449,7 @@ timeline.addEventListener('click', (e) => {
     } else {
       const next = ['queue','loop','tete'].find(s => segments[s].in === null);
       if (next) { selectSegment(next); setMode(next, 'in'); }
-      else { setStatus('✅ Tous les segments sont définis ! Tu peux Générer JSON.', 'ready'); }
+      else { setStatus('✅ Tous les segments sont définis !', 'ready'); }
     }
   } else {
     audio.currentTime = t;
@@ -474,14 +499,14 @@ function updateSpeed(seg) {
   const v = parseFloat(document.getElementById('speed-'+seg).value);
   segments[seg].speed = v;
   document.getElementById('speed-val-'+seg).textContent = v.toFixed(2)+'x';
-  updateRender();
+  updateAll();
 }
 
 // === Reverse ===
 function toggleReverse(seg) {
   segments[seg].reverse = !segments[seg].reverse;
-  const el = document.getElementById('rev-'+seg);
-  el.classList.toggle('on', segments[seg].reverse);
+  document.getElementById('rev-'+seg).classList.toggle('on', segments[seg].reverse);
+  updateAll();
 }
 
 // === Loops ===
@@ -491,7 +516,36 @@ function changeLoops(delta) {
   v = Math.max(1, Math.min(4, v));
   input.value = v;
   segments.loop.loops = v;
-  updateRender();
+  updateAll();
+}
+
+// === Compute assembled duration & sequence ===
+function computeSequence() {
+  const seq = [];
+  let assembledDur = 0;
+
+  ['queue','loop','tete'].forEach(seg => {
+    const s = segments[seg];
+    if (s.in !== null && s.out !== null) {
+      const rawDur = s.out - s.in;
+      const adjDur = rawDur / s.speed;
+      const loops = seg === 'loop' ? s.loops : 1;
+      for (let i = 0; i < loops; i++) {
+        seq.push({
+          seg: seg,
+          srcStart: s.in,
+          srcEnd: s.out,
+          speed: s.speed,
+          reverse: s.reverse,
+          assembledStart: assembledDur,
+          assembledDur: adjDur
+        });
+        assembledDur += adjDur;
+      }
+    }
+  });
+
+  return { seq, assembledDur };
 }
 
 // === Update segment UI ===
@@ -504,7 +558,7 @@ function updateSegmentUI(seg) {
     const rawDur = s.out - s.in;
     const adjDur = rawDur / s.speed;
     let txt = `Durée: ${rawDur.toFixed(1)}s → ${adjDur.toFixed(1)}s (à ${s.speed.toFixed(2)}x)`;
-    if (seg === 'loop') txt += ` × ${s.loops} loops = ${(adjDur*s.loops).toFixed(1)}s`;
+    if (seg === 'loop') txt += ` × ${s.loops} = ${(adjDur*s.loops).toFixed(1)}s`;
     if (s.reverse) txt += ' [REVERSED]';
     prev.textContent = txt;
     prev.style.color = '#A6CF98';
@@ -539,51 +593,215 @@ function updateOverlays() {
 
 // === Timeline 2 — Render bar ===
 function updateRender() {
+  const { seq, assembledDur } = computeSequence();
+  renderSequence = seq;
+
   const renderBar = document.getElementById('renderBar');
-  const renderInfo = document.getElementById('renderInfo');
+  // Clear and rebuild segments (keep playhead + target line)
   renderBar.innerHTML = '';
-  let totalDur = 0;
-  const segDurs = {};
 
-  ['queue','loop','tete'].forEach(seg => {
-    const s = segments[seg];
-    let dur = 0;
-    if (s.in !== null && s.out !== null) {
-      dur = (s.out - s.in) / s.speed;
-      if (seg === 'loop') dur *= s.loops;
-    }
-    segDurs[seg] = dur;
-    totalDur += dur;
-  });
-
-  ['queue','loop','tete'].forEach(seg => {
-    const s = segments[seg];
-    const dur = segDurs[seg];
-    const div = document.createElement('div');
-    div.className = 'render-seg '+seg;
-    if (totalDur > 0) div.style.flex = dur;
-    else div.style.flex = 1;
-    const names = {queue:'QUEUE',loop:'LOOP',tete:'TETE'};
-    let detail = dur > 0 ? dur.toFixed(1)+'s' : '—';
-    if (seg === 'loop' && s.loops > 1 && dur > 0) detail += ` (×${s.loops})`;
-    if (s.reverse && dur > 0) detail += ' ⟲';
-    div.innerHTML = `<span class="seg-name">${names[seg]}</span><span class="seg-detail">${detail}</span>`;
-    renderBar.appendChild(div);
-  });
-
-  if (totalDur > 0) {
-    renderInfo.innerHTML = `
-      <span>Durée totale : <strong>${totalDur.toFixed(1)}s</strong></span>
-      <span>QUEUE : <strong>${segDurs.queue.toFixed(1)}s</strong></span>
-      <span>LOOP : <strong>${segDurs.loop.toFixed(1)}s</strong></span>
-      <span>TETE : <strong>${segDurs.tete.toFixed(1)}s</strong></span>
-    `;
-  } else {
-    renderInfo.innerHTML = `<span>Durée totale : <strong>—</strong></span><span>Définis tes segments pour voir le rendu</span>`;
+  if (assembledDur === 0) {
+    ['queue','loop','tete'].forEach(seg => {
+      const div = document.createElement('div');
+      div.className = 'render-seg '+seg;
+      div.style.flex = 1;
+      const names = {queue:'QUEUE',loop:'LOOP',tete:'TETE'};
+      div.innerHTML = `<span class="seg-name">${names[seg]}</span><span class="seg-detail">—</span>`;
+      renderBar.appendChild(div);
+    });
+    document.getElementById('renderInfo').innerHTML = '<span>Durée totale : <strong>—</strong></span><span>Définis tes segments</span>';
+    document.getElementById('syncIndicator').innerHTML = '';
+    document.getElementById('videoTargetLine').style.display = 'none';
+    document.getElementById('renderPlayhead').style.display = 'none';
+    return;
   }
 
-  // Update previews
-  ['queue','loop','tete'].forEach(seg => updateSegmentUI(seg));
+  // Build segments from sequence
+  const segColors = {queue:'#58C4DD', loop:'#A6CF98', tete:'#FFF1B6'};
+  const segNames = {queue:'QUEUE', loop:'LOOP', tete:'TETE'};
+
+  // Group consecutive same-seg chunks
+  let i = 0;
+  while (i < seq.length) {
+    let j = i;
+    while (j < seq.length && seq[j].seg === seq[i].seg) j++;
+    const groupDur = seq.slice(i, j).reduce((a, c) => a + c.assembledDur, 0);
+    const seg = seq[i].seg;
+    const div = document.createElement('div');
+    div.className = 'render-seg '+seg;
+    div.style.flex = groupDur;
+    let detail = groupDur.toFixed(1)+'s';
+    if (seg === 'loop' && (j - i) > 1) detail += ` (×${j-i})`;
+    if (seq[i].reverse) detail += ' ⟲';
+    if (seq[i].speed !== 1.0) detail += ` ${seq[i].speed.toFixed(2)}x`;
+    div.innerHTML = `<span class="seg-name">${segNames[seg]}</span><span class="seg-detail">${detail}</span>`;
+    // Loop dividers
+    for (let k = i + 1; k < j; k++) {
+      const d = document.createElement('div');
+      d.className = 'loop-divider';
+      d.style.left = ((seq[k].assembledStart - seq[0].assembledStart) / assembledDur * 100) + '%';
+      div.appendChild(d);
+    }
+    renderBar.appendChild(div);
+    i = j;
+  }
+
+  // Playhead
+  const ph = document.createElement('div');
+  ph.className = 'render-playhead';
+  ph.id = 'renderPlayhead';
+  ph.style.display = isRendering ? 'block' : 'none';
+  renderBar.appendChild(ph);
+
+  // Video target line
+  const vtl = document.createElement('div');
+  vtl.className = 'video-target-line';
+  vtl.id = 'videoTargetLine';
+  if (assembledDur > 0) {
+    vtl.style.display = 'block';
+    vtl.style.left = (VIDEO_DURATION / assembledDur * 100) + '%';
+  }
+  renderBar.appendChild(vtl);
+
+  // Info
+  document.getElementById('renderInfo').innerHTML = `
+    <span>Assemblé : <strong>${assembledDur.toFixed(1)}s</strong></span>
+    <span>Vidéo : <strong>${VIDEO_DURATION}s</strong></span>
+    <span>Écart : <strong>${(assembledDur - VIDEO_DURATION).toFixed(1)}s</strong></span>
+  `;
+
+  // Sync indicator
+  const diff = assembledDur - VIDEO_DURATION;
+  const si = document.getElementById('syncIndicator');
+  if (Math.abs(diff) < 0.3) {
+    si.innerHTML = `<div class="sync-indicator sync-ok">🟢 Sync parfait (${diff.toFixed(1)}s)</div>`;
+  } else if (diff > 0) {
+    si.innerHTML = `<div class="sync-indicator sync-err">🔴 Trop long de ${diff.toFixed(1)}s — réduis loops, speed↑, ou raccourcis</div>`;
+  } else {
+    si.innerHTML = `<div class="sync-indicator sync-warn">🟡 Trop court de ${Math.abs(diff).toFixed(1)}s — ajoute loops, speed↓, ou allonge</div>`;
+  }
+
+  // Update render time display
+  updateRenderTimeDisplay();
+}
+
+// === Render playback ===
+function toggleRenderPlay() {
+  if (isRendering) stopRender();
+  else startRender();
+}
+
+function startRender() {
+  const { seq, assembledDur } = computeSequence();
+  if (seq.length === 0 || assembledDur === 0) { alert('Définis tes segments d\'abord'); return; }
+
+  // Stop normal playback
+  audio.pause();
+  isRendering = true;
+  renderPos = 0;
+  currentChunkIdx = 0;
+  document.getElementById('renderPlayBtn').textContent = '⏸ Stop rendu';
+  document.getElementById('renderPlayhead').style.display = 'block';
+
+  // Jump to first chunk
+  playChunk(0);
+  renderLoop();
+}
+
+function stopRender() {
+  isRendering = false;
+  audio.pause();
+  audio.playbackRate = 1;
+  document.getElementById('renderPlayBtn').textContent = '▶ Play rendu';
+  document.getElementById('renderPlayhead').style.display = 'none';
+  if (renderRAF) cancelAnimationFrame(renderRAF);
+  renderRAF = null;
+}
+
+function playChunk(idx) {
+  if (idx >= renderSequence.length) {
+    stopRender();
+    return;
+  }
+  currentChunkIdx = idx;
+  const chunk = renderSequence[idx];
+  audio.currentTime = chunk.srcStart;
+  audio.playbackRate = chunk.speed;
+  audio.play();
+}
+
+audio.addEventListener('timeupdate', () => {
+  if (isRendering && renderSequence.length > 0) {
+    const chunk = renderSequence[currentChunkIdx];
+    if (chunk && audio.currentTime >= chunk.srcEnd) {
+      // Move to next chunk
+      if (currentChunkIdx + 1 < renderSequence.length) {
+        playChunk(currentChunkIdx + 1);
+      } else {
+        stopRender();
+      }
+    }
+  }
+  updatePlayhead();
+});
+
+function renderLoop() {
+  if (!isRendering) return;
+  const chunk = renderSequence[currentChunkIdx];
+  if (chunk) {
+    // Calculate assembled position
+    const elapsedInChunk = (audio.currentTime - chunk.srcStart) * chunk.speed;
+    renderPos = chunk.assembledStart + Math.max(0, elapsedInChunk);
+
+    const { assembledDur } = computeSequence();
+    const pct = (renderPos / assembledDur) * 100;
+    const ph = document.getElementById('renderPlayhead');
+    if (ph) ph.style.left = pct + '%';
+
+    updateRenderTimeDisplay();
+  }
+  renderRAF = requestAnimationFrame(renderLoop);
+}
+
+function updateRenderTimeDisplay() {
+  const { assembledDur } = computeSequence();
+  const pos = isRendering ? renderPos : 0;
+  const m = Math.floor(pos / 60);
+  const s = (pos % 60).toFixed(1);
+  const dm = Math.floor(assembledDur / 60);
+  const ds = (assembledDur % 60).toFixed(1);
+  document.getElementById('renderTimeDisplay').textContent =
+    `${m}:${s.padStart(4,'0')} / ${dm}:${ds.padStart(4,'0')}`;
+}
+
+function seekRender(event) {
+  const { seq, assembledDur } = computeSequence();
+  if (assembledDur === 0) return;
+
+  const rect = event.currentTarget.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+  const targetAssembled = pct * assembledDur;
+
+  // Find which chunk this falls into
+  let idx = 0;
+  for (let i = 0; i < seq.length; i++) {
+    if (targetAssembled >= seq[i].assembledStart && targetAssembled < seq[i].assembledStart + seq[i].assembledDur) {
+      idx = i;
+      break;
+    }
+    if (i === seq.length - 1) idx = i;
+  }
+
+  const chunk = seq[idx];
+  const offsetInChunk = targetAssembled - chunk.assembledStart;
+  const srcOffset = offsetInChunk * chunk.speed;
+  audio.currentTime = chunk.srcStart + srcOffset;
+  audio.playbackRate = chunk.speed;
+
+  if (isRendering) {
+    currentChunkIdx = idx;
+    audio.play();
+  }
 }
 
 // === Status ===
@@ -593,52 +811,49 @@ function setStatus(text, cls) {
   bar.className = 'status-bar' + (cls ? ' '+cls : '');
 }
 
-// === Playback ===
+// === Normal playback ===
 let isPlaying = false;
-let playSegEnd = null;
-let playSegSpeed = 1;
-let playSegReverse = false;
-let playSegStart = 0;
 
 function togglePlay() {
+  if (isRendering) stopRender();
   if (isPlaying) audio.pause();
   else { audio.playbackRate = 1; audio.play(); }
 }
 
 audio.addEventListener('play', () => {
   isPlaying = true;
-  document.getElementById('playBtn').textContent = '⏸ Pause';
+  if (!isRendering) document.getElementById('playBtn').textContent = '⏸ Pause';
 });
 audio.addEventListener('pause', () => {
   isPlaying = false;
-  document.getElementById('playBtn').textContent = '▶ Play';
+  if (!isRendering) document.getElementById('playBtn').textContent = '▶ Play';
 });
 audio.addEventListener('ended', () => {
   isPlaying = false;
   document.getElementById('playBtn').textContent = '▶ Play';
-  playSegEnd = null;
 });
 
 function playSegment(seg) {
+  if (isRendering) stopRender();
   const s = segments[seg];
-  if (s.in === null) { alert('Place d\'abord le IN de '+seg.toUpperCase()); return; }
-  if (s.out === null) { alert('Place d\'abord le OUT de '+seg.toUpperCase()); return; }
+  if (s.in === null || s.out === null) { alert('Définis IN et OUT de '+seg.toUpperCase()+' d\'abord'); return; }
   audio.currentTime = s.in;
   audio.playbackRate = s.speed;
-  playSegEnd = s.out;
+  // Set a temporary end listener
+  const tempEnd = s.out;
+  const handler = () => {
+    if (audio.currentTime >= tempEnd) {
+      audio.pause();
+      audio.playbackRate = 1;
+      audio.removeEventListener('timeupdate', handler);
+    }
+  };
+  audio.addEventListener('timeupdate', handler);
   audio.play();
 }
 
-audio.addEventListener('timeupdate', () => {
-  updatePlayhead();
-  if (playSegEnd && audio.currentTime >= playSegEnd) {
-    audio.pause();
-    audio.playbackRate = 1;
-    playSegEnd = null;
-  }
-});
-
 function updatePlayhead() {
+  if (isRendering) return; // don't update timeline 1 during render
   const pct = (audio.currentTime/DURATION)*100;
   document.getElementById('playhead').style.left = pct+'%';
   document.getElementById('progressBar').style.width = pct+'%';
@@ -651,6 +866,7 @@ function updatePlayhead() {
 }
 
 document.getElementById('seekBar').addEventListener('click', (e) => {
+  if (isRendering) stopRender();
   const rect = e.currentTarget.getBoundingClientRect();
   const pct = (e.clientX-rect.left)/rect.width;
   audio.currentTime = pct*DURATION;
@@ -658,16 +874,36 @@ document.getElementById('seekBar').addEventListener('click', (e) => {
   updatePlayhead();
 });
 
+// === Update all ===
+function updateAll() {
+  ['queue','loop','tete'].forEach(seg => {
+    updateSegmentUI(seg);
+  });
+  updateOverlays();
+  updateRender();
+}
+
 // === Generate JSON ===
 function genJSON() {
   const missing = ['queue','loop','tete'].filter(s => segments[s].in === null || segments[s].out === null);
   if (missing.length > 0) { alert('Segments incomplets: '+missing.map(s=>s.toUpperCase()).join(', ')); return; }
+
+  const { assembledDur } = computeSequence();
+
   const seg = [
     {role:'queue', start:segments.queue.in, end:segments.queue.out, speed:segments.queue.speed, reverse:segments.queue.reverse},
     {role:'loop', start:segments.loop.in, end:segments.loop.out, speed:segments.loop.speed, reverse:segments.loop.reverse, loops:segments.loop.loops},
     {role:'tete', start:segments.tete.in, end:segments.tete.out, speed:segments.tete.speed, reverse:segments.tete.reverse}
   ];
-  document.getElementById('jsonOut').textContent = JSON.stringify(seg, null, 2);
+
+  const output = {
+    video_duration: VIDEO_DURATION,
+    segments: seg,
+    assembled_duration: parseFloat(assembledDur.toFixed(2)),
+    auto_fit: Math.abs(assembledDur - VIDEO_DURATION) > 0.3
+  };
+
+  document.getElementById('jsonOut').textContent = JSON.stringify(output, null, 2);
 }
 
 function copyJSON() {
@@ -677,7 +913,7 @@ function copyJSON() {
 }
 
 // Init
-updateRender();
+updateAll();
 </script>
 </body>
 </html>
