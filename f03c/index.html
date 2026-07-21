@@ -24,6 +24,8 @@ h2{color:#A6CF98;font-size:1.05em;margin:16px 0 10px}
 .timeline-wave{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
 .timeline-progress{position:absolute;top:0;left:0;height:100%;background:rgba(88,196,221,0.08);pointer-events:none}
 .beat-marker{position:absolute;top:0;width:1px;height:100%;background:rgba(255,241,182,0.15);pointer-events:none}
+.tick-marker{position:absolute;bottom:0;width:1px;height:12px;background:rgba(255,255,255,0.2);pointer-events:none}
+.tick-label{position:absolute;bottom:13px;font-size:.6em;color:rgba(255,255,255,0.3);pointer-events:none;transform:translateX(-50%);white-space:nowrap}
 .playhead{position:absolute;top:0;width:3px;height:100%;background:#58C4DD;box-shadow:0 0 8px #58C4DD;pointer-events:none;z-index:10}
 .time-tooltip{position:absolute;top:-28px;background:#1e1e38;border:1px solid #58C4DD;color:#58C4DD;padding:3px 8px;border-radius:4px;font-size:.8em;pointer-events:none;z-index:20;transform:translateX(-50%);display:none}
 
@@ -43,7 +45,8 @@ h2{color:#A6CF98;font-size:1.05em;margin:16px 0 10px}
 
 /* Timeline 2 — rendu final */
 .render-timeline{background:#13132a;border:1px solid #2a2a3e;border-radius:8px;padding:16px;margin:16px 0}
-.render-bar{display:flex;height:50px;border-radius:6px;overflow:hidden;border:1px solid #2a2a3e;margin-top:8px;cursor:pointer}
+.render-bar-container{position:relative}
+.render-bar{display:flex;height:50px;border-radius:6px;overflow:hidden;border:1px solid #2a2a3e;margin-top:8px;cursor:pointer;position:relative}
 .render-seg{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.75em;font-weight:bold;color:#0d0d1a;transition:flex .3s;position:relative;overflow:hidden}
 .render-seg.queue{background:#58C4DD}
 .render-seg.loop{background:#A6CF98}
@@ -54,6 +57,9 @@ h2{color:#A6CF98;font-size:1.05em;margin:16px 0 10px}
 .render-playhead{position:absolute;top:0;width:3px;height:100%;background:#FF6B6B;box-shadow:0 0 8px #FF6B6B;pointer-events:none;z-index:10;display:none}
 .video-target-line{position:absolute;top:0;width:2px;height:100%;background:#FF6B6B;box-shadow:0 0 6px #FF6B6B;pointer-events:none;z-index:9;display:none}
 .video-target-line::after{content:'vidéo 16.1s';position:absolute;top:-18px;left:4px;font-size:.65em;color:#FF6B6B;white-space:nowrap}
+.render-ticks{position:relative;height:18px;margin-top:2px}
+.render-tick{position:absolute;bottom:0;width:1px;height:6px;background:rgba(255,255,255,0.15)}
+.render-tick-label{position:absolute;bottom:7px;font-size:.6em;color:rgba(255,255,255,0.25);transform:translateX(-50%);white-space:nowrap}
 .render-info{display:flex;gap:16px;margin-top:8px;font-size:.8em;color:#90A4AE;flex-wrap:wrap}
 .render-info span strong{color:#ECEFF1}
 .sync-indicator{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:4px;font-size:.85em;font-weight:bold;margin-top:8px}
@@ -71,10 +77,13 @@ h2{color:#A6CF98;font-size:1.05em;margin:16px 0 10px}
 .seg-box.selected{box-shadow:0 0 12px rgba(88,196,221,.3);border-color:#58C4DD}
 .seg-box.selected.loop{box-shadow:0 0 12px rgba(166,207,152,.3);border-color:#A6CF98}
 .seg-box.selected.tete{box-shadow:0 0 12px rgba(255,241,182,.3);border-color:#FFF1B6}
-.seg-box h3{font-size:1em;margin-bottom:10px;cursor:pointer}
+.seg-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.seg-box h3{font-size:1em;cursor:pointer}
 .seg-box.queue h3{color:#58C4DD}
 .seg-box.loop h3{color:#A6CF98}
 .seg-box.tete h3{color:#FFF1B6}
+.btn-reset{background:transparent;border:1px solid #555;color:#888;padding:3px 10px;cursor:pointer;border-radius:4px;font-family:'Courier New',monospace;font-size:.75em;transition:all .2s}
+.btn-reset:hover{border-color:#FF6B6B;color:#FF6B6B}
 
 /* IN/OUT buttons */
 .io-buttons{display:flex;gap:8px;margin-bottom:10px}
@@ -89,6 +98,11 @@ h2{color:#A6CF98;font-size:1.05em;margin:16px 0 10px}
 .time-pill .value{color:#ECEFF1;font-weight:bold;font-size:1.05em}
 .time-pill.in{border-color:#FF6B6B}
 .time-pill.out{border-color:#FFD93D}
+.time-input{background:#070714;border:1px solid #2a2a3e;color:#ECEFF1;padding:4px 8px;width:100%;border-radius:4px;font-family:'Courier New',monospace;font-size:1em;font-weight:bold;text-align:center}
+.time-input:focus{outline:none;border-color:#58C4DD}
+.time-input.in{border-color:#FF6B6B}
+.time-input.out{border-color:#FFD93D}
+.time-input:disabled{color:#555}
 
 /* Speed slider */
 .speed-control{margin:10px 0}
@@ -159,12 +173,12 @@ h2{color:#A6CF98;font-size:1.05em;margin:16px 0 10px}
 <div class="instructions">
   <strong>Comment choisir tes segments :</strong><br>
   <span class="step">1.</span> Clique sur un segment (QUEUE / LOOP / TETE) pour le sélectionner<br>
-  <span class="step">2.</span> Clique <strong>IN</strong> → puis clique sur la Timeline 1 à l'endroit voulu<br>
-  <span class="step">3.</span> Clique <strong>OUT</strong> → puis clique sur la Timeline 1<br>
-  <span class="step">4.</span> Ajuste la vitesse (0.5x-2x), le reverse, et les loops (LOOP seulement)<br>
-  <span class="step">5.</span> Clique <strong>▶ Play rendu</strong> sur la Timeline 2 pour entendre l'assemblé complet<br>
-  <span class="step">6.</span> Vérifie l'indicateur de sync — l'assemblé doit faire ~16.1s<br>
-  <span class="step">7.</span> Quand c'est bon → <strong>Générer JSON</strong> → <strong>Copier</strong>
+  <span class="step">2.</span> Clique <strong>IN</strong> → clique sur la Timeline 1 OU tape directement la valeur dans le champ Start<br>
+  <span class="step">3.</span> Clique <strong>OUT</strong> → clique sur la Timeline 1 OU tape directement la valeur dans le champ End<br>
+  <span class="step">4.</span> Ajuste vitesse (0.5x-2x), reverse, loops (LOOP seulement)<br>
+  <span class="step">5.</span> <strong>▶ Écouter</strong> pour vérifier un segment · <strong>▶ Play rendu</strong> pour l'assemblé complet<br>
+  <span class="step">6.</span> <strong>↺ Reset</strong> pour effacer un seul segment sans toucher aux autres<br>
+  <span class="step">7.</span> Vérifie la sync (~16.1s) → <strong>Générer JSON</strong> → <strong>Copier</strong>
 </div>
 
 <!-- PLAYER — Timeline 1 -->
@@ -179,6 +193,7 @@ h2{color:#A6CF98;font-size:1.05em;margin:16px 0 10px}
     <canvas class="timeline-wave" id="waveCanvas"></canvas>
     <div class="timeline-progress" id="progressBar"></div>
     <div id="beatContainer"></div>
+    <div id="tickContainer"></div>
     <div class="seg-overlay seg-queue" id="overlayQueue" style="display:none"><span class="seg-label">QUEUE</span></div>
     <div class="seg-overlay seg-loop" id="overlayLoop" style="display:none"><span class="seg-label">LOOP</span></div>
     <div class="seg-overlay seg-tete" id="overlayTete" style="display:none"><span class="seg-label">TETE</span></div>
@@ -208,7 +223,7 @@ h2{color:#A6CF98;font-size:1.05em;margin:16px 0 10px}
 <div class="render-timeline">
   <h2>🎬 Timeline 2 — Rendu final assemblé</h2>
   <p class="hint">Clique ▶ Play rendu pour entendre l'enchaînement complet. Clique sur la barre pour sauter.</p>
-  <div style="position:relative">
+  <div class="render-bar-container">
     <div class="render-bar" id="renderBar" onclick="seekRender(event)">
       <div class="render-seg queue" style="flex:1"><span class="seg-name">—</span><span class="seg-detail">QUEUE</span></div>
       <div class="render-seg loop" style="flex:1"><span class="seg-name">—</span><span class="seg-detail">LOOP</span></div>
@@ -216,6 +231,7 @@ h2{color:#A6CF98;font-size:1.05em;margin:16px 0 10px}
       <div class="render-playhead" id="renderPlayhead"></div>
       <div class="video-target-line" id="videoTargetLine"></div>
     </div>
+    <div class="render-ticks" id="renderTicks"></div>
   </div>
   <div class="render-info" id="renderInfo">
     <span>Durée totale : <strong>—</strong></span>
@@ -234,14 +250,23 @@ h2{color:#A6CF98;font-size:1.05em;margin:16px 0 10px}
 <div class="segments">
   <!-- QUEUE -->
   <div class="seg-box queue" id="box-queue" data-seg="queue">
-    <h3 onclick="selectSegment('queue')">🔵 QUEUE (Hook)</h3>
+    <div class="seg-header">
+      <h3 onclick="selectSegment('queue')">🔵 QUEUE (Hook)</h3>
+      <button class="btn-reset" onclick="resetSegment('queue')">↺ Reset</button>
+    </div>
     <div class="io-buttons">
       <button class="btn-io" id="in-queue" onclick="setMode('queue','in')">⬅ IN</button>
       <button class="btn-io" id="out-queue" onclick="setMode('queue','out')">OUT ➡</button>
     </div>
     <div class="seg-times">
-      <div class="time-pill in"><div class="label">Start</div><div class="value" id="val-queue-in">—</div></div>
-      <div class="time-pill out"><div class="label">End</div><div class="value" id="val-queue-out">—</div></div>
+      <div class="time-pill in">
+        <div class="label">Start (s)</div>
+        <input type="number" class="time-input in" id="input-queue-in" placeholder="—" step="0.1" min="0" max="265" oninput="onInputChange('queue','in',this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+      </div>
+      <div class="time-pill out">
+        <div class="label">End (s)</div>
+        <input type="number" class="time-input out" id="input-queue-out" placeholder="—" step="0.1" min="0" max="265" oninput="onInputChange('queue','out',this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+      </div>
     </div>
     <div class="speed-control">
       <label>Vitesse <span class="val" id="speed-val-queue">1.00x</span></label>
@@ -257,14 +282,23 @@ h2{color:#A6CF98;font-size:1.05em;margin:16px 0 10px}
 
   <!-- LOOP -->
   <div class="seg-box loop" id="box-loop" data-seg="loop">
-    <h3 onclick="selectSegment('loop')">🟢 LOOP (Central)</h3>
+    <div class="seg-header">
+      <h3 onclick="selectSegment('loop')">🟢 LOOP (Central)</h3>
+      <button class="btn-reset" onclick="resetSegment('loop')">↺ Reset</button>
+    </div>
     <div class="io-buttons">
       <button class="btn-io" id="in-loop" onclick="setMode('loop','in')">⬅ IN</button>
       <button class="btn-io" id="out-loop" onclick="setMode('loop','out')">OUT ➡</button>
     </div>
     <div class="seg-times">
-      <div class="time-pill in"><div class="label">Start</div><div class="value" id="val-loop-in">—</div></div>
-      <div class="time-pill out"><div class="label">End</div><div class="value" id="val-loop-out">—</div></div>
+      <div class="time-pill in">
+        <div class="label">Start (s)</div>
+        <input type="number" class="time-input in" id="input-loop-in" placeholder="—" step="0.1" min="0" max="265" oninput="onInputChange('loop','in',this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+      </div>
+      <div class="time-pill out">
+        <div class="label">End (s)</div>
+        <input type="number" class="time-input out" id="input-loop-out" placeholder="—" step="0.1" min="0" max="265" oninput="onInputChange('loop','out',this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+      </div>
     </div>
     <div class="speed-control">
       <label>Vitesse <span class="val" id="speed-val-loop">1.00x</span></label>
@@ -286,14 +320,23 @@ h2{color:#A6CF98;font-size:1.05em;margin:16px 0 10px}
 
   <!-- TETE -->
   <div class="seg-box tete" id="box-tete" data-seg="tete">
-    <h3 onclick="selectSegment('tete')">🟡 TETE (Drop)</h3>
+    <div class="seg-header">
+      <h3 onclick="selectSegment('tete')">🟡 TETE (Drop)</h3>
+      <button class="btn-reset" onclick="resetSegment('tete')">↺ Reset</button>
+    </div>
     <div class="io-buttons">
       <button class="btn-io" id="in-tete" onclick="setMode('tete','in')">⬅ IN</button>
       <button class="btn-io" id="out-tete" onclick="setMode('tete','out')">OUT ➡</button>
     </div>
     <div class="seg-times">
-      <div class="time-pill in"><div class="label">Start</div><div class="value" id="val-tete-in">—</div></div>
-      <div class="time-pill out"><div class="label">End</div><div class="value" id="val-tete-out">—</div></div>
+      <div class="time-pill in">
+        <div class="label">Start (s)</div>
+        <input type="number" class="time-input in" id="input-tete-in" placeholder="—" step="0.1" min="0" max="265" oninput="onInputChange('tete','in',this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+      </div>
+      <div class="time-pill out">
+        <div class="label">End (s)</div>
+        <input type="number" class="time-input out" id="input-tete-out" placeholder="—" step="0.1" min="0" max="265" oninput="onInputChange('tete','out',this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+      </div>
     </div>
     <div class="speed-control">
       <label>Vitesse <span class="val" id="speed-val-tete">1.00x</span></label>
@@ -355,12 +398,12 @@ let segments = {
   tete:{in:null,out:null,speed:1.0,reverse:false}
 };
 
-// === Render playback state ===
-let isRendering = false;      // playing assembled render
-let renderPos = 0;            // current position in assembled time (seconds)
-let renderSequence = [];      // computed sequence of playback chunks
+// Render playback state
+let isRendering = false;
+let renderPos = 0;
+let renderSequence = [];
 let currentChunkIdx = 0;
-let renderRAF = null;         // requestAnimationFrame ID
+let renderRAF = null;
 
 // === Energy bar ===
 const ebar = document.getElementById('energyBar');
@@ -383,6 +426,20 @@ BEATS.forEach(t => {
   m.style.left = (t/DURATION*100)+'%';
   beatContainer.appendChild(m);
 });
+
+// === Timeline 1 ticks (every 10s) ===
+const tickContainer = document.getElementById('tickContainer');
+for (let t = 0; t <= DURATION; t += 10) {
+  const tick = document.createElement('div');
+  tick.className = 'tick-marker';
+  tick.style.left = (t/DURATION*100)+'%';
+  tickContainer.appendChild(tick);
+  const label = document.createElement('div');
+  label.className = 'tick-label';
+  label.style.left = (t/DURATION*100)+'%';
+  label.textContent = t + 's';
+  tickContainer.appendChild(label);
+}
 
 // === Waveform ===
 const canvas = document.getElementById('waveCanvas');
@@ -433,14 +490,13 @@ timeline.addEventListener('click', (e) => {
   if (isRendering) stopRender();
   const rect = timeline.getBoundingClientRect();
   const pct = Math.max(0, Math.min(1, (e.clientX-rect.left)/rect.width));
-  const t = Math.round(pct*DURATION*10)/10;
+  const t = Math.round(pct*DURATION*10)/10; // round to 0.1s
 
   if (mode && selectedSeg) {
     segments[selectedSeg][mode] = t;
     updateSegmentUI(selectedSeg);
     updateOverlays();
     updateAll();
-
     setMode(null, null);
     if (segments[selectedSeg].in === null) {
       setMode(selectedSeg, 'in');
@@ -466,7 +522,7 @@ function selectSegment(seg) {
   updateIOButtons();
   const names = {queue:'QUEUE',loop:'LOOP',tete:'TETE'};
   if (segments[seg].in === null) {
-    setStatus(`Segment ${names[seg]} sélectionné. Clique sur IN pour placer le départ.`, '');
+    setStatus(`Segment ${names[seg]} sélectionné. Clique sur IN ou tape une valeur.`, '');
   } else if (segments[seg].out === null) {
     setStatus(`${names[seg]} — start défini (${segments[seg].in}s). Clique sur OUT.`, '');
   } else {
@@ -479,8 +535,8 @@ function setMode(seg, m) {
   if (seg === null && m === null) { selectedSeg = null; mode = null; }
   else { if (seg) selectedSeg = seg; mode = m; }
   updateIOButtons();
-  if (mode === 'in') setStatus(`⏳ Clique sur la timeline pour placer le START de ${selectedSeg.toUpperCase()}`, 'waiting');
-  else if (mode === 'out') setStatus(`⏳ Clique sur la timeline pour placer le END de ${selectedSeg.toUpperCase()}`, 'waiting out');
+  if (mode === 'in') setStatus(`⏳ Clique sur la timeline ou tape la valeur START de ${selectedSeg.toUpperCase()}`, 'waiting');
+  else if (mode === 'out') setStatus(`⏳ Clique sur la timeline ou tape la valeur END de ${selectedSeg.toUpperCase()}`, 'waiting out');
 }
 
 function updateIOButtons() {
@@ -492,6 +548,42 @@ function updateIOButtons() {
     if (s === selectedSeg && mode === 'in') inBtn.classList.add('active');
     if (s === selectedSeg && mode === 'out') outBtn.classList.add('active','out');
   });
+}
+
+// === Reset segment ===
+function resetSegment(seg) {
+  if (isRendering) stopRender();
+  segments[seg].in = null;
+  segments[seg].out = null;
+  segments[seg].speed = 1.0;
+  segments[seg].reverse = false;
+  if (seg === 'loop') {
+    segments[seg].loops = 2;
+    document.getElementById('loops-loop').value = 2;
+  }
+  // Reset UI controls
+  document.getElementById('speed-'+seg).value = 1;
+  document.getElementById('speed-val-'+seg).textContent = '1.00x';
+  document.getElementById('rev-'+seg).classList.remove('on');
+  // Clear inputs
+  document.getElementById('input-'+seg+'-in').value = '';
+  document.getElementById('input-'+seg+'-out').value = '';
+  updateAll();
+  const names = {queue:'QUEUE',loop:'LOOP',tete:'TETE'};
+  setStatus(`↺ ${names[seg]} reset. Les autres segments sont intacts.`, '');
+}
+
+// === Input change (editable fields) ===
+function onInputChange(seg, field, value) {
+  if (value === '' || value === null) {
+    segments[seg][field] = null;
+    updateAll();
+    return;
+  }
+  const v = parseFloat(value);
+  if (isNaN(v)) return;
+  segments[seg][field] = Math.max(0, Math.min(DURATION, Math.round(v*10)/10));
+  updateAll();
 }
 
 // === Speed ===
@@ -523,38 +615,36 @@ function changeLoops(delta) {
 function computeSequence() {
   const seq = [];
   let assembledDur = 0;
-
   ['queue','loop','tete'].forEach(seg => {
     const s = segments[seg];
-    if (s.in !== null && s.out !== null) {
+    if (s.in !== null && s.out !== null && s.out > s.in) {
       const rawDur = s.out - s.in;
       const adjDur = rawDur / s.speed;
       const loops = seg === 'loop' ? s.loops : 1;
       for (let i = 0; i < loops; i++) {
         seq.push({
-          seg: seg,
-          srcStart: s.in,
-          srcEnd: s.out,
-          speed: s.speed,
-          reverse: s.reverse,
-          assembledStart: assembledDur,
-          assembledDur: adjDur
+          seg: seg, srcStart: s.in, srcEnd: s.out,
+          speed: s.speed, reverse: s.reverse,
+          assembledStart: assembledDur, assembledDur: adjDur
         });
         assembledDur += adjDur;
       }
     }
   });
-
   return { seq, assembledDur };
 }
 
 // === Update segment UI ===
 function updateSegmentUI(seg) {
   const s = segments[seg];
-  document.getElementById('val-'+seg+'-in').textContent = s.in !== null ? s.in+'s' : '—';
-  document.getElementById('val-'+seg+'-out').textContent = s.out !== null ? s.out+'s' : '—';
+  // Update input fields (without triggering oninput)
+  const inInput = document.getElementById('input-'+seg+'-in');
+  const outInput = document.getElementById('input-'+seg+'-out');
+  if (document.activeElement !== inInput) inInput.value = s.in !== null ? s.in : '';
+  if (document.activeElement !== outInput) outInput.value = s.out !== null ? s.out : '';
+
   const prev = document.getElementById('prev-'+seg);
-  if (s.in !== null && s.out !== null) {
+  if (s.in !== null && s.out !== null && s.out > s.in) {
     const rawDur = s.out - s.in;
     const adjDur = rawDur / s.speed;
     let txt = `Durée: ${rawDur.toFixed(1)}s → ${adjDur.toFixed(1)}s (à ${s.speed.toFixed(2)}x)`;
@@ -577,7 +667,7 @@ function updateOverlays() {
     const s = segments[seg];
     const cap = seg.charAt(0).toUpperCase()+seg.slice(1);
     const ov = document.getElementById('overlay'+cap);
-    if (s.in !== null && s.out !== null) {
+    if (s.in !== null && s.out !== null && s.out > s.in) {
       ov.style.display = 'block';
       ov.style.left = (s.in/DURATION*100)+'%';
       ov.style.width = ((s.out-s.in)/DURATION*100)+'%';
@@ -597,30 +687,27 @@ function updateRender() {
   renderSequence = seq;
 
   const renderBar = document.getElementById('renderBar');
-  // Clear and rebuild segments (keep playhead + target line)
   renderBar.innerHTML = '';
+
+  const segNames = {queue:'QUEUE', loop:'LOOP', tete:'TETE'};
 
   if (assembledDur === 0) {
     ['queue','loop','tete'].forEach(seg => {
       const div = document.createElement('div');
       div.className = 'render-seg '+seg;
       div.style.flex = 1;
-      const names = {queue:'QUEUE',loop:'LOOP',tete:'TETE'};
-      div.innerHTML = `<span class="seg-name">${names[seg]}</span><span class="seg-detail">—</span>`;
+      div.innerHTML = `<span class="seg-name">${segNames[seg]}</span><span class="seg-detail">—</span>`;
       renderBar.appendChild(div);
     });
     document.getElementById('renderInfo').innerHTML = '<span>Durée totale : <strong>—</strong></span><span>Définis tes segments</span>';
     document.getElementById('syncIndicator').innerHTML = '';
     document.getElementById('videoTargetLine').style.display = 'none';
     document.getElementById('renderPlayhead').style.display = 'none';
+    document.getElementById('renderTicks').innerHTML = '';
     return;
   }
 
-  // Build segments from sequence
-  const segColors = {queue:'#58C4DD', loop:'#A6CF98', tete:'#FFF1B6'};
-  const segNames = {queue:'QUEUE', loop:'LOOP', tete:'TETE'};
-
-  // Group consecutive same-seg chunks
+  // Build segments
   let i = 0;
   while (i < seq.length) {
     let j = i;
@@ -635,7 +722,6 @@ function updateRender() {
     if (seq[i].reverse) detail += ' ⟲';
     if (seq[i].speed !== 1.0) detail += ` ${seq[i].speed.toFixed(2)}x`;
     div.innerHTML = `<span class="seg-name">${segNames[seg]}</span><span class="seg-detail">${detail}</span>`;
-    // Loop dividers
     for (let k = i + 1; k < j; k++) {
       const d = document.createElement('div');
       d.className = 'loop-divider';
@@ -657,11 +743,25 @@ function updateRender() {
   const vtl = document.createElement('div');
   vtl.className = 'video-target-line';
   vtl.id = 'videoTargetLine';
-  if (assembledDur > 0) {
-    vtl.style.display = 'block';
-    vtl.style.left = (VIDEO_DURATION / assembledDur * 100) + '%';
-  }
+  vtl.style.display = 'block';
+  vtl.style.left = (VIDEO_DURATION / assembledDur * 100) + '%';
   renderBar.appendChild(vtl);
+
+  // Render ticks (every 5s or 2s depending on duration)
+  const renderTicks = document.getElementById('renderTicks');
+  renderTicks.innerHTML = '';
+  const tickInterval = assembledDur > 30 ? 10 : assembledDur > 15 ? 5 : 2;
+  for (let t = 0; t <= assembledDur + 0.1; t += tickInterval) {
+    const tick = document.createElement('div');
+    tick.className = 'render-tick';
+    tick.style.left = (t/assembledDur*100)+'%';
+    renderTicks.appendChild(tick);
+    const label = document.createElement('div');
+    label.className = 'render-tick-label';
+    label.style.left = (t/assembledDur*100)+'%';
+    label.textContent = t.toFixed(0)+'s';
+    renderTicks.appendChild(label);
+  }
 
   // Info
   document.getElementById('renderInfo').innerHTML = `
@@ -681,7 +781,6 @@ function updateRender() {
     si.innerHTML = `<div class="sync-indicator sync-warn">🟡 Trop court de ${Math.abs(diff).toFixed(1)}s — ajoute loops, speed↓, ou allonge</div>`;
   }
 
-  // Update render time display
   updateRenderTimeDisplay();
 }
 
@@ -694,16 +793,12 @@ function toggleRenderPlay() {
 function startRender() {
   const { seq, assembledDur } = computeSequence();
   if (seq.length === 0 || assembledDur === 0) { alert('Définis tes segments d\'abord'); return; }
-
-  // Stop normal playback
   audio.pause();
   isRendering = true;
   renderPos = 0;
   currentChunkIdx = 0;
   document.getElementById('renderPlayBtn').textContent = '⏸ Stop rendu';
   document.getElementById('renderPlayhead').style.display = 'block';
-
-  // Jump to first chunk
   playChunk(0);
   renderLoop();
 }
@@ -719,10 +814,7 @@ function stopRender() {
 }
 
 function playChunk(idx) {
-  if (idx >= renderSequence.length) {
-    stopRender();
-    return;
-  }
+  if (idx >= renderSequence.length) { stopRender(); return; }
   currentChunkIdx = idx;
   const chunk = renderSequence[idx];
   audio.currentTime = chunk.srcStart;
@@ -734,12 +826,8 @@ audio.addEventListener('timeupdate', () => {
   if (isRendering && renderSequence.length > 0) {
     const chunk = renderSequence[currentChunkIdx];
     if (chunk && audio.currentTime >= chunk.srcEnd) {
-      // Move to next chunk
-      if (currentChunkIdx + 1 < renderSequence.length) {
-        playChunk(currentChunkIdx + 1);
-      } else {
-        stopRender();
-      }
+      if (currentChunkIdx + 1 < renderSequence.length) playChunk(currentChunkIdx + 1);
+      else stopRender();
     }
   }
   updatePlayhead();
@@ -749,15 +837,12 @@ function renderLoop() {
   if (!isRendering) return;
   const chunk = renderSequence[currentChunkIdx];
   if (chunk) {
-    // Calculate assembled position
     const elapsedInChunk = (audio.currentTime - chunk.srcStart) * chunk.speed;
     renderPos = chunk.assembledStart + Math.max(0, elapsedInChunk);
-
     const { assembledDur } = computeSequence();
     const pct = (renderPos / assembledDur) * 100;
     const ph = document.getElementById('renderPlayhead');
     if (ph) ph.style.left = pct + '%';
-
     updateRenderTimeDisplay();
   }
   renderRAF = requestAnimationFrame(renderLoop);
@@ -777,31 +862,20 @@ function updateRenderTimeDisplay() {
 function seekRender(event) {
   const { seq, assembledDur } = computeSequence();
   if (assembledDur === 0) return;
-
   const rect = event.currentTarget.getBoundingClientRect();
   const pct = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
   const targetAssembled = pct * assembledDur;
-
-  // Find which chunk this falls into
   let idx = 0;
   for (let i = 0; i < seq.length; i++) {
-    if (targetAssembled >= seq[i].assembledStart && targetAssembled < seq[i].assembledStart + seq[i].assembledDur) {
-      idx = i;
-      break;
-    }
+    if (targetAssembled >= seq[i].assembledStart && targetAssembled < seq[i].assembledStart + seq[i].assembledDur) { idx = i; break; }
     if (i === seq.length - 1) idx = i;
   }
-
   const chunk = seq[idx];
   const offsetInChunk = targetAssembled - chunk.assembledStart;
   const srcOffset = offsetInChunk * chunk.speed;
   audio.currentTime = chunk.srcStart + srcOffset;
   audio.playbackRate = chunk.speed;
-
-  if (isRendering) {
-    currentChunkIdx = idx;
-    audio.play();
-  }
+  if (isRendering) { currentChunkIdx = idx; audio.play(); }
 }
 
 // === Status ===
@@ -813,11 +887,12 @@ function setStatus(text, cls) {
 
 // === Normal playback ===
 let isPlaying = false;
+let segPlayEnd = null;
 
 function togglePlay() {
   if (isRendering) stopRender();
   if (isPlaying) audio.pause();
-  else { audio.playbackRate = 1; audio.play(); }
+  else { audio.playbackRate = 1; segPlayEnd = null; audio.play(); }
 }
 
 audio.addEventListener('play', () => {
@@ -831,6 +906,7 @@ audio.addEventListener('pause', () => {
 audio.addEventListener('ended', () => {
   isPlaying = false;
   document.getElementById('playBtn').textContent = '▶ Play';
+  segPlayEnd = null;
 });
 
 function playSegment(seg) {
@@ -839,21 +915,20 @@ function playSegment(seg) {
   if (s.in === null || s.out === null) { alert('Définis IN et OUT de '+seg.toUpperCase()+' d\'abord'); return; }
   audio.currentTime = s.in;
   audio.playbackRate = s.speed;
-  // Set a temporary end listener
-  const tempEnd = s.out;
-  const handler = () => {
-    if (audio.currentTime >= tempEnd) {
-      audio.pause();
-      audio.playbackRate = 1;
-      audio.removeEventListener('timeupdate', handler);
-    }
-  };
-  audio.addEventListener('timeupdate', handler);
+  segPlayEnd = s.out;
   audio.play();
 }
 
+audio.addEventListener('timeupdate', () => {
+  if (segPlayEnd !== null && !isRendering && audio.currentTime >= segPlayEnd) {
+    audio.pause();
+    audio.playbackRate = 1;
+    segPlayEnd = null;
+  }
+});
+
 function updatePlayhead() {
-  if (isRendering) return; // don't update timeline 1 during render
+  if (isRendering) return;
   const pct = (audio.currentTime/DURATION)*100;
   document.getElementById('playhead').style.left = pct+'%';
   document.getElementById('progressBar').style.width = pct+'%';
@@ -871,14 +946,13 @@ document.getElementById('seekBar').addEventListener('click', (e) => {
   const pct = (e.clientX-rect.left)/rect.width;
   audio.currentTime = pct*DURATION;
   audio.playbackRate = 1;
+  segPlayEnd = null;
   updatePlayhead();
 });
 
 // === Update all ===
 function updateAll() {
-  ['queue','loop','tete'].forEach(seg => {
-    updateSegmentUI(seg);
-  });
+  ['queue','loop','tete'].forEach(seg => updateSegmentUI(seg));
   updateOverlays();
   updateRender();
 }
@@ -887,22 +961,18 @@ function updateAll() {
 function genJSON() {
   const missing = ['queue','loop','tete'].filter(s => segments[s].in === null || segments[s].out === null);
   if (missing.length > 0) { alert('Segments incomplets: '+missing.map(s=>s.toUpperCase()).join(', ')); return; }
-
   const { assembledDur } = computeSequence();
-
   const seg = [
     {role:'queue', start:segments.queue.in, end:segments.queue.out, speed:segments.queue.speed, reverse:segments.queue.reverse},
     {role:'loop', start:segments.loop.in, end:segments.loop.out, speed:segments.loop.speed, reverse:segments.loop.reverse, loops:segments.loop.loops},
     {role:'tete', start:segments.tete.in, end:segments.tete.out, speed:segments.tete.speed, reverse:segments.tete.reverse}
   ];
-
   const output = {
     video_duration: VIDEO_DURATION,
     segments: seg,
     assembled_duration: parseFloat(assembledDur.toFixed(2)),
     auto_fit: Math.abs(assembledDur - VIDEO_DURATION) > 0.3
   };
-
   document.getElementById('jsonOut').textContent = JSON.stringify(output, null, 2);
 }
 
