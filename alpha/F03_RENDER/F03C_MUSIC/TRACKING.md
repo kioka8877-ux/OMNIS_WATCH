@@ -1,29 +1,55 @@
-# F03C — Journal de Mission
+# F03C — Mixeur Musical (Canonisé ALPHA)
 
-> Fregate F03C — L'Architecte (F03C-A) + La Machine a Micro-jets (F03C-B)
-> Pipeline : music.mp3 -> directives.json -> video_with_music.mp4
+## Statut
+✅ CANONISÉ en ALPHA sur main — Mode texte qui dirige (pas de voix off)
 
-| Champ | Valeur |
-|-------|--------|
-| Fregate A | F03C-A — L'Architecte |
-| Fregate B | F03C-B — La Machine a Micro-jets |
-| Moteur analyse | Librosa (BPM + structure) |
-| Moteur decoupe | Pydub (speed, reverse, volume, fades, loops) |
-| Ducking | Pydub (hook 500ms + ducking -14dB) |
-| Heritage | SANCTORUM F03_SERAPHIM |
+## Rôle
+F03C prend la vidéo de F03B (SFX) et ajoute la musique de fond.
+S'insère entre F03B et F04 : F03A → F03B → **F03C** → F04 → F05
+
+## Architecture
+
+### F03C-A — L'Architecte (Analyse + Directives)
+- **Phase analyze** : Librosa détecte BPM + beats + waveform → viewer HTML
+- **Phase oracle** : L'Oracle sandbox enrichit les segments → directives.json
+- **Viewer** : Hébergé sur GitHub Pages (f03c/)
+  - Timeline 1 : musique source avec beats, sections d'énergie, clic IN/OUT
+  - Timeline 2 : rendu assemblé avec playback séquentiel
+  - Sliders vitesse 0.5x-2x (preservesPitch), reverse, loops
+  - Sync vidéo automatique (indicateur 🟢/🟡/🔴)
+  - Reset par segment, inputs éditables, graduations
+
+### F03C-B — La Machine (Mixage)
+- Découpe la musique en QUEUE/LOOP/TETE selon directives.json
+- Applique speed, reverse, volume_pct, fades, loops par segment
+- Crossfade entre segments
+- Stretch pour couvrir la durée vidéo
+- **Mode ALPHA : volume constant, pas de ducking** (pas de voix off)
+- Mux audio sur vidéo → video_with_music.mp4
+- Export backbone (musique seule)
+
+## Mode ALPHA vs BETA
+| Élément | ALPHA (main) | BETA (main) |
+|---------|-------------|-------------|
+| Ducking | ❌ Volume constant | ✅ -14dB sous voix off |
+| timing.json | ❌ Pas besoin | ✅ Source du ducking |
+| Voix off | ❌ Texte qui dirige | ✅ Whisper |
+| Input vidéo | video_complete.mp4 (SFX) | video_complete.mp4 (SFX + voix) |
+
+## Fichiers
+- `CODEBASE/omnis_f03c_a.py` — Architecte (Librosa + viewer + Oracle)
+- `CODEBASE/omnis_f03c_b.py` — Machine (Pydub + mixage + mux)
+- `CODEBASE/requirements_f03c.txt` — Dépendances
+- `IN/directives.json` — Directives de mixage (générées par Oracle)
+- `IN/analysis.json` — Analyse Librosa (BPM, beats)
+- `IN/viewer.html` — Viewer F03C-A (aussi sur GitHub Pages)
+- `OUT/` — video_with_music.mp4, master_audio_mix.mp3, backbone
 
 ## Workflow
+- `.github/workflows/f03c_music.yml` — workflow_dispatch manuel
+- Installe librosa + pydub + ffmpeg
+- Lance F03C-B avec les chemins alpha/
+- Upload artifact f03c-output
 
-1. **F03C-A analyze** : Analyser la musique -> BPM + waveform -> viewer HTML
-2. **GATE** : Operateur choisit QUEUE/LOOP/TETE dans le viewer
-3. **F03C-A prepare** : Oracle enrichit les segments -> directives.json
-4. **GATE** : Operateur valide les directives
-5. **F03C-B** : Decoupe + ducking + mix -> video_with_music.mp4
-6. **GATE** : Operateur valide le resultat
-
-## Phase : CONSTRUCTION
-
-### [2026-07-20] CONSTRUCTION F03C
-- F03C-A : adapte de seraphim_a.py (Librosa + viewer HTML + Oracle sandbox)
-- F03C-B : adapte de seraphim_b.py (Pydub + ducking + mux video)
-- Workflow GitHub Actions : f03c_music.yml
+## Héritage
+Adapté depuis SANCTORUM F03_SERAPHIM (seraphim_a.py + seraphim_b.py).

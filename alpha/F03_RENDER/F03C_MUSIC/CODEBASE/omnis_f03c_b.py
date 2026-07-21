@@ -1,20 +1,20 @@
 """
-omnis_f03c_b.py — F03C-B : La Machine a Micro-jets (Mixage Musical)
+omnis_f03c_b.py — F03C-B : La Machine à Micro-jets (Mixage Musical)
 Assemble le mix final : musique (directives.json) + video_complete.mp4 (F03B) -> video_with_music.mp4
-Adapte depuis SANCTORUM F03_SERAPHIM seraphim_b.py
+Adapté depuis SANCTORUM F03_SERAPHIM seraphim_b.py
 
-Changements vs SANCTORUM :
-- Input : video_complete.mp4 (F03B = SFX + voix off) au lieu de voix_purifiee.wav
-- Output : video_with_music.mp4 (video + audio mixe) au lieu de master_audio_mix.mp3
-- Ducking : utilise timing.json pour detecter quand la voix parle
-- Pas de push vers ANGRON-V2
+Mode ALPHA (texte qui dirige, pas de voix off) :
+- Pas de ducking — la musique joue à volume constant (défini par volume_pct par segment)
+- Pas de timing.json — pas de voix off sous laquelle ducker
+- Input : video_complete.mp4 (F03B = SFX uniquement, pas de voix off)
+- Output : video_with_music.mp4 (vidéo + audio mixé)
 - Conserve export backbone (musique seule)
 """
 import argparse, json, os, sys, math, subprocess, tempfile
 
 
 def extract_audio_from_video(video_path, output_audio_path):
-    """Extrait l'audio de video_complete.mp4 (SFX + voix off)."""
+    """Extrait l'audio de video_complete.mp4 (SFX)."""
     cmd = [
         "ffmpeg", "-y", "-i", video_path,
         "-vn", "-acodec", "pcm_s16le",
@@ -31,10 +31,10 @@ def assemble_mix(directives_path, music_path, video_audio_path, output_audio_pat
     with open(directives_path) as f:
         d = json.load(f)
 
-    print(f"[F03C-B] BPM={d['bpm']} | {len(d['audio_timeline'])} segments | ducking={d['ducking_db']}dB")
+    print(f"[F03C-B] BPM={d['bpm']} | {len(d['audio_timeline'])} segments | mode ALPHA (volume constant)")
 
     music_src = AudioSegment.from_file(music_path).set_frame_rate(44100).set_channels(2)
-    voice = AudioSegment.from_file(video_audio_path).set_frame_rate(44100).set_channels(2)
+    sfx = AudioSegment.from_file(video_audio_path).set_frame_rate(44100).set_channels(2)
 
     crossfade_ms = d.get('crossfade_ms', 15)
     music_backbone = AudioSegment.silent(duration=0)
@@ -56,7 +56,7 @@ def assemble_mix(directives_path, music_path, video_audio_path, output_audio_pat
         if seg.get('reverse', False):
             clip = clip.reverse()
 
-        # Volume
+        # Volume (constant par segment, pas de ducking)
         vol_pct = seg.get('volume_pct', 100)
         if vol_pct != 100 and vol_pct > 0:
             clip = clip + (20 * math.log10(vol_pct / 100))
@@ -81,8 +81,8 @@ def assemble_mix(directives_path, music_path, video_audio_path, output_audio_pat
 
     print(f"[F03C-B] Backbone musique : {len(music_backbone)/1000:.1f}s")
 
-    # Stretch backbone to cover voice + 2s tail
-    target_ms = len(voice) + 2000
+    # Stretch backbone to cover video audio + 2s tail
+    target_ms = len(sfx) + 2000
     if len(music_backbone) < target_ms:
         last = d['audio_timeline'][-1]
         filler = music_src[int(last['start']*1000):int(last['end']*1000)]
@@ -93,23 +93,16 @@ def assemble_mix(directives_path, music_path, video_audio_path, output_audio_pat
 
     music_backbone = music_backbone[:target_ms]
 
-    # Ducking : full volume pendant hook (avant voix), duck sous la voix
-    ducking_db = d.get('ducking_db', -14.0)
-    music_ducked = music_backbone + ducking_db
-
-    # Hook duration = 500ms plein volume avant que la voix commence
-    hook_ms = 500
-    if len(music_backbone) > hook_ms:
-        music_final = music_backbone[:hook_ms].append(music_ducked[hook_ms:], crossfade=50)
-    else:
-        music_final = music_ducked
+    # Mode ALPHA : volume constant, pas de ducking
+    # La musique joue telle quelle avec les volume_pct de chaque segment
+    music_final = music_backbone
 
     # Pad si necessaire
-    if len(music_final) < len(voice):
-        music_final = music_final + AudioSegment.silent(len(voice) - len(music_final))
+    if len(music_final) < len(sfx):
+        music_final = music_final + AudioSegment.silent(len(sfx) - len(music_final))
 
-    # Mix voix/SFX sur musique
-    master = music_final.overlay(voice, position=0)
+    # Mix SFX sur musique (overlay = SFX par-dessus la musique)
+    master = music_final.overlay(sfx, position=0)
     master = master.normalize(headroom=1.0)
 
     # Export audio mix
@@ -118,7 +111,7 @@ def assemble_mix(directives_path, music_path, video_audio_path, output_audio_pat
     dur_s = len(master) / 1000
     print(f"[F03C-B] Audio mix -> {output_audio_path} ({size_kb} KB, {dur_s:.1f}s)")
 
-    # Export backbone seul (musique pure, sans voix)
+    # Export backbone seul (musique pure, sans SFX)
     backbone_path = output_audio_path.replace('.mp3', '_backbone.mp3')
     music_backbone_full = music_backbone[:target_ms].normalize(headroom=1.0)
     music_backbone_full.export(backbone_path, format='mp3', bitrate='192k')

@@ -24,7 +24,6 @@ def analyze_bpm(music_path, output_json, output_html):
     # Detect energy sections
     import numpy as np
     rms = librosa.feature.rms(y=y)[0]
-    rms_times = librosa.frames_to_time(librosa.frames_from_samples(len(y), hop_length=512), sr=sr)
 
     fig, ax = plt.subplots(figsize=(16, 4), facecolor='#0d0d1a')
     times = np.linspace(0, duration, len(y))
