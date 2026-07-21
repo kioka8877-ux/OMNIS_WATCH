@@ -359,7 +359,7 @@ h2{color:#A6CF98;font-size:1.05em;margin:16px 0 10px}
   <div class="json-out" id="jsonOut">→ Clique "Générer JSON" après avoir choisi tes segments</div>
 </div>
 
-<audio id="audio" preload="metadata"></audio>
+<audio id="audio" preload="auto" crossorigin="anonymous"></audio>
 
 <script>
 const audio = document.getElementById('audio');
@@ -367,6 +367,15 @@ audio.src = 'music.mp3';
 audio.preservesPitch = true;
 audio.mozPreservesPitch = true;
 audio.webkitPreservesPitch = true;
+
+// Audio loading state
+let audioReady = false;
+audio.addEventListener('canplaythrough', () => { audioReady = true; console.log('Audio ready'); });
+audio.addEventListener('canplay', () => { audioReady = true; console.log('Audio can play'); });
+audio.addEventListener('error', (e) => { console.error('Audio error:', e, audio.error); alert('Erreur chargement audio: ' + (audio.error ? audio.error.code : 'unknown')); });
+audio.addEventListener('waiting', () => { console.log('Audio buffering...'); });
+audio.addEventListener('playing', () => { console.log('Audio playing'); });
+audio.load();
 
 const BPM = 112.35;
 const DURATION = 265.45;
@@ -819,7 +828,8 @@ function playChunk(idx) {
   const chunk = renderSequence[idx];
   audio.currentTime = chunk.srcStart;
   audio.playbackRate = chunk.speed;
-  audio.play();
+  const p = audio.play();
+  if (p && p.catch) p.catch(e => console.error('Chunk play failed:', e));
 }
 
 audio.addEventListener('timeupdate', () => {
@@ -892,7 +902,12 @@ let segPlayEnd = null;
 function togglePlay() {
   if (isRendering) stopRender();
   if (isPlaying) audio.pause();
-  else { audio.playbackRate = 1; segPlayEnd = null; audio.play(); }
+  else {
+    audio.playbackRate = 1;
+    segPlayEnd = null;
+    const p = audio.play();
+    if (p && p.catch) p.catch(e => console.error('Play failed:', e));
+  }
 }
 
 audio.addEventListener('play', () => {
@@ -916,7 +931,8 @@ function playSegment(seg) {
   audio.currentTime = s.in;
   audio.playbackRate = s.speed;
   segPlayEnd = s.out;
-  audio.play();
+  const p = audio.play();
+  if (p && p.catch) p.catch(e => console.error('Segment play failed:', e));
 }
 
 audio.addEventListener('timeupdate', () => {
