@@ -1,0 +1,47 @@
+{
+  "source_music": "Lana Del Rey - Summertime Sadness",
+  "bpm": 112.35,
+  "total_duration_sec": 265.45,
+  "video_duration_sec": 16.1,
+  "assembled_duration_sec": 16.11,
+  "auto_fit": false,
+  "audio_timeline": [
+    {
+      "role": "queue",
+      "start": 68.3,
+      "end": 75.1,
+      "loops": 1,
+      "speed": 0.95,
+      "reverse": false,
+      "volume_pct": 100,
+      "fade_in_ms": 0,
+      "fade_out_ms": 200
+    },
+    {
+      "role": "loop",
+      "start": 87.4,
+      "end": 95.0,
+      "loops": 1,
+      "speed": 0.95,
+      "reverse": false,
+      "volume_pct": 80,
+      "fade_in_ms": 50,
+      "fade_out_ms": 50
+    },
+    {
+      "role": "tete",
+      "start": 95.5,
+      "end": 96.4,
+      "loops": 1,
+      "speed": 0.95,
+      "reverse": false,
+      "volume_pct": 110,
+      "fade_in_ms": 0,
+      "fade_out_ms": 400
+    }
+  ],
+  "crossfade_ms": 15,
+  "ducking_db": -14.0,
+  "ducking_source": "timing.json",
+  "ducking_note": "Voix off de 0.0s a 15.84s (65 mots). Musique ducked sous la voix pendant toute la narration. Hook 500ms plein volume au debut. TETE a 110% car la voix se termine a 15.84s et le drop final couvre les 0.26s restants."
+}
