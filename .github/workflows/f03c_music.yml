@@ -1,0 +1,41 @@
+name: F03C Music Mixer
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Mode (alpha)'
+        required: true
+        default: 'alpha'
+
+permissions:
+  contents: write
+
+jobs:
+  f03c:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install Python deps
+        run: |
+          pip install librosa soundfile pydub numpy scipy matplotlib
+
+      - name: Run F03C-B Mixer
+        run: |
+          cd alpha/F03_RENDER/F03C_MUSIC/CODEBASE
+          python3 omnis_f03c_b.py \
+            --directives ../IN/directives.json \
+            --music ../IN/music.mp3 \
+            --video ../IN/video_complete.mp4 \
+            --output ../OUT/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: f03c-output
+          path: alpha/F03_RENDER/F03C_MUSIC/OUT/
