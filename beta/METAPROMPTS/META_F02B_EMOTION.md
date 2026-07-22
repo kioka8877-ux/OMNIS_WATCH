@@ -50,6 +50,32 @@ DESCRIPTION F02A (ce qu'on voit)     SCRIPT VOIX OFF (ce qu'on entend)
 
 ---
 
+## PERTURABO BRIDGE (OBLIGATOIRE)
+
+Avant de generer le script voix off, l'Oracle DOIT :
+
+1. **Fetch les regles virales** depuis PERTURABO (GitHub raw) :
+   - https://raw.githubusercontent.com/kioka8877-ux/PERTURABO/main/MONDES_FORGES/YOUTUBE/ARCHIVUM/rules/shorts_rules.md
+   - https://raw.githubusercontent.com/kioka8877-ux/PERTURABO/main/MONDES_FORGES/YOUTUBE/ARCHIVUM/rules/tim_danilov_rules.md
+
+2. **Si une chaine est assignee** a cette video, fetch son identite :
+   - https://raw.githubusercontent.com/kioka8877-ux/PERTURABO/main/MONDES_FORGES/YOUTUBE/ARCHIVUM/channels/{channel_slug}/channel_identity.json
+
+3. **Appliquer les regles** sur le script voix off :
+   - **Regle S1** : Structure Hook -> Explain Payoff -> Foreshadow Payoff -> Reveal Payoff
+   - **Regle S2** : Le premier texte set up le payoff, pas juste un hook genial isole
+   - **Regle S3** : Le hook visuel (premier texte + premiere frame) doit fonctionner sans son
+   - **Regle 4 Tim Danilov** : Squelette avant script -- jamais de texte generique. Si un squelette viral (F02 Breacher) existe pour le demon analyse, l'utiliser comme moule
+   - **Regle S18** : Le feed Shorts est un scroll passif -- le titre et la premiere frame font l'acquisition
+
+4. **Si un squelette viral** (F02 Breacher output) existe pour le demon analyse, l'utiliser comme moule pour le script. Le squelette est le moule. La niche est le metal.
+
+5. **PERTURABO se rendort.** OMNIS-WATCH continue seul avec un script viral. PERTURABO evolue en permanence -- l'Oracle fetch la version la plus recente a chaque execution de F02B.
+
+> **Note :** PERTURABO est une flotte independante (reverse engineering YouTube). Elle extrait les regles virales de chaines a millions de vues et forge des identites de chaines. L'Oracle OMNIS-WATCH s'en nourrit au runtime sans copier statiquement -- toujours a jour, zero maintenance.
+
+---
+
 ## LES MODES EMOTIONNELS
 
 | Mode | Tonalite voix | Rythme | Colorimetrie | Type de zoom |
