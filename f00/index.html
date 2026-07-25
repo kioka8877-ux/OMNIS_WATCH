@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F00 ASSETFORGE — Préparation Multi-Clips</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d0d1a;color:#ECEFF1;font-family:'Courier New',monospace;padding:20px;max-width:1200px;margin:0 auto}
+h1{color:#58C4DD;font-size:1.3em;margin-bottom:6px}
+h2{color:#A6CF98;font-size:1.05em;margin:16px 0 10px}
+.hint{color:#666;font-size:.8em;margin:6px 0}
+.stats{display:flex;gap:24px;margin:10px 0;color:#FFF1B6;font-size:1em;flex-wrap:wrap}
+
+/* Upload */
+.upload-zone{background:#13132a;border:2px dashed #2a2a3e;border-radius:10px;padding:30px;text-align:center;margin:16px 0;cursor:pointer;transition:border-color .2s}
+.upload-zone:hover{border-color:#58C4DD}
+.upload-zone p{color:#90A4AE;font-size:.9em}
+.upload-zone .icon{font-size:2em;margin-bottom:8px}
+#fileInput{display:none}
+
+/* Clip list */
+.clips-list{margin:16px 0}
+.clip-card{background:#13132a;border:1px solid #2a2a3e;border-radius:8px;padding:16px;margin-bottom:14px}
+.clip-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.clip-card-header h3{color:#58C4DD;font-size:1em;cursor:pointer}
+.clip-card-header .clip-info{font-size:.8em;color:#666}
+.btn-remove{background:transparent;border:1px solid #555;color:#888;padding:3px 10px;cursor:pointer;border-radius:4px;font-size:.75em}
+.btn-remove:hover{border-color:#FF6B6B;color:#FF6B6B}
+
+/* Video player per clip */
+.clip-player{display:flex;gap:14px;flex-wrap:wrap}
+.clip-video{flex:0 0 300px;max-width:300px}
+.clip-video video{width:100%;border-radius:6px;border:1px solid #2a2a3e}
+.clip-controls{flex:1;min-width:250px}
+.clip-timeline{position:relative;width:100%;height:60px;background:#070714;border:1px solid #2a2a3e;border-radius:6px;cursor:crosshair;overflow:hidden;user-select:none;margin-bottom:8px}
+.clip-timeline .tl-bg{position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(90deg,#0a0a1a,#0d0d22)}
+.clip-timeline .tl-progress{position:absolute;top:0;left:0;height:100%;background:rgba(88,196,221,0.08)}
+.clip-timeline .tl-playhead{position:absolute;top:0;width:2px;height:100%;background:#58C4DD;box-shadow:0 0 6px #58C4DD;z-index:10}
+.clip-timeline .tl-tick{position:absolute;bottom:0;width:1px;height:8px;background:rgba(255,255,255,0.15)}
+.clip-timeline .tl-tick-label{position:absolute;bottom:9px;font-size:.55em;color:rgba(255,255,255,0.2);transform:translateX(-50%)}
+.clip-timeline .seq-overlay{position:absolute;top:0;height:100%;opacity:.3;pointer-events:none;border-left:2px solid;border-right:2px solid}
+.clip-timeline .seq-overlay .seq-num{position:absolute;top:2px;left:4px;font-size:.6em;font-weight:bold;color:#0d0d1a}
+.clip-controls .ctl-row{display:flex;gap:8px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
+.clip-controls .ctl-row label{font-size:.8em;color:#90A4AE;min-width:60px}
+.clip-controls .ctl-row .time-display{color:#58C4DD;font-size:.85em;font-weight:bold}
+.btn-play-clip{background:#58C4DD;color:#0d0d1a;border:none;padding:6px 14px;cursor:pointer;border-radius:4px;font-family:'Courier New',monospace;font-weight:bold;font-size:.85em}
+.btn-play-clip:hover{background:#7AD5F0}
+
+/* Sequences per clip */
+.sequences-section{margin-top:10px}
+.sequences-section h4{color:#A6CF98;font-size:.9em;margin-bottom:6px}
+.seq-row{display:flex;gap:8px;align-items:center;background:#070714;border:1px solid #2a2a3e;border-radius:6px;padding:8px 10px;margin-bottom:6px;flex-wrap:wrap}
+.seq-row .seq-pos{background:#1e1e38;color:#58C4DD;border:1px solid #444;border-radius:4px;padding:3px 8px;font-size:.8em;font-weight:bold;min-width:30px;text-align:center}
+.seq-row .seq-times{display:flex;gap:6px;align-items:center}
+.seq-row .seq-input{background:#1e1e38;border:1px solid #444;color:#ECEFF1;padding:4px 8px;width:70px;border-radius:4px;font-family:'Courier New',monospace;font-size:.85em;text-align:center}
+.seq-row .seq-input.in{border-color:#FF6B6B}
+.seq-row .seq-input.out{border-color:#FFD93D}
+.seq-row .seq-label{font-size:.75em;color:#666}
+.seq-row .speed-ctrl{display:flex;align-items:center;gap:4px}
+.seq-row .speed-ctrl input{width:80px}
+.seq-row .speed-ctrl .sval{color:#58C4DD;font-size:.8em;font-weight:bold;min-width:40px}
+.seq-row .btn-play-seq{background:transparent;border:1px solid #A6CF98;color:#A6CF98;padding:3px 8px;cursor:pointer;border-radius:3px;font-size:.75em}
+.seq-row .btn-play-seq:hover{background:rgba(166,207,152,0.1)}
+.seq-row .btn-del-seq{background:transparent;border:1px solid #555;color:#888;padding:3px 8px;cursor:pointer;border-radius:3px;font-size:.75em}
+.seq-row .btn-del-seq:hover{border-color:#FF6B6B;color:#FF6B6B}
+.btn-add-seq{background:#1e1e38;border:1px solid #444;color:#ECEFF1;padding:6px 14px;cursor:pointer;border-radius:4px;font-size:.8em;margin-top:4px}
+.btn-add-seq:hover{border-color:#A6CF98;color:#A6CF98}
+
+/* Speed slider */
+.speed-slider{-webkit-appearance:none;height:4px;background:#1e1e38;border-radius:2px;outline:none}
+.speed-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;background:#58C4DD;border-radius:50%;cursor:pointer}
+.speed-slider::-moz-range-thumb{width:12px;height:12px;background:#58C4DD;border-radius:50%;cursor:pointer;border:none}
+
+/* Budget / sync */
+.budget-section{background:#13132a;border:1px solid #2a2a3e;border-radius:8px;padding:16px;margin:16px 0}
+.budget-row{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.budget-row label{font-size:.85em;color:#90A4AE}
+.budget-input{background:#1e1e38;border:1px solid #444;color:#ECEFF1;padding:6px 10px;width:80px;border-radius:4px;font-family:'Courier New',monospace;font-size:1em;text-align:center}
+.budget-display{display:flex;gap:20px;flex-wrap:wrap;font-size:.9em;color:#90A4AE;margin-top:8px}
+.budget-display span strong{color:#ECEFF1}
+.sync-indicator{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:4px;font-size:.85em;font-weight:bold;margin-top:8px}
+.sync-ok{background:rgba(166,207,152,0.15);color:#A6CF98;border:1px solid #A6CF98}
+.sync-warn{background:rgba(255,217,61,0.15);color:#FFD93D;border:1px solid #FFD93D}
+.sync-err{background:rgba(255,107,107,0.15);color:#FF6B6B;border:1px solid #FF6B6B}
+
+/* Assembly timeline */
+.assembly-timeline{background:#13132a;border:1px solid #2a2a3e;border-radius:8px;padding:16px;margin:16px 0}
+.assembly-bar{display:flex;height:40px;border-radius:6px;overflow:hidden;border:1px solid #2a2a3e;margin-top:8px}
+.assembly-seg{display:flex;align-items:center;justify-content:center;font-size:.7em;font-weight:bold;color:#0d0d1a;transition:flex .3s;position:relative;overflow:hidden}
+.assembly-seg .seg-name{font-size:.85em}
+.assembly-seg .seg-detail{font-size:.65em;opacity:.7;margin-top:1px}
+.budget-line{position:absolute;top:0;width:2px;height:100%;background:#FF6B6B;box-shadow:0 0 6px #FF6B6B;z-index:9}
+.budget-line::after{content:'budget';position:absolute;top:-16px;left:4px;font-size:.6em;color:#FF6B6B;white-space:nowrap}
+
+/* Output */
+.output-section{background:#13132a;border:1px solid #2a2a3e;border-radius:8px;padding:18px;margin:18px 0}
+.btn-gen{background:#58C4DD;color:#0d0d1a;border:none;padding:10px 20px;cursor:pointer;border-radius:6px;font-family:'Courier New',monospace;font-weight:bold;margin-right:8px}
+.btn-gen:hover{background:#FFF1B6;color:#0d0d1a}
+.btn-copy{background:#A6CF98;color:#0d0d1a;border:none;padding:10px 20px;cursor:pointer;border-radius:6px;font-family:'Courier New',monospace;font-weight:bold}
+.btn-copy:hover{background:#C3E8B5}
+.json-out{background:#070714;border:1px solid #58C4DD;padding:14px;border-radius:6px;font-size:.85em;white-space:pre-wrap;color:#A6CF98;margin-top:12px;min-height:60px;word-break:break-all;max-height:400px;overflow-y:auto}
+
+.instructions{background:#13132a;border:1px solid #2a2a3e;border-radius:8px;padding:14px;margin:12px 0;font-size:.85em;color:#90A4AE;line-height:1.6}
+.instructions strong{color:#ECEFF1}
+.instructions .step{color:#58C4DD;font-weight:bold}
+</style>
+</head>
+<body>
+
+<h1>🎬 F00 ASSETFORGE — Préparation Multi-Clips</h1>
+<p style="color:#90A4AE;font-size:.9em">Sélectionne des séquences dans plusieurs clips → sort un clip unique calibré sur la voix off</p>
+
+<div class="instructions">
+  <strong>Comment ça marche :</strong><br>
+  <span class="step">1.</span> Upload tes clips bruts (bouton ci-dessous)<br>
+  <span class="step">2.</span> Pour chaque clip, ajoute des séquences (IN/OUT par séquence)<br>
+  <span class="step">3.</span> Ajuste la vitesse de chaque séquence (0.5x-2x)<br>
+  <span class="step">4.</span> Renseigne la durée de ta voix off (budget temporel)<br>
+  <span class="step">5.</span> Vérifie l'indicateur de sync — le total ne doit pas dépasser la voix off<br>
+  <span class="step">6.</span> <strong>Générer JSON</strong> → <strong>Copier</strong> → colle-le dans le chat
+</div>
+
+<!-- Upload -->
+<div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+  <div class="icon">📁</div>
+  <p>Clique pour uploader tes clips (MP4, MOV, WebM...)</p>
+</div>
+<input type="file" id="fileInput" multiple accept="video/*">
+
+<!-- Clips -->
+<div class="clips-list" id="clipsList"></div>
+
+<!-- Budget -->
+<div class="budget-section">
+  <h2>⏱️ Budget temporel — Voix off</h2>
+  <div class="budget-row">
+    <label>Durée voix off (s) :</label>
+    <input type="number" class="budget-input" id="voiceoffDuration" value="0" step="0.1" min="0" oninput="updateAll()">
+    <label style="margin-left:12px">Total séquences :</label>
+    <span class="time-display" id="totalDuration" style="color:#58C4DD;font-weight:bold">0.0s</span>
+  </div>
+  <div class="budget-display" id="budgetDisplay">
+    <span>Total: <strong>0.0s</strong></span>
+    <span>Budget: <strong>—</strong></span>
+    <span>Écart: <strong>—</strong></span>
+  </div>
+  <div id="syncIndicator"></div>
+</div>
+
+<!-- Assembly timeline -->
+<div class="assembly-timeline">
+  <h2>🎬 Timeline assemblée</h2>
+  <p class="hint">Aperçu de l'enchaînement des séquences dans le clip unique final</p>
+  <div style="position:relative">
+    <div class="assembly-bar" id="assemblyBar">
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;color:#666;font-size:.8em">Ajoute des séquences pour voir l'assemblage</div>
+    </div>
+  </div>
+</div>
+
+<!-- Output -->
+<div class="output-section">
+  <h2>📋 sequences.json</h2>
+  <button class="btn-gen" onclick="genJSON()">Générer JSON</button>
+  <button class="btn-copy" onclick="copyJSON()">Copier</button>
+  <div class="json-out" id="jsonOut">→ Ajoute des clips et des séquences, puis clique "Générer JSON"</div>
+</div>
+
+<script>
+let clips = []; // {id, name, url, duration, videoEl, sequences: []}
+let clipCounter = 0;
+
+// === File upload ===
+document.getElementById('fileInput').addEventListener('change', (e) => {
+  for (const file of e.target.files) {
+    if (file.type.startsWith('video/')) {
+      addClip(file);
+    }
+  }
+  e.target.value = ''; // reset for re-upload
+});
+
+function addClip(file) {
+  const id = ++clipCounter;
+  const url = URL.createObjectURL(file);
+  const video = document.createElement('video');
+  video.preload = 'metadata';
+  video.src = url;
+
+  video.addEventListener('loadedmetadata', () => {
+    const clip = {
+      id: id,
+      name: file.name,
+      url: url,
+      duration: video.duration,
+      videoEl: video,
+      sequences: []
+    };
+    clips.push(clip);
+    renderClips();
+    updateAll();
+  });
+}
+
+function removeClip(id) {
+  const idx = clips.findIndex(c => c.id === id);
+  if (idx >= 0) {
+    URL.revokeObjectURL(clips[idx].url);
+    clips.splice(idx, 1);
+    renderClips();
+    updateAll();
+  }
+}
+
+// === Render clips ===
+function renderClips() {
+  const list = document.getElementById('clipsList');
+  list.innerHTML = '';
+
+  clips.forEach(clip => {
+    const card = document.createElement('div');
+    card.className = 'clip-card';
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'clip-card-header';
+    header.innerHTML = `
+      <h3>📹 Clip ${clip.id}: ${clip.name}</h3>
+      <span class="clip-info">${clip.duration.toFixed(1)}s</span>
+      <button class="btn-remove" onclick="removeClip(${clip.id})">✕ Supprimer</button>
+    `;
+    card.appendChild(header);
+
+    // Player
+    const player = document.createElement('div');
+    player.className = 'clip-player';
+
+    // Video
+    const videoDiv = document.createElement('div');
+    videoDiv.className = 'clip-video';
+    const vid = document.createElement('video');
+    vid.src = clip.url;
+    vid.controls = false;
+    vid.id = `video-${clip.id}`;
+    videoDiv.appendChild(vid);
+    player.appendChild(videoDiv);
+
+    // Controls
+    const controls = document.createElement('div');
+    controls.className = 'clip-controls';
+
+    // Timeline
+    const tl = document.createElement('div');
+    tl.className = 'clip-timeline';
+    tl.id = `tl-${clip.id}`;
+    tl.innerHTML = `
+      <div class="tl-bg"></div>
+      <div class="tl-progress" id="tl-prog-${clip.id}"></div>
+      <div class="tl-playhead" id="tl-ph-${clip.id}" style="left:0%"></div>
+      <div id="tl-ticks-${clip.id}"></div>
+      <div id="tl-seqs-${clip.id}"></div>
+    `;
+    tl.addEventListener('click', (e) => {
+      const rect = tl.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      vid.currentTime = pct * clip.duration;
+    });
+    controls.appendChild(tl);
+
+    // Play button + time
+    const ctlRow = document.createElement('div');
+    ctlRow.className = 'ctl-row';
+    ctlRow.innerHTML = `
+      <button class="btn-play-clip" onclick="toggleClipPlay(${clip.id})">▶ Play</button>
+      <span class="time-display" id="time-${clip.id}">0:00 / ${formatTime(clip.duration)}</span>
+    `;
+    controls.appendChild(ctlRow);
+
+    // Sequences
+    const seqSection = document.createElement('div');
+    seqSection.className = 'sequences-section';
+    seqSection.innerHTML = `<h4>Séquences (${clip.sequences.length})</h4>`;
+    seqSection.id = `seqs-${clip.id}`;
+
+    clip.sequences.forEach((seq, idx) => {
+      seqSection.appendChild(createSeqRow(clip, seq, idx));
+    });
+
+    const addBtn = document.createElement('button');
+    addBtn.className = 'btn-add-seq';
+    addBtn.textContent = '+ Ajouter une séquence';
+    addBtn.onclick = () => {
+      const lastOut = clip.sequences.length > 0 ? clip.sequences[clip.sequences.length - 1].out : 0;
+      const newSeq = { in: lastOut, out: Math.min(lastOut + 5, clip.duration), speed: 1.0 };
+      clip.sequences.push(newSeq);
+      renderClips();
+      updateAll();
+    };
+    seqSection.appendChild(addBtn);
+
+    controls.appendChild(seqSection);
+    player.appendChild(controls);
+    card.appendChild(player);
+    list.appendChild(card);
+
+    // Setup ticks
+    setupTicks(clip);
+
+    // Video events
+    vid.addEventListener('timeupdate', () => {
+      const pct = (vid.currentTime / clip.duration) * 100;
+      document.getElementById(`tl-ph-${clip.id}`).style.left = pct + '%';
+      document.getElementById(`tl-prog-${clip.id}`).style.width = pct + '%';
+      document.getElementById(`time-${clip.id}`).textContent = `${formatTime(vid.currentTime)} / ${formatTime(clip.duration)}`;
+    });
+  });
+}
+
+function setupTicks(clip) {
+  const container = document.getElementById(`tl-ticks-${clip.id}`);
+  if (!container) return;
+  container.innerHTML = '';
+  const interval = clip.duration > 60 ? 10 : clip.duration > 30 ? 5 : 2;
+  for (let t = 0; t <= clip.duration; t += interval) {
+    const tick = document.createElement('div');
+    tick.className = 'tl-tick';
+    tick.style.left = (t / clip.duration * 100) + '%';
+    container.appendChild(tick);
+    const label = document.createElement('div');
+    label.className = 'tl-tick-label';
+    label.style.left = (t / clip.duration * 100) + '%';
+    label.textContent = t + 's';
+    container.appendChild(label);
+  }
+}
+
+function createSeqRow(clip, seq, idx) {
+  const row = document.createElement('div');
+  row.className = 'seq-row';
+
+  const seqNum = clip.sequences.indexOf(seq) + 1;
+  const colors = ['#58C4DD', '#A6CF98', '#FFF1B6', '#FF6B6B', '#C792EA', '#FFCB6B'];
+  const color = colors[(seqNum - 1) % colors.length];
+
+  row.innerHTML = `
+    <div class="seq-pos" style="border-color:${color};color:${color}">#${seqNum}</div>
+    <div class="seq-times">
+      <input type="number" class="seq-input in" placeholder="IN" step="0.1" min="0" max="${clip.duration}" value="${seq.in}" oninput="updateSeq(${clip.id},${idx},'in',this.value)">
+      <span class="seq-label">→</span>
+      <input type="number" class="seq-input out" placeholder="OUT" step="0.1" min="0" max="${clip.duration}" value="${seq.out}" oninput="updateSeq(${clip.id},${idx},'out',this.value)">
+    </div>
+    <div class="speed-ctrl">
+      <input type="range" class="speed-slider" min="0.5" max="2" step="0.05" value="${seq.speed}" oninput="updateSeq(${clip.id},${idx},'speed',this.value);this.nextElementSibling.textContent=parseFloat(this.value).toFixed(2)+'x'">
+      <span class="sval">${seq.speed.toFixed(2)}x</span>
+    </div>
+    <button class="btn-play-seq" onclick="playSeq(${clip.id},${idx})">▶</button>
+    <button class="btn-del-seq" onclick="delSeq(${clip.id},${idx})">✕</button>
+  `;
+  return row;
+}
+
+function updateSeq(clipId, seqIdx, field, value) {
+  const clip = clips.find(c => c.id === clipId);
+  if (!clip) return;
+  if (field === 'speed') {
+    clip.sequences[seqIdx].speed = parseFloat(value);
+  } else {
+    clip.sequences[seqIdx][field] = Math.max(0, Math.min(clip.duration, parseFloat(value) || 0));
+  }
+  updateAll();
+}
+
+function delSeq(clipId, seqIdx) {
+  const clip = clips.find(c => c.id === clipId);
+  if (!clip) return;
+  clip.sequences.splice(seqIdx, 1);
+  renderClips();
+  updateAll();
+}
+
+function toggleClipPlay(clipId) {
+  const vid = document.getElementById(`video-${clipId}`);
+  if (vid.paused) vid.play();
+  else vid.pause();
+}
+
+function playSeq(clipId, seqIdx) {
+  const clip = clips.find(c => c.id === clipId);
+  if (!clip) return;
+  const seq = clip.sequences[seqIdx];
+  const vid = document.getElementById(`video-${clipId}`);
+  vid.currentTime = seq.in;
+  vid.playbackRate = seq.speed;
+  vid.play();
+  const handler = () => {
+    if (vid.currentTime >= seq.out) {
+      vid.pause();
+      vid.playbackRate = 1;
+      vid.removeEventListener('timeupdate', handler);
+    }
+  };
+  vid.addEventListener('timeupdate', handler);
+}
+
+// === Compute total ===
+function computeTotal() {
+  let total = 0;
+  const allSeqs = [];
+  clips.forEach(clip => {
+    clip.sequences.forEach(seq => {
+      if (seq.out > seq.in) {
+        const dur = (seq.out - seq.in) / seq.speed;
+        total += dur;
+        allSeqs.push({ clip: clip.name, in: seq.in, out: seq.out, speed: seq.speed, dur: dur, clipId: clip.id });
+      }
+    });
+  });
+  return { total, allSeqs };
+}
+
+// === Update all ===
+function updateAll() {
+  const { total, allSeqs } = computeTotal();
+  const budget = parseFloat(document.getElementById('voiceoffDuration').value) || 0;
+
+  // Display
+  document.getElementById('totalDuration').textContent = total.toFixed(1) + 's';
+
+  const bd = document.getElementById('budgetDisplay');
+  if (budget > 0) {
+    const diff = total - budget;
+    bd.innerHTML = `
+      <span>Total: <strong>${total.toFixed(1)}s</strong></span>
+      <span>Budget: <strong>${budget.toFixed(1)}s</strong></span>
+      <span>Écart: <strong>${diff.toFixed(1)}s</strong></span>
+    `;
+    const si = document.getElementById('syncIndicator');
+    if (Math.abs(diff) < 0.5) {
+      si.innerHTML = `<div class="sync-indicator sync-ok">🟢 Sync parfait (${diff.toFixed(1)}s)</div>`;
+    } else if (diff > 0) {
+      si.innerHTML = `<div class="sync-indicator sync-err">🔴 Trop long de ${diff.toFixed(1)}s — réduis séquences, speed↑, ou raccourcis</div>`;
+    } else {
+      si.innerHTML = `<div class="sync-indicator sync-warn">🟡 Trop court de ${Math.abs(diff).toFixed(1)}s — ajoute séquences ou speed↓</div>`;
+    }
+  } else {
+    bd.innerHTML = `<span>Total: <strong>${total.toFixed(1)}s</strong></span><span>Budget: <strong>—</strong></span><span>Renseigne la durée voix off</span>`;
+    document.getElementById('syncIndicator').innerHTML = '';
+  }
+
+  // Assembly bar
+  updateAssemblyBar(allSeqs, total, budget);
+
+  // Sequence overlays on clip timelines
+  clips.forEach(clip => {
+    const container = document.getElementById(`tl-seqs-${clip.id}`);
+    if (!container) return;
+    container.innerHTML = '';
+    const colors = ['#58C4DD', '#A6CF98', '#FFF1B6', '#FF6B6B', '#C792EA', '#FFCB6B'];
+    clip.sequences.forEach((seq, idx) => {
+      if (seq.out > seq.in) {
+        const ov = document.createElement('div');
+        ov.className = 'seq-overlay';
+        ov.style.left = (seq.in / clip.duration * 100) + '%';
+        ov.style.width = ((seq.out - seq.in) / clip.duration * 100) + '%';
+        ov.style.background = colors[idx % colors.length];
+        ov.style.borderColor = colors[idx % colors.length];
+        ov.innerHTML = `<span class="seq-num">#${idx + 1}</span>`;
+        container.appendChild(ov);
+      }
+    });
+  });
+}
+
+function updateAssemblyBar(allSeqs, total, budget) {
+  const bar = document.getElementById('assemblyBar');
+  bar.innerHTML = '';
+
+  if (allSeqs.length === 0) {
+    bar.innerHTML = '<div style="flex:1;display:flex;align-items:center;justify-content:center;color:#666;font-size:.8em">Ajoute des séquences pour voir l\'assemblage</div>';
+    return;
+  }
+
+  const colors = ['#58C4DD', '#A6CF98', '#FFF1B6', '#FF6B6B', '#C792EA', '#FFCB6B'];
+
+  allSeqs.forEach((seq, idx) => {
+    const div = document.createElement('div');
+    div.className = 'assembly-seg';
+    div.style.background = colors[idx % colors.length];
+    div.style.flex = seq.dur;
+    const clipNum = clips.find(c => c.id === seq.clipId)?.id || '?';
+    div.innerHTML = `<span class="seg-name">C${clipNum}#${idx + 1}</span><span class="seg-detail">${seq.dur.toFixed(1)}s</span>`;
+    bar.appendChild(div);
+  });
+
+  // Budget line
+  if (budget > 0 && total > 0) {
+    const line = document.createElement('div');
+    line.className = 'budget-line';
+    line.style.left = (budget / total * 100) + '%';
+    if (budget / total > 1) line.style.display = 'none';
+    bar.appendChild(line);
+  }
+}
+
+// === Generate JSON ===
+function genJSON() {
+  const { allSeqs } = computeTotal();
+  if (allSeqs.length === 0) { alert('Ajoute au moins une séquence'); return; }
+
+  const budget = parseFloat(document.getElementById('voiceoffDuration').value) || 0;
+
+  const segments = allSeqs.map((seq, idx) => ({
+    clip: seq.clip,
+    in: parseFloat(seq.in.toFixed(2)),
+    out: parseFloat(seq.out.toFixed(2)),
+    speed: seq.speed,
+    position: idx + 1
+  }));
+
+  const output = {
+    voiceoff_duration: budget,
+    segments: segments
+  };
+
+  document.getElementById('jsonOut').textContent = JSON.stringify(output, null, 2);
+}
+
+function copyJSON() {
+  const t = document.getElementById('jsonOut').textContent;
+  if (t.startsWith('→')) { alert('Génère le JSON d\'abord'); return; }
+  navigator.clipboard.writeText(t).then(() => alert('JSON copié !'));
+}
+
+// === Utils ===
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return `${m}:${sec.toString().padStart(2, '0')}`;
+}
+</script>
+</body>
+</html>
