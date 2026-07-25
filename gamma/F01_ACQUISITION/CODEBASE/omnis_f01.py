@@ -24,7 +24,7 @@ from pathlib import Path
 
 # ── Constantes ──────────────────────────────────────────────────────────────
 
-INPUT_FILENAME = "video_raw.mp4"
+INPUT_FILENAME = "video_raw.mp4"  # défaut; en gamma, utiliser --input-file clip_unique.mp4
 OUTPUT_FILENAME = "video_coupee.mp4"
 MANIFEST_FILENAME = "f01_manifest.json"
 DEFAULT_FPS = 30
@@ -318,7 +318,7 @@ def generate_manifest(output_dir, out_info, actual_duration, total_frames,
             "codec": out_info["codec"]
         },
         "input": {
-            "source_file": INPUT_FILENAME,
+            "source_file": args.input_file,
             "in_timestamp": in_ts,
             "out_timestamp": out_ts
         },
@@ -344,6 +344,7 @@ def main():
         description="F01 ACQUISITION — Decoupe et formatage video"
     )
     parser.add_argument("--input", required=True, help="Dossier IN/")
+    parser.add_argument("--input-file", default=INPUT_FILENAME, help="Nom du fichier d'entree (defaut: video_raw.mp4, gamma: clip_unique.mp4)")
     parser.add_argument("--output", required=True, help="Dossier OUT/")
     parser.add_argument("--in-timestamp", required=True, help="Timestamp IN (ex: 00:02)")
     parser.add_argument("--out-timestamp", required=True, help="Timestamp OUT (ex: 00:15)")
@@ -364,7 +365,7 @@ def main():
 
     input_dir = Path(args.input)
     output_dir = Path(args.output)
-    input_path = input_dir / INPUT_FILENAME
+    input_path = input_dir / args.input_file
     output_path = output_dir / OUTPUT_FILENAME
 
     # ── Verifications ──
