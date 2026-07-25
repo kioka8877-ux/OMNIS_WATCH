@@ -1,0 +1,37 @@
+name: F00 Assetforge
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Mode (gamma)'
+        required: true
+        default: 'gamma'
+
+permissions:
+  contents: write
+
+jobs:
+  f00:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Run F00 Assetforge
+        run: |
+          cd gamma/F00_ASSETFORGE/CODEBASE
+          python3 omnis_f00.py \
+            --sequences ../IN/sequences.json \
+            --clips-dir ../IN/ \
+            --output ../OUT/ \
+            --voiceoff-duration $(python3 -c "import json; d=json.load(open('../IN/sequences.json')); print(d.get('voiceoff_duration', 0))")
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: f00-output
+          path: gamma/F00_ASSETFORGE/OUT/

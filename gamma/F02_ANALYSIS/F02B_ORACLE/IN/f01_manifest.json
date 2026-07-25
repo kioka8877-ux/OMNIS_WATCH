@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "fps": 30,
+    "duration_seconds": 20.0,
+    "total_frames": 600,
+    "width": 1080,
+    "height": 1920,
+    "format": "9:16",
+    "blur_pad": true,
+    "speed": 1.0,
+    "volume": 1.0,
+    "codec": "h264"
+  },
+  "input": {
+    "source_file": "video_raw.mp4",
+    "in_timestamp": "00:00",
+    "out_timestamp": "00:20"
+  },
+  "output": {
+    "file": "video_coupee.mp4",
+    "size_mb": 12.5
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "version": "1.0",
+  "emotion_mode": "TRISTE",
+  "narrative_arc": "setup → context → twist → emotional_peak → resolution",
+  "video": {
+    "source": "video_coupee.mp4",
+    "fps": 30,
+    "total_frames": 600,
+    "width": 1080,
+    "height": 1920
+  },
+  "text_overlays": [
+    {
+      "id": "txt_01",
+      "content": "This is Max.",
+      "start_frame": 0,
+      "end_frame": 90,
+      "animation": "fade_in",
+      "emotion_weight": "setup",
+      "font": "Arial Black",
+      "size": 72,
+      "color": "#FFFFFF",
+      "stroke_color": "#000000",
+      "stroke_width": 4,
+      "position": "center_bottom"
+    },
+    {
+      "id": "txt_02",
+      "content": "His owner is dying.",
+      "start_frame": 105,
+      "end_frame": 225,
+      "animation": "typewriter",
+      "emotion_weight": "context",
+      "font": "Arial Black",
+      "size": 64,
+      "color": "#FFFFFF",
+      "stroke_color": "#000000",
+      "stroke_width": 4,
+      "position": "center_bottom"
+    },
+    {
+      "id": "txt_03",
+      "content": "He knows.",
+      "start_frame": 240,
+      "end_frame": 330,
+      "animation": "fade_in_slow",
+      "emotion_weight": "twist",
+      "font": "Arial Black",
+      "size": 80,
+      "color": "#FFFFFF",
+      "stroke_color": "#000000",
+      "stroke_width": 4,
+      "position": "center"
+    },
+    {
+      "id": "txt_04",
+      "content": "So he stays.",
+      "start_frame": 360,
+      "end_frame": 480,
+      "animation": "fade_in_slow",
+      "emotion_weight": "emotional_peak",
+      "font": "Arial Black",
+      "size": 68,
+      "color": "#FFFFFF",
+      "stroke_color": "#000000",
+      "stroke_width": 4,
+      "position": "center_bottom"
+    },
+    {
+      "id": "txt_05",
+      "content": "Until the end.",
+      "start_frame": 510,
+      "end_frame": 599,
+      "animation": "fade_in_slow",
+      "emotion_weight": "resolution",
+      "font": "Arial Black",
+      "size": 56,
+      "color": "#CCCCCC",
+      "stroke_color": "#000000",
+      "stroke_width": 3,
+      "position": "center_bottom"
+    }
+  ],
+  "zoom_keyframes": [
+    {"frame": 0, "scale": 1.0, "target_x": 0.5, "target_y": 0.5},
+    {"frame": 105, "scale": 1.1, "target_x": 0.52, "target_y": 0.36},
+    {"frame": 240, "scale": 1.2, "target_x": 0.55, "target_y": 0.37},
+    {"frame": 360, "scale": 1.35, "target_x": 0.65, "target_y": 0.41},
+    {"frame": 510, "scale": 1.5, "target_x": 0.78, "target_y": 0.30}
+  ],
+  "color_preset": "cold_desaturated",
+  "color_css_filter": "contrast(0.95) saturate(0.6) brightness(0.9) hue-rotate(-5deg)",
+  "enhance_4k": true,
+  "sfx_timeline": [
+    {"frame": 0, "type": "keyboard", "volume": 0.3},
+    {"frame": 105, "type": "keyboard", "volume": 0.3},
+    {"frame": 105, "type": "whoosh", "volume": 0.5},
+    {"frame": 240, "type": "keyboard", "volume": 0.2},
+    {"frame": 240, "type": "whoosh", "volume": 0.4},
+    {"frame": 360, "type": "keyboard", "volume": 0.2},
+    {"frame": 360, "type": "whoosh", "volume": 0.6},
+    {"frame": 510, "type": "keyboard", "volume": 0.15},
+    {"frame": 510, "type": "whoosh", "volume": 0.3}
+  ],
+  "tracking_source": "tracking_data.json"
+}

@@ -1,0 +1,20 @@
+{
+  "target_type": "face",
+  "target_label": null,
+  "fps": 30,
+  "total_frames": 600,
+  "smooth_window": 5,
+  "tracks": [
+    {"frame": 0, "x": 0.52, "y": 0.35, "confidence": 0.95},
+    {"frame": 60, "x": 0.52, "y": 0.36, "confidence": 0.93},
+    {"frame": 120, "x": 0.53, "y": 0.35, "confidence": 0.94},
+    {"frame": 180, "x": 0.55, "y": 0.38, "confidence": 0.91},
+    {"frame": 240, "x": 0.60, "y": 0.40, "confidence": 0.88},
+    {"frame": 300, "x": 0.65, "y": 0.42, "confidence": 0.85},
+    {"frame": 360, "x": 0.70, "y": 0.38, "confidence": 0.82},
+    {"frame": 420, "x": 0.72, "y": 0.35, "confidence": 0.80},
+    {"frame": 480, "x": 0.75, "y": 0.33, "confidence": 0.78},
+    {"frame": 540, "x": 0.78, "y": 0.30, "confidence": 0.75},
+    {"frame": 599, "x": 0.80, "y": 0.28, "confidence": 0.72}
+  ]
+}
