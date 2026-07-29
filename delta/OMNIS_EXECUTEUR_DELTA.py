@@ -251,25 +251,65 @@ def cmd_gate_g2(token, ledger):
             ledger["gh_runs"]["d01_transcribe"] = run_id_gh
             log_ok(f"Run D-F01 transcription: #{run_id_gh}")
 
-    section("D-F02 Viral Cut - Oracle + PERTURABO")
-    log_info("L'Oracle (sandbox) genere la cutlist base sur PERTURABO")
-    log_info("1. Preparez le prompt:")
-    log_info(f"  python F02_VIRAL_CUT/CODEBASE/omnis_d02_viralcut.py \\")
-    log_info(f"    --input F02_VIRAL_CUT/IN/ --output F02_VIRAL_CUT/OUT/ --prepare")
-    log_info("2. L'Oracle genere cutlist.json base sur le prompt")
-    log_info("3. Validez la cutlist:")
-    log_info(f"  python F02_VIRAL_CUT/CODEBASE/omnis_d02_viralcut.py \\")
-    log_info(f"    --input F02_VIRAL_CUT/IN/ --output F02_VIRAL_CUT/OUT/ --validate cutlist.json")
+    section("D-F02 Viral Cut - Oracle automatique")
+    log_info("Attente D-F01 scenes + transcription...")
+    
+    d01s_id = ledger.get("gh_runs", {}).get("d01_scenedetect")
+    d01t_id = ledger.get("gh_runs", {}).get("d01_transcribe")
+    
+    for rid, name in [(d01s_id, "D-F01 scenes"), (d01t_id, "D-F01 transcription")]:
+        if rid:
+            log_info(f"Attente {name} #{rid}...")
+            success, _ = wait_for_run(token, rid, timeout=600, interval=15)
+            if not success:
+                log_fail(f"{name} #{rid} a echoue")
+                return
+    
+    section("Telechargement artifacts D-F01")
+    f01_out = SCRIPT_DIR / "F01_SCENE_DETECT" / "OUT"
+    f01_out.mkdir(parents=True, exist_ok=True)
+    download_artifact(token, d01s_id, "d01-scenes-output", str(f01_out))
+    download_artifact(token, d01t_id, "d01-transcript-output", str(f01_out))
+    
+    f02_in = SCRIPT_DIR / "F02_VIRAL_CUT" / "IN"
+    f02_in.mkdir(parents=True, exist_ok=True)
+    for f in f01_out.iterdir():
+        import shutil
+        shutil.copy2(f, f02_in / f.name)
+    
+    section("Trigger D-F02 Oracle sur GitHub Actions")
+    if trigger_workflow(token, "d02_viralcut.yml", inputs={"mode": MODE}):
+        time.sleep(5)
+        run_id_gh = get_latest_run_id(token, "d02_viralcut.yml")
+        if run_id_gh:
+            ledger["gh_runs"]["d02_oracle"] = run_id_gh
+            log_ok(f"Run D-F02 Oracle: #{run_id_gh}")
+            
+            log_info("Attente D-F02 Oracle (generation cutlist OpenRouter)...")
+            success, _ = wait_for_run(token, run_id_gh, timeout=300, interval=15)
+            if not success:
+                log_fail("D-F02 Oracle a echoue")
+                save_ledger(ledger)
+                return
+            
+            f02_out = SCRIPT_DIR / "F02_VIRAL_CUT" / "OUT"
+            f02_out.mkdir(parents=True, exist_ok=True)
+            download_artifact(token, run_id_gh, "d02-cutlist-output", str(f02_out))
+            
+            log_ok("Cutlist generee et telechargee !")
+            ledger["etapes_completees"].extend(["D-F01", "D-F02"])
 
     ledger["gate_actuelle"] = "G2"
     save_ledger(ledger)
 
+    ledger["gate_actuelle"] = "G3"
+    save_ledger(ledger)
+    
     print()
     print("=" * 52)
-    print(" GATE G2 - En attente de validation")
-    print(" 1. D-F01: GitHub Actions (scenes + transcription)")
-    print(" 2. D-F02: Oracle sandbox (PERTURABO cutlist)")
-    print(" Quand tout est valide: --gate G3")
+    print(" GATE G2 -> G3 - D-F01 + D-F02 termines")
+    print(" Cutlist Oracle validee. Pret pour reframe.")
+    print(" Lancez: --gate G3")
     print("=" * 52)
 
 
