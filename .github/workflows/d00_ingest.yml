@@ -8,8 +8,8 @@ on:
         required: true
         default: 'delta'
       url:
-        description: 'URL YouTube a telecharger'
-        required: true
+        description: 'URL YouTube (optionnel - sinon prendre IN/video_source.mp4)'
+        required: false
 
 permissions:
   contents: write
@@ -25,6 +25,16 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y ffmpeg
           pip install yt-dlp
+
+      - name: Check for local video
+        id: check_video
+        run: |
+          if [ -f "delta/F00_INGEST/IN/video_source.mp4" ]; then
+            echo "local_video=true" >> $GITHUB_OUTPUT
+            ls -la delta/F00_INGEST/IN/video_source.mp4
+          else
+            echo "local_video=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Run D-F00 Ingest
         env:
