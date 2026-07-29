@@ -3,10 +3,10 @@ name: F03C Music Mixer
 on:
   workflow_dispatch:
     inputs:
-      mode:
-        description: 'Mode (alpha)'
+mode:
+        description: 'Mode (gamma)'
         required: true
-        default: 'alpha'
+        default: 'gamma'
 
 permissions:
   contents: write
@@ -27,7 +27,7 @@ jobs:
 
       - name: Run F03C-B Mixer
         run: |
-          cd alpha/F03_RENDER/F03C_MUSIC/CODEBASE
+          cd gamma/F03_RENDER/F03C_MUSIC/CODEBASE
           python3 omnis_f03c_b.py \
             --directives ../IN/directives.json \
             --music ../IN/music.mp3 \
@@ -38,4 +38,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: f03c-output
-          path: alpha/F03_RENDER/F03C_MUSIC/OUT/
+          path: gamma/F03_RENDER/F03C_MUSIC/OUT/

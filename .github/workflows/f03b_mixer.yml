@@ -5,9 +5,9 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 'Mode (alpha)'
+        description: 'Mode (gamma)'
         required: true
-        default: 'alpha'
+        default: 'gamma'
 
 permissions:
   contents: write
@@ -23,7 +23,7 @@ jobs:
 
       - name: Run F03B Mixer
         run: |
-          cd alpha/F03_RENDER/F03B_MIXER/CODEBASE
+          cd gamma/F03_RENDER/F03B_MIXER/CODEBASE
           python3 omnis_f03b_mixer.py \
             --input ../IN/ \
             --output ../OUT/ \
@@ -33,4 +33,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: f03b-output
-          path: alpha/F03_RENDER/F03B_MIXER/OUT/
+          path: gamma/F03_RENDER/F03B_MIXER/OUT/

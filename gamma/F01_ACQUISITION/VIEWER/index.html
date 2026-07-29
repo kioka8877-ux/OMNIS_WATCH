@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OMNIS-WATCH — Gate 1</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI',system-ui,sans-serif; background:#1a1a2e; color:#e0e0e0; padding:20px; max-width:800px; margin:0 auto; }
+.header { background:#16213e; padding:16px 24px; border-bottom:2px solid #0f3460; border-radius:8px 8px 0 0; margin-bottom:20px; }
+.header h1 { font-size:20px; color:#e94560; }
+.header .sub { font-size:12px; color:#888; margin-top:4px; }
+.section { background:#16213e; border:1px solid #0f3460; border-radius:8px; padding:20px; margin-bottom:16px; }
+.section h2 { font-size:14px; color:#e94560; margin-bottom:12px; text-transform:uppercase; letter-spacing:1px; }
+.tiktok-wrap { display:flex; justify-content:center; margin-bottom:12px; }
+.tiktok-wrap iframe { border:none; border-radius:12px; }
+.btn-row { display:flex; gap:8px; margin-bottom:10px; }
+.btn { padding:10px 16px; border:1px solid #333; background:#1a1a2e; color:#ccc; border-radius:6px; cursor:pointer; font-size:13px; }
+.btn:hover { background:#222; color:#fff; }
+.btn-in { border-color:#4ecca3; color:#4ecca3; }
+.btn-out { border-color:#e94560; color:#e94560; }
+.dur-badge { display:inline-block; background:#0f3460; padding:6px 14px; border-radius:6px; font-family:monospace; font-size:13px; color:#4ecca3; margin-bottom:10px; }
+.input-row { margin-bottom:12px; }
+.input-row label { font-size:13px; color:#ccc; display:block; margin-bottom:6px; }
+.input-row input { width:100%; padding:10px; background:#0a0a1e; border:1px solid #333; border-radius:6px; color:#fff; font-family:monospace; font-size:14px; }
+.fmt-row { display:flex; gap:8px; margin-bottom:12px; }
+.fmt-btn { flex:1; padding:12px; border:1px solid #333; background:#1a1a2e; color:#888; border-radius:6px; cursor:pointer; font-size:13px; text-align:center; }
+.fmt-btn.active { border-color:#e94560; background:#2d1a2e; color:#fff; }
+.fmt-btn .res { font-size:10px; color:#666; margin-top:3px; }
+.toggle-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.toggle-row input { width:18px; height:18px; accent-color:#e94560; }
+.toggle-row label { font-size:13px; color:#ccc; }
+.slider-row { margin-bottom:12px; }
+.slider-row label { font-size:13px; color:#ccc; display:flex; justify-content:space-between; margin-bottom:6px; }
+.slider-row label .val { color:#4ecca3; font-family:monospace; }
+.slider-row input[type=range] { width:100%; accent-color:#e94560; }
+.gen-btn { width:100%; padding:14px; background:#e94560; border:none; color:#fff; border-radius:8px; font-weight:bold; font-size:15px; cursor:pointer; }
+.gen-btn:hover { background:#ff5577; }
+.json-box { background:#0a0a1e; border:1px solid #333; border-radius:6px; padding:14px; font-family:monospace; font-size:11px; color:#4ecca3; white-space:pre-wrap; word-break:break-all; max-height:250px; overflow:auto; margin-top:12px; display:none; }
+.json-actions { display:flex; gap:8px; margin-top:10px; }
+.note { font-size:11px; color:#666; margin-top:12px; line-height:1.6; }
+.note b { color:#aaa; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>⚔ OMNIS-WATCH — Gate 1</h1>
+  <div class="sub">Coupe • Format • Speed • Volume</div>
+</div>
+
+<div class="section">
+  <h2>🎬 Vidéo TikTok</h2>
+  <div class="tiktok-wrap">
+    <iframe src="https://www.tiktok.com/embed/v2/7662470669803818260" width="340" height="700" allowfullscreen></iframe>
+  </div>
+  <p style="font-size:12px;color:#888;text-align:center">Play la vidéo ci-dessus, note les timestamps</p>
+</div>
+
+<div class="section">
+  <h2>⏱ Coupe IN / OUT</h2>
+  <div class="input-row">
+    <label>IN (début) — en secondes, ex: 2.5</label>
+    <input type="number" id="inPt" step="0.1" min="0" placeholder="ex: 0">
+  </div>
+  <div class="input-row">
+    <label>OUT (fin) — en secondes, ex: 15.0</label>
+    <input type="number" id="outPt" step="0.1" min="0" placeholder="ex: 30">
+  </div>
+  <div class="dur-badge" id="durLabel">Sélection: —</div>
+</div>
+
+<div class="section">
+  <h2>⚙ Configuration</h2>
+  <div class="fmt-row">
+    <div class="fmt-btn active" data-w="1080" data-h="1920" onclick="pickFmt(this)">9:16<div class="res">1080×1920</div></div>
+    <div class="fmt-btn" data-w="1920" data-h="1080" onclick="pickFmt(this)">16:9<div class="res">1920×1080</div></div>
+    <div class="fmt-btn" data-w="1080" data-h="1080" onclick="pickFmt(this)">1:1<div class="res">1080×1080</div></div>
+  </div>
+  <div class="toggle-row">
+    <input type="checkbox" id="blurPad">
+    <label for="blurPad">Blur-pad — uniquement si vidéo horizontale</label>
+  </div>
+  <div class="slider-row">
+    <label>⚡ Speed <span class="val" id="speedV">1.00x</span></label>
+    <input type="range" id="speed" min="0.25" max="3" step="0.25" value="1">
+  </div>
+  <div class="slider-row">
+    <label>🔊 Volume <span class="val" id="volV">100%</span></label>
+    <input type="range" id="vol" min="0" max="300" step="5" value="100">
+  </div>
+</div>
+
+<div class="section">
+  <button class="gen-btn" onclick="genJSON()">⚔ GÉNÉRER GATE 1 JSON</button>
+  <div class="json-box" id="jsonOut"></div>
+  <div class="json-actions">
+    <button class="btn" onclick="copyJSON()">📋 Copier le JSON</button>
+    <button class="btn" onclick="downloadJSON()">📥 Télécharger</button>
+  </div>
+  <div class="note">
+    <b>→ Play la vidéo TikTok ci-dessus</b><br>
+    <b>→ Note les timestamps IN et OUT</b><br>
+    <b>→ Entre-les dans les champs</b><br>
+    <b>→ Génère et copie le JSON</b><br>
+    <b>→ Colle-le dans le chat</b>
+  </div>
+</div>
+
+<script>
+var fmt = {w:1080, h:1920};
+
+document.getElementById('inPt').addEventListener('input', updDur);
+document.getElementById('outPt').addEventListener('input', updDur);
+
+function updDur() {
+  var i = parseFloat(document.getElementById('inPt').value);
+  var o = parseFloat(document.getElementById('outPt').value);
+  if (!isNaN(i) && !isNaN(o) && o > i) {
+    document.getElementById('durLabel').textContent = 'Sélection: ' + i + 's → ' + o + 's (' + (o-i).toFixed(1) + 's)';
+  }
+}
+
+function pickFmt(el) {
+  document.querySelectorAll('.fmt-btn').forEach(function(b) { b.classList.remove('active'); });
+  el.classList.add('active');
+  fmt = { w: parseInt(el.dataset.w), h: parseInt(el.dataset.h) };
+}
+
+document.getElementById('speed').addEventListener('input', function(e) {
+  document.getElementById('speedV').textContent = parseFloat(e.target.value).toFixed(2) + 'x';
+});
+document.getElementById('vol').addEventListener('input', function(e) {
+  document.getElementById('volV').textContent = e.target.value + '%';
+});
+
+function genJSON() {
+  var i = parseFloat(document.getElementById('inPt').value);
+  var o = parseFloat(document.getElementById('outPt').value);
+  if (isNaN(i) || isNaN(o)) { alert('Entre IN et OUT !'); return; }
+  if (o <= i) { alert('OUT doit être après IN !'); return; }
+  var c = {
+    source_file: 'video_raw.mp4',
+    in_timestamp: i.toFixed(3),
+    out_timestamp: o.toFixed(3),
+    format: fmt.w + ':' + fmt.h,
+    width: fmt.w,
+    height: fmt.h,
+    blur_pad: document.getElementById('blurPad').checked,
+    speed: parseFloat(document.getElementById('speed').value),
+    volume: parseInt(document.getElementById('vol').value) / 100,
+    selection_duration: parseFloat((o - i).toFixed(2)),
+    video_duration: 30.0
+  };
+  var j = document.getElementById('jsonOut');
+  j.textContent = JSON.stringify(c, null, 2);
+  j.style.display = 'block';
+  j.scrollIntoView({ behavior: 'smooth' });
+}
+
+function copyJSON() {
+  navigator.clipboard.writeText(document.getElementById('jsonOut').textContent).then(function() {
+    event.target.textContent = '✅ Copié!';
+    setTimeout(function() { event.target.textContent = '📋 Copier le JSON'; }, 2000);
+  });
+}
+
+function downloadJSON() {
+  var json = document.getElementById('jsonOut').textContent;
+  var blob = new Blob([json], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'gate1_config.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>

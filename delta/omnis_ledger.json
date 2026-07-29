@@ -1,0 +1,24 @@
+{
+  "version": "1.0",
+  "run_id": null,
+  "production_title": null,
+  "gate_actuelle": "G1",
+  "statut": "INIT",
+  "etapes_completees": [],
+  "github_repo": "kioka8877-ux/OMNIS_WATCH",
+  "canonical_mode": "delta",
+  "artefacts": {
+    "video_source": null,
+    "d00_manifest": null,
+    "scenes": null,
+    "transcript": null,
+    "cutlist": null,
+    "clips_reframes": null,
+    "clips_finaux": null
+  },
+  "gh_runs": {},
+  "derniere_mise_a_jour": null,
+  "instructions_cold_start": "Lire OMNIS_COLD_START.md. Cloner le repo. Mode delta sur delta-dev. python OMNIS_EXECUTEUR_DELTA.py --resume",
+  "error_log": [],
+  "process_notes": {}
+}
