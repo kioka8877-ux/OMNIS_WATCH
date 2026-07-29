@@ -14,9 +14,17 @@ Sortie: cutlist.json (3-15 moments viraux justifies par PERTURABO)
 import argparse
 import json
 import os
+import re
 import sys
-import urllib.request
 from pathlib import Path
+
+try:
+    import requests
+except ImportError:
+    import subprocess
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "requests", "--quiet"])
+    import requests
+
 
 PERTURABO_BASE = "https://raw.githubusercontent.com/kioka8877-ux/PERTURABO/main/MONDES_FORGES/YOUTUBE/ARCHIVUM"
 RULES_SHORTS = f"{PERTURABO_BASE}/rules/shorts_rules.md"
@@ -56,6 +64,59 @@ def fetch_channel_identity(channel_slug):
     url = f"{PERTURABO_BASE}/channels/{channel_slug}/channel_identity.json"
     return fetch_perturabo(url)
 
+
+def call_openrouter(prompt_text, api_key, model="openai/gpt-4o"):
+    log_info("Appel OpenRouter Oracle...")
+    url = "https://openrouter.ai/api/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://github.com/kioka8877-ux/OMNIS_WATCH",
+        "X-Title": "OMNIS-Delta-Oracle"
+    }
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": "Tu es VIRAL CUT DETECTOR pour YouTube Shorts. Genere UNIQUEMENT du JSON valide, rien d autre."},
+            {"role": "user", "content": prompt_text}
+        ],
+        "temperature": 0.3,
+        "max_tokens": 4096
+    }
+    try:
+        resp = requests.post(url, headers=headers, json=payload, timeout=120)
+        if resp.status_code != 200:
+            log_fail(f"OpenRouter error {resp.status_code}: {resp.text[:300]}")
+            return None
+        result = resp.json()
+        raw = result["choices"][0]["message"]["content"]
+        json_match = re.search(r'`(?:json)?\s*([\s\S]*?)\s*`', raw)
+        if json_match:
+            raw_json = json_match.group(1)
+        else:
+            raw_json = raw.strip()
+        return json.loads(raw_json)
+    except Exception as e:
+        log_fail(f"OpenRouter call failed: {e}")
+        return None
+
+def run_oracle(input_dir, output_dir, channel_slug=None, model="openai/gpt-4o"):
+    api_key = os.environ.get("OPENROUTER_API_KEY")
+    if not api_key:
+        log_fail("OPENROUTER_API_KEY non definie dans l environnement")
+        sys.exit(1)
+    prepare_prompt(input_dir, output_dir, channel_slug)
+    prompt_path = output_dir / PROMPT_FILENAME
+    with open(prompt_path, "r", encoding="utf-8") as f:
+        prompt_text = f.read()
+    cutlist = call_openrouter(prompt_text, api_key, model)
+    if not cutlist:
+        sys.exit(1)
+    cutlist_path = output_dir / OUTPUT_FILENAME
+    with open(cutlist_path, "w", encoding="utf-8") as f:
+        json.dump(cutlist, f, ensure_ascii=False, indent=2)
+    log_ok(f"Cutlist generee par Oracle: {cutlist_path}")
+    validate_cutlist(input_dir, output_dir, OUTPUT_FILENAME)
 
 def prepare_prompt(input_dir, output_dir, channel_slug=None):
     """Genere le prompt pour l'Oracle (sandbox)."""
