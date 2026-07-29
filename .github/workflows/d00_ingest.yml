@@ -27,6 +27,8 @@ jobs:
           pip install yt-dlp
 
       - name: Run D-F00 Ingest
+        env:
+          YT_DLP_EXTRACTOR_ARGS: "youtube:player_client=android"
         run: |
           cd delta/F00_INGEST/CODEBASE
           python3 omnis_d00_ingest.py \
