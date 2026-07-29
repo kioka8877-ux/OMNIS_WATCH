@@ -42,7 +42,7 @@ def probe_video(path):
         raise RuntimeError(f"ffprobe failed: {result.stderr}")
     data = json.loads(result.stdout)
     video_stream = next(
-        s for s in data["streams"] if s["codec_type"] == "video", None
+        (s for s in data["streams"] if s["codec_type"] == "video"), None
     )
     if not video_stream:
         raise RuntimeError("Aucun stream video trouve")
