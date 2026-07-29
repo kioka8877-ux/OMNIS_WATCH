@@ -1,0 +1,40 @@
+name: D02 Viral Cut (Oracle)
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Mode (delta)'
+        required: true
+        default: 'delta'
+
+permissions:
+  contents: write
+
+jobs:
+  d02-oracle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run D-F02 Oracle
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          cd delta/F02_VIRAL_CUT/CODEBASE
+          python3 omnis_d02_viralcut.py \
+            --input ../IN/ \
+            --output ../OUT/ \
+            --oracle
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: d02-cutlist-output
+          path: delta/F02_VIRAL_CUT/OUT/
