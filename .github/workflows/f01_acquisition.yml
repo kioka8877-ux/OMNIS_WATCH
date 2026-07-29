@@ -2,7 +2,7 @@
 name: F01 Acquisition
 
 on:
-workflow_dispatch:
+  workflow_dispatch:
     inputs:
       mode:
         description: 'Mode (gamma)'
@@ -32,7 +32,7 @@ workflow_dispatch:
         description: 'Volume (ex: 1.0)'
         required: false
         default: '1.0'
-input_file:
+      input_file:
         description: 'Fichier entree (video_raw.mp4 ou clip_unique.mp4)'
         required: false
         default: 'video_raw.mp4'
