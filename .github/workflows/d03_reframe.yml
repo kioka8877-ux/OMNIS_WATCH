@@ -1,0 +1,42 @@
+name: D03 Reframe
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Mode (delta)'
+        required: true
+        default: 'delta'
+
+permissions:
+  contents: write
+
+jobs:
+  d03:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          pip install mediapipe opencv-python-headless ultralytics
+
+      - name: Run D-F03 Reframe
+        run: |
+          cd delta/F03_REFRAME/CODEBASE
+          python3 omnis_d03_reframe.py \
+            --input ../IN/ \
+            --output ../OUT/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: d03-output
+          path: delta/F03_REFRAME/OUT/

@@ -1,7 +1,7 @@
 # D-F02 VIRAL CUT - Tracking
 
 ## Statut
-- **Statut :** PLANIFI
+- **Statut :** CODE COMPLETE
 - **Version :** delta
 - **Priorit :** tape 4
 

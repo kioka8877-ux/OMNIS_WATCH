@@ -1,0 +1,40 @@
+name: D00 Ingest
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Mode (delta)'
+        required: true
+        default: 'delta'
+      url:
+        description: 'URL YouTube a telecharger'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  d00:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install FFmpeg + yt-dlp
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          pip install yt-dlp
+
+      - name: Run D-F00 Ingest
+        run: |
+          cd delta/F00_INGEST/CODEBASE
+          python3 omnis_d00_ingest.py \
+            --url "${{ github.event.inputs.url }}" \
+            --output ../OUT/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: d00-output
+          path: delta/F00_INGEST/OUT/
