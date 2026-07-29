@@ -111,7 +111,7 @@ def wait_for_run(token, run_id, timeout=600, interval=15):
     while time.time() - start < timeout:
         resp = requests.get(url, headers=gh_headers(token))
         if resp.status_code != 200:
-            log_warn(f"Erreur status run {run_id}: {resp.status_code}")
+            log_info(f"Erreur status run {run_id}: {resp.status_code}")
             time.sleep(interval)
             continue
         data = resp.json()
