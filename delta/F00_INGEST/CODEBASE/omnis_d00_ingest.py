@@ -65,9 +65,12 @@ def download_youtube(url, output_path):
         "yt-dlp",
         "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
         "--merge-output-format", "mp4",
-        "--extractor-args", "youtube:player_client=android",
+        "--extractor-args", "youtube:player_client=android,web",
+        "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+        "--add-header", "Origin:https://www.youtube.com",
         "-o", str(output_path),
         "--no-playlist",
+        "--no-check-certificate",
         url
     ]
     result = subprocess.run(cmd, capture_output=True, text=True)
