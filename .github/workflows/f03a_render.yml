@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 'Mode (alpha)'
+        description: 'Mode (gamma)'
         required: true
-        default: 'alpha'
+        default: 'gamma'
 
 permissions:
   contents: write
@@ -27,18 +27,18 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd alpha/F03_RENDER/F03A_REMOTION/CODEBASE
+          cd gamma/F03_RENDER/F03A_REMOTION/CODEBASE
           npm install
 
       - name: Copy input files
         run: |
-          mkdir -p alpha/F03_RENDER/F03A_REMOTION/CODEBASE/public
-          cp alpha/F03_RENDER/F03A_REMOTION/IN/codex.json alpha/F03_RENDER/F03A_REMOTION/CODEBASE/public/codex.json
-          cp alpha/F03_RENDER/F03A_REMOTION/IN/video_coupee.mp4 alpha/F03_RENDER/F03A_REMOTION/CODEBASE/public/video_coupee.mp4
+          mkdir -p gamma/F03_RENDER/F03A_REMOTION/CODEBASE/public
+          cp gamma/F03_RENDER/F03A_REMOTION/IN/codex.json gamma/F03_RENDER/F03A_REMOTION/CODEBASE/public/codex.json
+          cp gamma/F03_RENDER/F03A_REMOTION/IN/video_coupee.mp4 gamma/F03_RENDER/F03A_REMOTION/CODEBASE/public/video_coupee.mp4
 
       - name: Render with Remotion
         run: |
-          cd alpha/F03_RENDER/F03A_REMOTION/CODEBASE
+          cd gamma/F03_RENDER/F03A_REMOTION/CODEBASE
           FPS=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['fps'])")
           FRAMES=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['total_frames'])")
           WIDTH=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['width'])")
@@ -56,4 +56,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: f03a-output
-          path: alpha/F03_RENDER/F03A_REMOTION/CODEBASE/OUT/
+          path: gamma/F03_RENDER/F03A_REMOTION/CODEBASE/OUT/

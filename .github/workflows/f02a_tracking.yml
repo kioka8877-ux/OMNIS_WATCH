@@ -5,9 +5,9 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 'Mode (alpha)'
+        description: 'Mode (gamma)'
         required: true
-        default: 'alpha'
+        default: 'gamma'
       target_type:
         description: 'Cible (face, hand, dog, cat, person)'
         required: true
@@ -33,7 +33,7 @@ jobs:
 
       - name: Run F02A Tracking
         run: |
-          cd alpha/F02_ANALYSIS/F02A_VISION/CODEBASE
+          cd gamma/F02_ANALYSIS/F02A_VISION/CODEBASE
           python3 omnis_f02a_track.py \
             --input ../IN/ \
             --output ../OUT/ \
@@ -44,4 +44,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: f02a-output
-          path: alpha/F02_ANALYSIS/F02A_VISION/OUT/
+          path: gamma/F02_ANALYSIS/F02A_VISION/OUT/

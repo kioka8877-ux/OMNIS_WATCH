@@ -7,7 +7,7 @@
   "etapes_completees": [],
   "repo_root": null,
   "github_repo": "kioka8877-ux/OMNIS_WATCH",
-  "canonical_mode": "alpha",
+  "canonical_mode": "gamma",
   "artefacts": {
     "video_raw": "SHARED/IN/video_raw.mp4",
     "video_coupee": null,
@@ -28,7 +28,7 @@
   "f03b_meta": {},
   "f04_meta": {},
   "derniere_mise_a_jour": null,
-  "instructions_cold_start": "Lire OMNIS_COLD_START.md. Cloner le repo. Mode alpha sur main. python OMNIS_EXECUTEUR.py --resume",
+  "instructions_cold_start": "Lire OMNIS_COLD_START.md. Cloner le repo. Mode gamma sur gamma-dev. python OMNIS_EXECUTEUR.py --resume",
   "error_log": [],
   "process_notes": {}
 }

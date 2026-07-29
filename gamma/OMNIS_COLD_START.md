@@ -18,13 +18,13 @@ export GH_TOKEN=<votre_token_github>
 
 3. **Verifier le ledger**
 ```bash
-cat alpha/omnis_ledger.json | python3 -m json.tool
+cat gamma/omnis_ledger.json | python3 -m json.tool
 ```
 Le champ `gate_actuelle` indique ou reprendre.
 
 4. **Reprendre la production**
 ```bash
-cd alpha
+cd gamma
 python OMNIS_EXECUTEUR.py --resume
 ```
 

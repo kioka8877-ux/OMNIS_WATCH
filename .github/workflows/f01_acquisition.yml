@@ -2,12 +2,12 @@
 name: F01 Acquisition
 
 on:
-  workflow_dispatch:
+workflow_dispatch:
     inputs:
       mode:
-        description: 'Mode (alpha)'
+        description: 'Mode (gamma)'
         required: true
-        default: 'alpha'
+        default: 'gamma'
       in_timestamp:
         description: 'Timestamp IN (ex: 00:02)'
         required: true
@@ -32,6 +32,10 @@ on:
         description: 'Volume (ex: 1.0)'
         required: false
         default: '1.0'
+input_file:
+        description: 'Fichier entree (video_raw.mp4 ou clip_unique.mp4)'
+        required: false
+        default: 'video_raw.mp4'
 
 permissions:
   contents: write
@@ -47,9 +51,10 @@ jobs:
 
       - name: Run F01 Acquisition
         run: |
-          cd alpha/F01_ACQUISITION/CODEBASE
+          cd gamma/F01_ACQUISITION/CODEBASE
           python3 omnis_f01.py \
             --input ../IN/ \
+            --input-file "${{ github.event.inputs.input_file }}" \
             --output ../OUT/ \
             --in-timestamp "${{ github.event.inputs.in_timestamp }}" \
             --out-timestamp "${{ github.event.inputs.out_timestamp }}" \
@@ -62,4 +67,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: f01-output
-          path: alpha/F01_ACQUISITION/OUT/
+          path: gamma/F01_ACQUISITION/OUT/

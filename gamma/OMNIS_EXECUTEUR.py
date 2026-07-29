@@ -46,7 +46,7 @@ except ImportError:
 SCRIPT_DIR = Path(__file__).parent.resolve()
 LEDGER_PATH = SCRIPT_DIR / "omnis_ledger.json"
 REPO_NAME = "kioka8877-ux/OMNIS_WATCH"
-MODE = "alpha"
+MODE = "gamma"
 GH_API = "https://api.github.com/repos"
 
 # ── Logging ─────────────────────────────────────────────────────────────────
@@ -88,7 +88,7 @@ def gh_headers(token):
         "Accept": "application/vnd.github.v3+json",
     }
 
-def trigger_workflow(token, workflow_filename, ref="main", inputs=None):
+def trigger_workflow(token, workflow_filename, ref="gamma-dev", inputs=None):
     """Declenche un workflow GitHub Actions."""
     url = f"{GH_API}/{REPO_NAME}/actions/workflows/{workflow_filename}/dispatches"
     payload = {"ref": ref}
