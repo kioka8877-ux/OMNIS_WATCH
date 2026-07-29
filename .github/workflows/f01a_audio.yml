@@ -5,9 +5,13 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 'Mode (alpha)'
+        description: 'Mode (gamma)'
         required: true
-        default: 'alpha'
+        default: 'gamma'
+      script_file:
+        description: 'Fichier script (script.txt)'
+        required: false
+        default: 'script.txt'
 
 permissions:
   contents: write
@@ -22,17 +26,21 @@ jobs:
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
+      - name: Install TTS deps
+        run: pip install edge-tts --quiet
+
       - name: Run F01A Castellan
         run: |
-          cd alpha/F01_AUDIO/F01A_CASTELLAN/CODEBASE
+          cd gamma/F01_AUDIO/F01A_CASTELLAN/CODEBASE
           python3 omnis_f01a_castellan.py \
             --input ../IN/ \
-            --output ../OUT/
+            --output ../OUT/ \
+            --script "${{ github.event.inputs.script_file }}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: f01a-output
           path: |
-            alpha/F01_AUDIO/F01A_CASTELLAN/OUT/audio_clean.mp3
-            alpha/F01_AUDIO/F01A_CASTELLAN/OUT/silence_map.json
+            gamma/F01_AUDIO/F01A_CASTELLAN/OUT/audio_clean.mp3
+            gamma/F01_AUDIO/F01A_CASTELLAN/OUT/silence_map.json

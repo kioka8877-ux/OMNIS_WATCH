@@ -27,26 +27,50 @@ DEFAULT_BASE = "."
 # check-out : verifie que les fichiers d'ENTREE sont presents avant de lancer la fregate
 # check-in  : verifie que les fichiers de SORTIE sont presents et valides apres la fregate
 MANIFEST = {
-    "F01": {
+    "F00": {
         "check-out": {
             "files": [
-                {"path": "F01_ACQUISITION/IN/video_raw.mp4", "type": "file", "min_size": 10000},
+                {"path": "F00_ASSETFORGE/IN/sequences.json", "type": "json",
+                 "required_keys": ["voiceoff_duration", "sequences"]},
             ],
         },
         "check-in": {
             "files": [
-                {"path": "F01_ACQUISITION/OUT/video_coupee.mp4", "type": "file", "min_size": 5000},
-                {"path": "F01_ACQUISITION/OUT/f01_manifest.json", "type": "json",
-                 "required_keys": ["meta", "input", "output"]},
+                {"path": "F00_ASSETFORGE/OUT/scenes", "type": "dir"},
+            ],
+        },
+    },
+    "F01A": {
+        "check-out": {
+            "files": [
+                {"path": "F01_AUDIO/F01A_CASTELLAN/IN/script.txt", "type": "file", "min_size": 10},
+            ],
+        },
+        "check-in": {
+            "files": [
+                {"path": "F01_AUDIO/F01A_CASTELLAN/OUT/audio_clean.mp3", "type": "file", "min_size": 1000},
+                {"path": "F01_AUDIO/F01A_CASTELLAN/OUT/silence_map.json", "type": "json",
+                 "required_keys": ["segments"]},
+            ],
+        },
+    },
+    "F01B": {
+        "check-out": {
+            "files": [
+                {"path": "F01_AUDIO/F01B_WHISPER/IN/audio_clean.mp3", "type": "file", "min_size": 1000},
+            ],
+        },
+        "check-in": {
+            "files": [
+                {"path": "F01_AUDIO/F01B_WHISPER/OUT/timing.json", "type": "json",
+                 "required_keys": ["segments", "duration_seconds"]},
             ],
         },
     },
     "F02A": {
         "check-out": {
             "files": [
-                {"path": "F02_ANALYSIS/F02A_VISION/IN/video_coupee.mp4", "type": "file", "min_size": 5000},
-                {"path": "F02_ANALYSIS/F02A_VISION/IN/f01_manifest.json", "type": "json",
-                 "required_keys": ["meta"]},
+                {"path": "F02_ANALYSIS/F02A_VISION/IN/video_scenes", "type": "dir"},
             ],
         },
         "check-in": {
@@ -61,12 +85,6 @@ MANIFEST = {
         "check-out": {
             "files": [
                 {"path": "F02_ANALYSIS/F02B_ORACLE/IN/narrative.txt", "type": "file", "min_size": 50},
-                {"path": "F02_ANALYSIS/F02B_ORACLE/IN/f01_manifest.json", "type": "json",
-                 "required_keys": ["meta"]},
-            ],
-            "optional": [
-                {"path": "F02_ANALYSIS/F02B_ORACLE/IN/tracking_data.json", "type": "json",
-                 "required_keys": ["tracks"]},
             ],
         },
         "check-in": {
@@ -82,7 +100,7 @@ MANIFEST = {
             "files": [
                 {"path": "F03_RENDER/F03A_REMOTION/IN/codex.json", "type": "json",
                  "required_keys": ["video", "text_overlays"]},
-                {"path": "F03_RENDER/F03A_REMOTION/IN/video_coupee.mp4", "type": "file", "min_size": 5000},
+                {"path": "F03_RENDER/F03A_REMOTION/IN/video_scenes", "type": "dir"},
             ],
         },
         "check-in": {
@@ -105,16 +123,29 @@ MANIFEST = {
             ],
         },
     },
+    "F03C": {
+        "check-out": {
+            "files": [
+                {"path": "F03_RENDER/F03C_MUSIC/IN/video_complete.mp4", "type": "file", "min_size": 5000},
+                {"path": "F03_RENDER/F03C_MUSIC/IN/directives.json", "type": "json",
+                 "required_keys": ["mood", "bpm"]},
+            ],
+        },
+        "check-in": {
+            "files": [
+                {"path": "F03_RENDER/F03C_MUSIC/OUT/video_final.mp4", "type": "file", "min_size": 5000},
+            ],
+        },
+    },
     "F04": {
         "check-out": {
             "files": [
-                {"path": "F04_CAMOUFLAGE/IN/video_complete.mp4", "type": "file", "min_size": 5000},
+                {"path": "F04_CAMOUFLAGE/IN/video_final.mp4", "type": "file", "min_size": 5000},
             ],
         },
         "check-in": {
             "files": [
                 {"path": "F04_CAMOUFLAGE/OUT/youtube_final.mp4", "type": "file", "min_size": 5000},
-                {"path": "F04_CAMOUFLAGE/OUT/rapport_f04.html", "type": "file", "min_size": 100},
             ],
         },
     },
@@ -150,14 +181,14 @@ def validate_file(path, spec, base):
         log_fail(f"Manquant: {spec['path']}")
         return 1
 
-    if spec.get("type") == "file":
-        size = os.path.getsize(full_path)
-        min_size = spec.get("min_size", 0)
-        if size < min_size:
-            log_fail(f"Trop petit: {spec['path']} ({size} bytes < {min_size})")
+    if spec.get("type") == "dir":
+        if not os.path.isdir(full_path):
+            log_fail(f"Repertoire manquant: {spec['path']}")
             errors += 1
         else:
-            log_ok(f"OK: {spec['path']} ({size / 1024:.1f} KB)")
+            files = [f for f in os.listdir(full_path) if not f.startswith('.')]
+            log_ok(f"OK: {spec['path']} ({len(files)} fichiers)")
+    elif spec.get("type") == "file":
 
     elif spec.get("type") == "json":
         try:
@@ -237,7 +268,7 @@ def main():
     )
     parser.add_argument("--frigate", required=True,
                         choices=list(MANIFEST.keys()),
-                        help="Fregate a valider (F01, F02A, F02B, F03A, F03B, F04, F05)")
+                        help="Fregate a valider")
     parser.add_argument("--mode", required=True,
                         choices=["check-out", "check-in"],
                         help="Mode de validation (check-out = avant, check-in = apres)")

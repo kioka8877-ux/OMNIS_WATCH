@@ -3,7 +3,7 @@ name: F03C Music Mixer
 on:
   workflow_dispatch:
     inputs:
-mode:
+      mode:
         description: 'Mode (gamma)'
         required: true
         default: 'gamma'

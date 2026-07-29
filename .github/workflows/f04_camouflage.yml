@@ -5,9 +5,9 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 'Mode (alpha)'
+        description: 'Mode (gamma)'
         required: true
-        default: 'alpha'
+        default: 'gamma'
 
 permissions:
   contents: write
@@ -23,7 +23,7 @@ jobs:
 
       - name: Run F04 Camouflage
         run: |
-          cd alpha/F04_CAMOUFLAGE/CODEBASE
+          cd gamma/F04_CAMOUFLAGE/CODEBASE
           python3 omnis_f04.py \
             --input ../IN/ \
             --output ../OUT/
@@ -32,4 +32,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: f04-output
-          path: alpha/F04_CAMOUFLAGE/OUT/
+          path: gamma/F04_CAMOUFLAGE/OUT/

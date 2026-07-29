@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 'Mode (alpha)'
+        description: 'Mode (gamma)'
         required: true
-        default: 'alpha'
+        default: 'gamma'
 
 permissions:
   contents: write
@@ -22,7 +22,7 @@ jobs:
 
       - name: Run F05 Luther
         run: |
-          cd alpha/F05_LUTHER/CODEBASE
+          cd gamma/F05_LUTHER/CODEBASE
           python3 omnis_f05_luther.py \
             --input ../IN/ \
             --output ../OUT/
@@ -31,4 +31,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: f05-output
-          path: alpha/F05_LUTHER/OUT/
+          path: gamma/F05_LUTHER/OUT/

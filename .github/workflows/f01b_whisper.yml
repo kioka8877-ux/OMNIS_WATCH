@@ -5,9 +5,9 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 'Mode (alpha)'
+        description: 'Mode (gamma)'
         required: true
-        default: 'alpha'
+        default: 'gamma'
       model:
         description: 'Whisper model (tiny/base/small/medium)'
         required: false
@@ -31,7 +31,7 @@ jobs:
 
       - name: Run F01B Whisper
         run: |
-          cd alpha/F01_AUDIO/F01B_WHISPER/CODEBASE
+          cd gamma/F01_AUDIO/F01B_WHISPER/CODEBASE
           python3 omnis_f01b_whisper.py \
             --input ../IN/ \
             --output ../OUT/ \
@@ -41,4 +41,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: f01b-output
-          path: alpha/F01_AUDIO/F01B_WHISPER/OUT/timing.json
+          path: gamma/F01_AUDIO/F01B_WHISPER/OUT/timing.json
