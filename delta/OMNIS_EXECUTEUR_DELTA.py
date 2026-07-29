@@ -175,6 +175,7 @@ def cmd_start(title, url, token, ledger):
     ledger["gate_actuelle"] = "G1"
     ledger["statut"] = "EN_COURS"
     ledger["etapes_completees"] = []
+    ledger["artefacts"] = {}
     ledger["gh_runs"] = {}
 
     log_ok(f"Production: {title}")
