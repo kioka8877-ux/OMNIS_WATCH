@@ -189,6 +189,17 @@ def validate_file(path, spec, base):
             files = [f for f in os.listdir(full_path) if not f.startswith('.')]
             log_ok(f"OK: {spec['path']} ({len(files)} fichiers)")
     elif spec.get("type") == "file":
+        if not os.path.isfile(full_path):
+            log_fail(f"Fichier requis: {spec['path']}")
+            errors += 1
+        else:
+            file_size = os.path.getsize(full_path)
+            min_size = spec.get("min_size", 0)
+            if file_size < min_size:
+                log_fail(f"Fichier trop petit: {spec['path']} ({file_size} < {min_size} bytes)")
+                errors += 1
+            else:
+                log_ok(f"OK: {spec['path']} ({file_size} bytes)")
 
     elif spec.get("type") == "json":
         try:
@@ -229,10 +240,10 @@ def validate_frigate(frigate, mode, base):
     errors = 0
 
     print()
-    print(f"{'═' * 52}")
-    print(f" CUSTOS — Validation {frigate} {mode}")
+    print(f"{'=' * 52}")
+    print(f" CUSTOS - Validation {frigate} {mode}")
     print(f" Base: {base}")
-    print(f"{'═' * 52}")
+    print(f"{'=' * 52}")
     print()
 
     # Fichiers obligatoires
@@ -250,14 +261,14 @@ def validate_frigate(frigate, mode, base):
     # Resultat
     print()
     if errors == 0:
-        print(f" {'═' * 48}")
-        print(f" VALIDATION OK — {frigate} {mode} : Aucune erreur.")
-        print(f" {'═' * 48}")
+        print(f" {'=' * 48}")
+        print(f" VALIDATION OK - {frigate} {mode} : Aucune erreur.")
+        print(f" {'=' * 48}")
         return 0
     else:
-        print(f" {'═' * 48}")
-        print(f" VALIDATION FAIL — {errors} erreur(s) detectee(s). Transit interdit.")
-        print(f" {'═' * 48}")
+        print(f" {'=' * 48}")
+        print(f" VALIDATION FAIL - {errors} erreur(s) detectee(s). Transit interdit.")
+        print(f" {'=' * 48}")
         return 1
 
 # ── Main ────────────────────────────────────────────────────────────────────

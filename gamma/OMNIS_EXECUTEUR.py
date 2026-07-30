@@ -206,6 +206,7 @@ def cmd_start(title, token, ledger):
 
     # Trigger F01A sur GitHub Actions
     section("Trigger F01A sur GitHub Actions")
+    run_id_gh = None
     if trigger_workflow(token, "f01a_audio.yml", inputs={"mode": MODE}):
         time.sleep(5)
         run_id_gh = get_latest_run_id(token, "f01a_audio.yml")
@@ -216,9 +217,9 @@ def cmd_start(title, token, ledger):
 
     print()
     print("=" * 52)
-    print(" GATE G1 — F01A lance sur GitHub Actions")
+    print(" GATE G1 - F01A lance sur GitHub Actions")
     print(" (nettoyage audio + silence detection)")
-    print(f" Run: #{run_id_gh}")
+    print(f" Run: #{run_id_gh if run_id_gh else 'N/A'}")
     print(f" Surveillez: https://github.com/{REPO_NAME}/actions")
     print(" Quand F01A et F01B sont termines: --gate G2")
     print("=" * 52)
@@ -263,6 +264,7 @@ def cmd_gate_g2(token, ledger):
         save_ledger(ledger)
         return
 
+    f01b_run_id = None
     if trigger_workflow(token, "f01b_whisper.yml", inputs={"mode": MODE}):
         time.sleep(5)
         f01b_run_id = get_latest_run_id(token, "f01b_whisper.yml")
@@ -272,6 +274,10 @@ def cmd_gate_g2(token, ledger):
 
     # 3. Attendre F01B
     section("Attente F01B Whisper")
+    if not f01b_run_id:
+        log_fail("Impossible de lancer F01B Whisper")
+        save_ledger(ledger)
+        return
     success, _ = wait_for_run(token, f01b_run_id, timeout=600, interval=15)
     if not success:
         log_fail(f"Run F01B #{f01b_run_id} non termine")
@@ -288,6 +294,7 @@ def cmd_gate_g2(token, ledger):
     ledger["etapes_completees"].append("F01B")
 
     # Lire timing pour la duree
+    voiceoff_duration = None
     timing_path = f01b_out / "timing.json"
     if timing_path.exists():
         with open(timing_path) as f:
@@ -297,15 +304,14 @@ def cmd_gate_g2(token, ledger):
         log_ok(f"Duree voix off: {voiceoff_duration}s")
         log_info(f"Utilisez cette duree pour preparer sequences.json")
         log_info(f"  -> gamma/F00_ASSETFORGE/IN/sequences.json")
-        log_info(f"  -> format: {{\"voiceoff_duration\": {voiceoff_duration:.1f}, \"segments\": [...]}}")
 
     ledger["gate_actuelle"] = "G2"
     save_ledger(ledger)
 
     print()
     print("=" * 52)
-    print(" GATE G2 — Audio pret !")
-    print(f" Duree voix off: {voiceoff_duration:.1f}s")
+    print(" GATE G2 - Audio pret !")
+    print(f" Duree voix off: {voiceoff_duration:.1f}s" if voiceoff_duration else " Duree voix off: inconnue")
     print(" Tache operateur:")
     print(" 1. Preparez sequences.json dans F00_ASSETFORGE/IN/")
     print(" 2. Placez les clips bruts dans F00_ASSETFORGE/IN/")
@@ -329,12 +335,18 @@ def cmd_gate_g3(token, ledger):
 
     # Trigger F00
     section("Trigger F00 Assetforge sur GitHub Actions")
+    f00_run_id = None
     if trigger_workflow(token, "f00_assetforge.yml", inputs={"mode": MODE}):
         time.sleep(5)
         f00_run_id = get_latest_run_id(token, "f00_assetforge.yml")
         if f00_run_id:
             ledger["gh_runs"]["f00"] = f00_run_id
             log_ok(f"Run F00: #{f00_run_id}")
+
+    if not f00_run_id:
+        log_fail("Impossible de lancer F00 Assetforge")
+        save_ledger(ledger)
+        return
 
     # Attendre F00
     success, _ = wait_for_run(token, f00_run_id, timeout=600, interval=15)
@@ -391,6 +403,7 @@ def cmd_gate_g4(token, ledger):
 
     # Trigger F03A
     section("Trigger F03A sur GitHub Actions")
+    f03a_out = SCRIPT_DIR / "F03_RENDER" / "F03A_REMOTION" / "OUT"
     if trigger_workflow(token, "f03a_render.yml", inputs={"mode": MODE}):
         time.sleep(5)
         f03a_run_id = get_latest_run_id(token, "f03a_render.yml")
@@ -399,7 +412,6 @@ def cmd_gate_g4(token, ledger):
             log_info("Attente F03A (peut prendre plusieurs minutes)...")
             success, _ = wait_for_run(token, f03a_run_id, timeout=1800, interval=30)
             if success:
-                f03a_out = SCRIPT_DIR / "F03_RENDER" / "F03A_REMOTION" / "OUT"
                 f03a_out.mkdir(parents=True, exist_ok=True)
                 download_artifact(token, f03a_run_id, "f03a-output", str(f03a_out))
                 log_ok("F03A termine")
@@ -408,6 +420,7 @@ def cmd_gate_g4(token, ledger):
     section("Preparation F03B Mixer")
     f03b_in = SCRIPT_DIR / "F03_RENDER" / "F03B_MIXER" / "IN"
     f03b_in.mkdir(parents=True, exist_ok=True)
+    f03b_out = SCRIPT_DIR / "F03_RENDER" / "F03B_MIXER" / "OUT"
     video_visuelle = f03a_out / "video_visuelle.mp4"
     if video_visuelle.exists():
         shutil.copy2(video_visuelle, f03b_in / "video_visuelle.mp4")
@@ -426,7 +439,6 @@ def cmd_gate_g4(token, ledger):
             log_info("Attente F03B...")
             success, _ = wait_for_run(token, f03b_run_id, timeout=600, interval=15)
             if success:
-                f03b_out = SCRIPT_DIR / "F03_RENDER" / "F03B_MIXER" / "OUT"
                 f03b_out.mkdir(parents=True, exist_ok=True)
                 download_artifact(token, f03b_run_id, "f03b-output", str(f03b_out))
                 log_ok("F03B termine")
@@ -435,6 +447,7 @@ def cmd_gate_g4(token, ledger):
     section("Preparation F03C Music")
     f03c_in = SCRIPT_DIR / "F03_RENDER" / "F03C_MUSIC" / "IN"
     f03c_in.mkdir(parents=True, exist_ok=True)
+    f03c_out = SCRIPT_DIR / "F03_RENDER" / "F03C_MUSIC" / "OUT"
     video_complete = f03b_out / "video_complete.mp4"
     if video_complete.exists():
         shutil.copy2(video_complete, f03c_in / "video_complete.mp4")
@@ -453,22 +466,23 @@ def cmd_gate_g4(token, ledger):
 
     print()
     print("=" * 52)
-    print(" GATE G4 — Rendu lance sur GitHub Actions")
+    print(" GATE G4 - Rendu lance sur GitHub Actions")
     print(" F03A + F03B + F03C en cours")
-    print(" Surveillez: https://github.com/{REPO_NAME}/actions")
+    print(f" Surveillez: https://github.com/{REPO_NAME}/actions")
     print(" Quand F03C est termine: --gate F04")
     print("=" * 52)
 
 def cmd_gate_f04(token, ledger):
     """F04 Camouflage + F05 Luther"""
-    section("F04 — Camouflage")
+    section("F04 - Camouflage")
 
     # Attendre F03C
+    f03c_out = SCRIPT_DIR / "F03_RENDER" / "F03C_MUSIC" / "OUT"
+    f03b_out = SCRIPT_DIR / "F03_RENDER" / "F03B_MIXER" / "OUT"
     f03c_run_id = ledger.get("gh_runs", {}).get("f03c")
     if f03c_run_id:
         success, _ = wait_for_run(token, f03c_run_id, timeout=600, interval=15)
         if success:
-            f03c_out = SCRIPT_DIR / "F03_RENDER" / "F03C_MUSIC" / "OUT"
             f03c_out.mkdir(parents=True, exist_ok=True)
             download_artifact(token, f03c_run_id, "f03c-output", str(f03c_out))
 
@@ -520,7 +534,7 @@ def cmd_gate_f04(token, ledger):
     print()
     print("=" * 52)
     print(" F04 + F05 lances sur GitHub Actions")
-    print(" Surveillez: https://github.com/{REPO_NAME}/actions")
+    print(f" Surveillez: https://github.com/{REPO_NAME}/actions")
     print(" Quand F05 est termine: --close")
     print("=" * 52)
 
