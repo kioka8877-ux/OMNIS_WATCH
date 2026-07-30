@@ -89,7 +89,10 @@ def remove_silences(input_path: str, output_path: str, threshold_db: float, min_
     _, stderr, rc = ffmpeg(
         "-i", input_path,
         "-af", (
-            f"silenceremove=stop_periods=-1"
+            f"silenceremove=start_periods=1"
+            f":start_duration={min_duration}"
+            f":start_threshold={threshold_db}dB"
+            f":stop_periods=-1"
             f":stop_duration={min_duration}"
             f":stop_threshold={threshold_db}dB"
         ),
