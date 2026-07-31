@@ -153,7 +153,7 @@ jobs:
           mkdir -p delta/F03_REFRAME/IN
           python3 delta/_tools/download_artifact.py \
             "${{ secrets.GITHUB_TOKEN }}" \
-            delta_orchestrator.yml \
+            d00_ingest.yml \
             d00-output \
             delta/F03_REFRAME/IN/ \
             main
