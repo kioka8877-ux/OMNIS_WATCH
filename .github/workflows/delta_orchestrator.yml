@@ -49,7 +49,7 @@ jobs:
           pip install requests
 
       - name: G1 - Ingest
-        if: ${{ github.event.inputs.gate == 'G1' }}
+        if: github.event.inputs.gate == 'G1'
         run: |
           cd delta/F00_INGEST/CODEBASE
           URL="${{ github.event.inputs.url }}"
@@ -65,35 +65,23 @@ jobs:
           echo "G1_DONE=true" >> $GITHUB_ENV
 
       - name: Upload G1 artifact
-        if: ${{ github.event.inputs.gate == 'G1' }}
+        if: github.event.inputs.gate == 'G1'
         uses: actions/upload-artifact@v4
         with:
           name: d00-output
           path: delta/F00_INGEST/OUT/
 
       - name: G2 - Scene Detect + Transcribe
-        if: ${{ github.event.inputs.gate == 'G2' }}
+        if: github.event.inputs.gate == 'G2'
         run: |
           mkdir -p delta/F01_SCENE_DETECT/IN
-          # Download D00 artifact from latest successful run
-          pip install requests
-          python3 -c "
-import requests, json, io, zipfile, os
-token = '${{ secrets.GITHUB_TOKEN }}'
-headers = {'Authorization': f'token {token}', 'Accept': 'application/vnd.github.v3+json'}
-# Find latest D00 run
-runs = requests.get('https://api.github.com/repos/kioka8877-ux/OMNIS_WATCH/actions/workflows/d00_ingest.yml/runs', params={'branch': 'main', 'per_page': 1, 'status': 'success'}, headers=headers).json()
-run_id = runs['workflow_runs'][0]['id']
-print(f'D00 run: {run_id}')
-arts = requests.get(f'https://api.github.com/repos/kioka8877-ux/OMNIS_WATCH/actions/runs/{run_id}/artifacts', headers=headers).json()
-for a in arts['artifacts']:
-    if a['name'] == 'd00-output':
-        dl = requests.get(a['archive_download_url'], headers=headers)
-        z = zipfile.ZipFile(io.BytesIO(dl.content))
-        z.extractall('delta/F01_SCENE_DETECT/IN/')
-        print('D00 artifact extracted')
-        break
-" || echo "Downloaded"
+          pip install requests -q
+          python3 delta/_tools/download_artifact.py \
+            "${{ secrets.GITHUB_TOKEN }}" \
+            d00_ingest.yml \
+            d00-output \
+            delta/F01_SCENE_DETECT/IN/ \
+            main
           ls -la delta/F01_SCENE_DETECT/IN/
 
       - name: G2 - Run Scene Detect
@@ -186,16 +174,7 @@ for a in arts['artifacts']:
           path: delta/F06_LUTHER/OUT/
 
       - name: Ledger update
-        run: |
-          python3 -c "
-import json, os
-ledger_path = 'delta/omnis_ledger.json'
-gate = '${{ github.event.inputs.gate }}'
-ledger = json.load(open(ledger_path)) if os.path.exists(ledger_path) else {}
-ledger['gate_actuelle'] = gate
-json.dump(ledger, open(ledger_path, 'w'), indent=2)
-print(f'Ledger updated: gate={gate}')
-"
+        run: python3 delta/_tools/update_ledger.py "${{ github.event.inputs.gate }}"
       - name: Commit ledger
         run: |
           git config user.name "delta-orchestrator"
