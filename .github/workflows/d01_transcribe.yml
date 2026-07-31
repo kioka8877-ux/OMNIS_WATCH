@@ -7,6 +7,9 @@ on:
         description: 'Mode (delta)'
         required: true
         default: 'delta'
+      d00_run_id:
+        description: 'D00 run ID for artifact download'
+        required: true
 
 permissions:
   contents: write
@@ -17,6 +20,15 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download D00 artifact
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          workflow: d00_ingest.yml
+          run_id: ${{ github.event.inputs.d00_run_id }}
+          name: d00-output
+          path: delta/F01_SCENE_DETECT/IN/
 
       - name: Setup Python
         uses: actions/setup-python@v5

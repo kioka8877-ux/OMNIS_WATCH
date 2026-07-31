@@ -247,15 +247,16 @@ def cmd_gate_g2(token, ledger):
     shutil.copy2(d00_out / "video_source.mp4", f01_in / "video_source.mp4")
     shutil.copy2(d00_out / "d00_manifest.json", f01_in / "d00_manifest.json")
 
+    d00_run_id = ledger.get("gh_runs", {}).get("d00", "")
     section("Trigger D-F01 Scene Detect + Transcribe sur GitHub Actions")
-    if trigger_workflow(token, "d01_scenedetect.yml", inputs={"mode": MODE}):
+    if trigger_workflow(token, "d01_scenedetect.yml", inputs={"mode": MODE, "d00_run_id": str(d00_run_id)}):
         time.sleep(5)
         run_id_gh = get_latest_run_id(token, "d01_scenedetect.yml")
         if run_id_gh:
             ledger["gh_runs"]["d01_scenedetect"] = run_id_gh
             log_ok(f"Run D-F01 scenes: #{run_id_gh}")
 
-    if trigger_workflow(token, "d01_transcribe.yml", inputs={"mode": MODE}):
+    if trigger_workflow(token, "d01_transcribe.yml", inputs={"mode": MODE, "d00_run_id": str(d00_run_id)}):
         time.sleep(5)
         run_id_gh = get_latest_run_id(token, "d01_transcribe.yml")
         if run_id_gh:
