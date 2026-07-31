@@ -27,7 +27,9 @@ def main():
     run_id = None
     found = False
     while page <= 10 and not found:
-        params = {"branch": branch, "per_page": 20, "status": "success", "page": page}
+        params = {"per_page": 20, "status": "success", "page": page}
+        if branch:
+            params["branch"] = branch
         runs = requests.get(runs_url, headers=headers, params=params).json()
         if not runs.get("workflow_runs"):
             break

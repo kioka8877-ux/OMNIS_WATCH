@@ -156,7 +156,7 @@ jobs:
             d00_ingest.yml \
             d00-output \
             delta/F03_REFRAME/IN/ \
-            main
+            ""
           python3 delta/_tools/download_artifact.py \
             "${{ secrets.GITHUB_TOKEN }}" \
             delta_orchestrator.yml \
