@@ -2,16 +2,21 @@
   "version": "1.0",
   "run_id": "DELTA_20260731_0144",
   "production_title": "Test pipeline delta",
-  "gate_actuelle": "G1",
+  "gate_actuelle": "G2",
   "statut": "G1_COMPLETE",
-  "etapes_completees": ["D-F00"],
+  "etapes_completees": [
+    "D-F00",
+    "D-F00",
+    "D-F00",
+    "D-F01"
+  ],
   "github_repo": "kioka8877-ux/OMNIS_WATCH",
   "canonical_mode": "delta",
   "artefacts": {},
   "gh_runs": {
     "d00": 30594553281
   },
-  "derniere_mise_a_jour": "2026-07-31T01:46:00.000000+00:00",
+  "derniere_mise_a_jour": "2026-07-31T01:15:38.594552+00:00",
   "instructions_cold_start": "Lire OMNIS_COLD_START.md. Cloner le repo. Mode delta sur delta-dev. python OMNIS_EXECUTEUR_DELTA.py --resume",
   "error_log": [],
   "process_notes": {}
