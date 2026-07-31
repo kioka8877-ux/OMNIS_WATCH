@@ -7,6 +7,14 @@ on:
         description: 'Mode (delta)'
         required: true
         default: 'delta'
+      clip_count:
+        description: 'Number of clips to generate (1-15)'
+        required: true
+        default: '5'
+      clip_max_duration:
+        description: 'Max duration per clip in seconds (15-90)'
+        required: true
+        default: '60'
 
 permissions:
   contents: write
@@ -31,7 +39,9 @@ jobs:
           python3 omnis_d02_viralcut.py \
             --input ../IN/ \
             --output ../OUT/ \
-            --oracle
+            --oracle \
+            --clip-count "${{ github.event.inputs.clip_count }}" \
+            --clip-max-duration "${{ github.event.inputs.clip_max_duration }}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

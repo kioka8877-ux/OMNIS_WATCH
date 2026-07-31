@@ -49,9 +49,11 @@ def section(title):
 def fetch_perturabo(url):
     """Fetch un fichier depuis PERTURABO (GitHub raw)."""
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "OMNIS-Delta"})
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            return resp.read().decode("utf-8")
+        resp = requests.get(url, headers={"User-Agent": "OMNIS-Delta"}, timeout=30)
+        if resp.status_code == 200:
+            return resp.text
+        log_fail(f"Erreur fetch PERTURABO: {url} - {resp.status_code}")
+        return ""
     except Exception as e:
         log_fail(f"Erreur fetch PERTURABO: {url} - {e}")
         return ""
@@ -100,12 +102,12 @@ def call_openrouter(prompt_text, api_key, model="openai/gpt-4o"):
         log_fail(f"OpenRouter call failed: {e}")
         return None
 
-def run_oracle(input_dir, output_dir, channel_slug=None, model="openai/gpt-4o"):
+def run_oracle(input_dir, output_dir, clip_count=5, clip_max_duration=60, channel_slug=None, model="openai/gpt-4o"):
     api_key = os.environ.get("OPENROUTER_API_KEY")
     if not api_key:
         log_fail("OPENROUTER_API_KEY non definie dans l environnement")
         sys.exit(1)
-    prepare_prompt(input_dir, output_dir, channel_slug)
+    prepare_prompt(input_dir, output_dir, channel_slug, clip_count, clip_max_duration)
     prompt_path = output_dir / PROMPT_FILENAME
     with open(prompt_path, "r", encoding="utf-8") as f:
         prompt_text = f.read()
@@ -118,9 +120,10 @@ def run_oracle(input_dir, output_dir, channel_slug=None, model="openai/gpt-4o"):
     log_ok(f"Cutlist generee par Oracle: {cutlist_path}")
     validate_cutlist(input_dir, output_dir, OUTPUT_FILENAME)
 
-def prepare_prompt(input_dir, output_dir, channel_slug=None):
+def prepare_prompt(input_dir, output_dir, channel_slug=None, clip_count=5, clip_max_duration=60):
     """Genere le prompt pour l'Oracle (sandbox)."""
     section("D-F02 PREPARE - Generation du prompt Oracle")
+    log_info(f"Parametres operateur: {clip_count} clips, max {clip_max_duration}s")
 
     scenes_path = input_dir / SCENES_FILENAME
     transcript_path = input_dir / TRANSCRIPT_FILENAME
@@ -179,7 +182,7 @@ def prepare_prompt(input_dir, output_dir, channel_slug=None):
 
 ## MISSION:
 Tu es un VIRAL CUT DETECTOR pour YouTube Shorts.
-Identifie les 3-15 MEILLEURS moments de cette video qui deviendront des Shorts viraux.
+Identifie les {clip_count} MEILLEURS moments de cette video qui deviendront des Shorts viraux.
 
 CRITERES (par ordre de priorite):
 1. Hook potential : la premiere frame fonctionne SANS SON (Regle S3)
@@ -189,8 +192,8 @@ CRITERES (par ordre de priorite):
 5. Sujet : visage ou personne identifiable pour le reframe
 
 REGLES DE SORTIE:
-- 3-15 moments maximum
-- Chaque moment = 15-60s
+- EXACTEMENT {clip_count} moments (ni plus, ni moins)
+- Chaque moment = 15-{clip_max_duration}s
 - Ordre chronologique
 - Premier moment = HOOK (capture dans les 3s)
 - Dernier moment = PAYOFF ou LOOP
@@ -311,20 +314,28 @@ def main():
     parser.add_argument("--output", required=True, help="Dossier OUT/")
     parser.add_argument("--channel", default=None,
                         help="Slug de chane PERTURABO (optionnel)")
+    parser.add_argument("--clip-count", type=int, default=5,
+                        help="Nombre de clips a generer (defaut 5)")
+    parser.add_argument("--clip-max-duration", type=int, default=60,
+                        help="Duree max par clip en secondes (defaut 60)")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--prepare", action="store_true",
                        help="Genere le prompt Oracle")
     group.add_argument("--validate", metavar="FILE",
                        help="Valide la cutlist generee par l'Oracle")
+    group.add_argument("--oracle", action="store_true",
+                       help="Mode complet: prepare + appelle OpenRouter + valide")
     args = parser.parse_args()
 
     input_dir = Path(args.input)
     output_dir = Path(args.output)
 
     if args.prepare:
-        prepare_prompt(input_dir, output_dir, args.channel)
-    else:
+        prepare_prompt(input_dir, output_dir, args.channel, args.clip_count, args.clip_max_duration)
+    elif args.validate:
         validate_cutlist(input_dir, output_dir, args.validate)
+    elif args.oracle:
+        run_oracle(input_dir, output_dir, args.clip_count, args.clip_max_duration, args.channel)
 
 
 if __name__ == "__main__":

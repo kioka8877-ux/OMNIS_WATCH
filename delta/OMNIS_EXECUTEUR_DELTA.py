@@ -3,14 +3,15 @@ OMNIS_EXECUTEUR_DELTA.py - Orchestrateur OMNIS-WATCH DELTA (GitHub Actions)
 ===========================================================================
 Sandbox = telecommande + Oracle.
 Toutes les fregates delta tournent sur GitHub Actions.
-L'operateur intervient aux 3 gates (G1, G2=G3, G4).
+L'operateur valide aux 5 gates (G1 a G5). F05 + F06 automatiques.
 
 Usage:
   python OMNIS_EXECUTEUR_DELTA.py --start --title "Mon sujet" --url "https://..."
-  python OMNIS_EXECUTEUR_DELTA.py --gate G2    # Telecharge D-F00, lance D-F01 + D-F02 (Oracle)
-  python OMNIS_EXECUTEUR_DELTA.py --gate G3    # Trigger D-F03 (reframe)
-  python OMNIS_EXECUTEUR_DELTA.py --gate G4    # Telecharge D-F03, trigger D-F04 (assembly)
-  python OMNIS_EXECUTEUR_DELTA.py --close      # Telecharger clips finaux
+  python OMNIS_EXECUTEUR_DELTA.py --gate G2    # Telecharge F00, lance F01
+  python OMNIS_EXECUTEUR_DELTA.py --gate G3    # Lance F02 Oracle (interaction operateur)
+  python OMNIS_EXECUTEUR_DELTA.py --gate G4    # Lance F03 reframe
+  python OMNIS_EXECUTEUR_DELTA.py --gate G5    # Lance F04 assembly + auto F05 + F06
+  python OMNIS_EXECUTEUR_DELTA.py --close      # Telecharger clips finaux (F06)
   python OMNIS_EXECUTEUR_DELTA.py --resume     # Reprendre depuis ledger
 
 Variables d'environnement requises:
@@ -166,8 +167,8 @@ def get_latest_run_id(token, workflow_filename):
     return runs[0]["id"]
 
 
-def cmd_start(title, url, token, ledger):
-    section("GATE G1 - Initialisation")
+def cmd_gate_g1(title, url, token, ledger):
+    section("GATE G1 - Initialisation / Ingest")
 
     run_id = f"DELTA_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}"
     ledger["run_id"] = run_id
@@ -184,34 +185,29 @@ def cmd_start(title, url, token, ledger):
     if url:
         log_ok(f"URL source: {url}")
         inputs = {"mode": MODE, "url": url}
+        section("Trigger D-F00 Ingest sur GitHub Actions")
+        if trigger_workflow(token, "d00_ingest.yml", inputs=inputs):
+            time.sleep(5)
+            run_id_gh = get_latest_run_id(token, "d00_ingest.yml")
+            if run_id_gh:
+                ledger["gh_runs"]["d00"] = run_id_gh
+                log_ok(f"Run D-F00 GitHub Actions: #{run_id_gh}")
     else:
         log_info("Pas d'URL - upload manuel requis")
         log_info("Placez video_source.mp4 dans delta/F00_INGEST/IN/")
-        save_ledger(ledger)
-        return
+        log_info("Puis lancez le workflow d00_ingest.yml manuellement ou --gate G2 si deja fait")
 
-    section("Trigger D-F00 Ingest sur GitHub Actions")
-    if trigger_workflow(token, "d00_ingest.yml", inputs=inputs):
-        time.sleep(5)
-        run_id_gh = get_latest_run_id(token, "d00_ingest.yml")
-        if run_id_gh:
-            ledger["gh_runs"]["d00"] = run_id_gh
-            log_ok(f"Run D-F00 GitHub Actions: #{run_id_gh}")
-            save_ledger(ledger)
-            print()
-            print("=" * 52)
-            print(" GATE G1 - D-F00 lance sur GitHub Actions")
-            print(f" Run: #{run_id_gh}")
-            print(f" Surveillez: https://github.com/{REPO_NAME}/actions")
-            print(f" Quand D-F00 est termine, lancez: --gate G2")
-            print("=" * 52)
-    else:
-        log_fail("Echec du trigger D-F00")
-        save_ledger(ledger)
+    save_ledger(ledger)
+    print()
+    print("=" * 52)
+    print(" GATE G1 - D-F00 lance (ou upload manuel)")
+    print(f" Quand F00 est termine et valide:")
+    print(f"   python OMNIS_EXECUTEUR_DELTA.py --gate G2")
+    print("=" * 52)
 
 
 def cmd_gate_g2(token, ledger):
-    section("GATE G2 - Scene Detect + Viral Cut")
+    section("GATE G2 - Scene Detect")
 
     d00_run_id = ledger.get("gh_runs", {}).get("d00")
     if not d00_run_id:
@@ -228,15 +224,14 @@ def cmd_gate_g2(token, ledger):
         return
 
     download_artifact(token, d00_run_id, "d00-output", str(d00_out))
+    ledger["etapes_completees"].append("D-F00")
 
     f01_in = SCRIPT_DIR / "F01_SCENE_DETECT" / "IN"
     f01_in.mkdir(parents=True, exist_ok=True)
     shutil.copy2(d00_out / "video_source.mp4", f01_in / "video_source.mp4")
     shutil.copy2(d00_out / "d00_manifest.json", f01_in / "d00_manifest.json")
 
-    ledger["etapes_completees"].append("D-F00")
-
-    section("Trigger D-F01 Scene Detect sur GitHub Actions")
+    section("Trigger D-F01 Scene Detect + Transcribe sur GitHub Actions")
     if trigger_workflow(token, "d01_scenedetect.yml", inputs={"mode": MODE}):
         time.sleep(5)
         run_id_gh = get_latest_run_id(token, "d01_scenedetect.yml")
@@ -251,12 +246,10 @@ def cmd_gate_g2(token, ledger):
             ledger["gh_runs"]["d01_transcribe"] = run_id_gh
             log_ok(f"Run D-F01 transcription: #{run_id_gh}")
 
-    section("D-F02 Viral Cut - Oracle automatique")
     log_info("Attente D-F01 scenes + transcription...")
-    
     d01s_id = ledger.get("gh_runs", {}).get("d01_scenedetect")
     d01t_id = ledger.get("gh_runs", {}).get("d01_transcribe")
-    
+
     for rid, name in [(d01s_id, "D-F01 scenes"), (d01t_id, "D-F01 transcription")]:
         if rid:
             log_info(f"Attente {name} #{rid}...")
@@ -264,57 +257,94 @@ def cmd_gate_g2(token, ledger):
             if not success:
                 log_fail(f"{name} #{rid} a echoue")
                 return
-    
+
     section("Telechargement artifacts D-F01")
     f01_out = SCRIPT_DIR / "F01_SCENE_DETECT" / "OUT"
     f01_out.mkdir(parents=True, exist_ok=True)
     download_artifact(token, d01s_id, "d01-scenes-output", str(f01_out))
     download_artifact(token, d01t_id, "d01-transcript-output", str(f01_out))
-    
+
+    ledger["etapes_completees"].extend(["D-F00", "D-F01"])
+
+    ledger["gate_actuelle"] = "G2"
+    save_ledger(ledger)
+
+    print()
+    print("=" * 52)
+    print(" GATE G2 - D-F01 termine")
+    print(" Scenes et transcription telechargees")
+    print(" Validez les scenes, puis:")
+    print("   python OMNIS_EXECUTEUR_DELTA.py --gate G3")
+    print("=" * 52)
+
+
+def cmd_gate_g3(token, ledger):
+    section("GATE G3 - Viral Cut (Oracle + Operateur)")
+
+    f01_out = SCRIPT_DIR / "F01_SCENE_DETECT" / "OUT"
+
     f02_in = SCRIPT_DIR / "F02_VIRAL_CUT" / "IN"
     f02_in.mkdir(parents=True, exist_ok=True)
     for f in f01_out.iterdir():
-        import shutil
         shutil.copy2(f, f02_in / f.name)
-    
+
+    print()
+    print("-- Interaction operateur pour D-F02 Viral Cut --")
+    print()
+
+    clip_count = input("  Nombre de clips a generer (1-15, defaut 5): ").strip()
+    if not clip_count:
+        clip_count = "5"
+    elif not clip_count.isdigit() or int(clip_count) < 1 or int(clip_count) > 15:
+        log_fail("Nombre invalide, utilisation de 5")
+        clip_count = "5"
+
+    clip_duration = input("  Duree max par clip en secondes (15-90, defaut 60): ").strip()
+    if not clip_duration:
+        clip_duration = "60"
+    elif not clip_duration.isdigit() or int(clip_duration) < 15 or int(clip_duration) > 90:
+        log_fail("Duree invalide, utilisation de 60s")
+        clip_duration = "60"
+
+    log_ok(f"{clip_count} clips, max {clip_duration}s chacun")
+
+    inputs = {"mode": MODE, "clip_count": clip_count, "clip_max_duration": clip_duration}
+
     section("Trigger D-F02 Oracle sur GitHub Actions")
-    if trigger_workflow(token, "d02_viralcut.yml", inputs={"mode": MODE}):
+    if trigger_workflow(token, "d02_viralcut.yml", inputs=inputs):
         time.sleep(5)
         run_id_gh = get_latest_run_id(token, "d02_viralcut.yml")
         if run_id_gh:
             ledger["gh_runs"]["d02_oracle"] = run_id_gh
             log_ok(f"Run D-F02 Oracle: #{run_id_gh}")
-            
+
             log_info("Attente D-F02 Oracle (generation cutlist OpenRouter)...")
             success, _ = wait_for_run(token, run_id_gh, timeout=300, interval=15)
             if not success:
                 log_fail("D-F02 Oracle a echoue")
                 save_ledger(ledger)
                 return
-            
+
             f02_out = SCRIPT_DIR / "F02_VIRAL_CUT" / "OUT"
             f02_out.mkdir(parents=True, exist_ok=True)
             download_artifact(token, run_id_gh, "d02-cutlist-output", str(f02_out))
-            
             log_ok("Cutlist generee et telechargee !")
             ledger["etapes_completees"].extend(["D-F01", "D-F02"])
 
-    ledger["gate_actuelle"] = "G2"
-    save_ledger(ledger)
-
     ledger["gate_actuelle"] = "G3"
     save_ledger(ledger)
-    
+
     print()
     print("=" * 52)
-    print(" GATE G2 -> G3 - D-F01 + D-F02 termines")
-    print(" Cutlist Oracle validee. Pret pour reframe.")
-    print(" Lancez: --gate G3")
+    print(" GATE G3 - D-F02 termine")
+    print(" Cutlist Oracle generee avec vos parametres")
+    print(" Validez la cutlist, puis:")
+    print("   python OMNIS_EXECUTEUR_DELTA.py --gate G4")
     print("=" * 52)
 
 
-def cmd_gate_g3(token, ledger):
-    section("GATE G3 - Reframe")
+def cmd_gate_g4(token, ledger):
+    section("GATE G4 - Reframe")
 
     cutlist_path = SCRIPT_DIR / "F02_VIRAL_CUT" / "OUT" / "cutlist.json"
     if not cutlist_path.exists():
@@ -347,20 +377,22 @@ def cmd_gate_g3(token, ledger):
             f03_out = SCRIPT_DIR / "F03_REFRAME" / "OUT"
             f03_out.mkdir(parents=True, exist_ok=True)
             download_artifact(token, run_id_gh, "d03-output", str(f03_out))
+            ledger["etapes_completees"].extend(["D-F01", "D-F02", "D-F03"])
 
-    ledger["etapes_completees"].extend(["D-F01", "D-F02", "D-F03"])
-    ledger["gate_actuelle"] = "G3"
+    ledger["gate_actuelle"] = "G4"
     save_ledger(ledger)
 
     print()
     print("=" * 52)
-    print(" GATE G3 - D-F03 termine")
-    print(" Quand pret: --gate G4")
+    print(" GATE G4 - D-F03 termine")
+    print(" Clips reframes telecharges")
+    print(" Validez le reframe, puis:")
+    print("   python OMNIS_EXECUTEUR_DELTA.py --gate G5")
     print("=" * 52)
 
 
-def cmd_gate_g4(token, ledger):
-    section("GATE G4 - Assembly")
+def cmd_gate_g5(token, ledger):
+    section("GATE G5 - Assembly + Camouflage + Luther")
 
     f04_in = SCRIPT_DIR / "F04_ASSEMBLY" / "IN"
     f04_in.mkdir(parents=True, exist_ok=True)
@@ -384,45 +416,121 @@ def cmd_gate_g4(token, ledger):
         if run_id_gh:
             ledger["gh_runs"]["d04"] = run_id_gh
             log_ok(f"Run D-F04: #{run_id_gh}")
+            log_info("Attente D-F04 Assembly...")
+            success, _ = wait_for_run(token, run_id_gh, timeout=600, interval=15)
+            if not success:
+                log_fail("D-F04 a echoue")
+                save_ledger(ledger)
+                return
 
-    ledger["etapes_completees"].append("D-F04")
-    ledger["gate_actuelle"] = "G4"
+            f04_out = SCRIPT_DIR / "F04_ASSEMBLY" / "OUT"
+            f04_out.mkdir(parents=True, exist_ok=True)
+            download_artifact(token, run_id_gh, "d04-output", str(f04_out))
+            log_ok("Assembly termine !")
+
+            ledger["etapes_completees"].append("D-F04")
+
+    section("Auto: D-F05 Camouflage")
+    f05_in = SCRIPT_DIR / "F05_CAMOUFLAGE" / "IN"
+    f05_in.mkdir(parents=True, exist_ok=True)
+
+    f04_clips = f04_out / "clips_finaux"
+    if f04_clips.exists():
+        for f in f04_clips.iterdir():
+            shutil.copy2(f, f05_in / f.name)
+
+    if trigger_workflow(token, "d05_camouflage.yml", inputs={"mode": MODE}):
+        time.sleep(5)
+        run_id_gh = get_latest_run_id(token, "d05_camouflage.yml")
+        if run_id_gh:
+            ledger["gh_runs"]["d05"] = run_id_gh
+            log_ok(f"Run D-F05: #{run_id_gh}")
+            log_info("Attente D-F05 Camouflage...")
+            success, _ = wait_for_run(token, run_id_gh, timeout=600, interval=15)
+            if not success:
+                log_fail("D-F05 a echoue")
+                save_ledger(ledger)
+                return
+
+            f05_out = SCRIPT_DIR / "F05_CAMOUFLAGE" / "OUT"
+            f05_out.mkdir(parents=True, exist_ok=True)
+            download_artifact(token, run_id_gh, "d05-output", str(f05_out))
+            log_ok("Camouflage termine !")
+            ledger["etapes_completees"].append("D-F05")
+
+    section("Auto: D-F06 Luther")
+    f06_in = SCRIPT_DIR / "F06_LUTHER" / "IN"
+    f06_in.mkdir(parents=True, exist_ok=True)
+
+    f05_clips = f05_out / "clips_camoufles"
+    if f05_clips.exists():
+        for f in f05_clips.iterdir():
+            shutil.copy2(f, f06_in / f.name)
+
+    if trigger_workflow(token, "d06_luther.yml", inputs={"mode": MODE}):
+        time.sleep(5)
+        run_id_gh = get_latest_run_id(token, "d06_luther.yml")
+        if run_id_gh:
+            ledger["gh_runs"]["d06"] = run_id_gh
+            log_ok(f"Run D-F06: #{run_id_gh}")
+            log_info("Attente D-F06 Luther...")
+            success, _ = wait_for_run(token, run_id_gh, timeout=600, interval=15)
+            if not success:
+                log_fail("D-F06 a echoue")
+                save_ledger(ledger)
+                return
+
+            f06_out = SCRIPT_DIR / "F06_LUTHER" / "OUT"
+            f06_out.mkdir(parents=True, exist_ok=True)
+            download_artifact(token, run_id_gh, "d06-output", str(f06_out))
+            log_ok("Luther termine !")
+            ledger["etapes_completees"].append("D-F06")
+
+    ledger["gate_actuelle"] = "G5"
+    ledger["statut"] = "TERMINE"
     save_ledger(ledger)
 
     print()
     print("=" * 52)
-    print(" GATE G4 - D-F04 lance sur GitHub Actions")
-    print(f" Surveillez: https://github.com/{REPO_NAME}/actions")
-    print(f" Quand D-F04 est termine: --close")
+    print(" GATE G5 - PRODUCTION TERMINEE")
+    print(" F04 assembly + F05 camouflage + F06 luther OK")
+    print(" Clips finaux: delta/F06_LUTHER/OUT/clips_finaux/")
+    print(" Pour telecharger les artefacts:")
+    print("   python OMNIS_EXECUTEUR_DELTA.py --close")
     print("=" * 52)
 
 
 def cmd_close(token, ledger):
     section("CLOSE - Telechargement final")
 
-    d04_run_id = ledger.get("gh_runs", {}).get("d04")
-    if not d04_run_id:
-        log_fail("Aucun run D-F04 dans le ledger")
+    f06_run_id = ledger.get("gh_runs", {}).get("d06")
+    if not f06_run_id:
+        f05_out = SCRIPT_DIR / "F05_CAMOUFLAGE" / "OUT"
+        if f05_out.exists():
+            log_info("F06 deja telecharge ou absent - utilisation F05")
+            f06_out = SCRIPT_DIR / "F06_LUTHER" / "OUT"
+            if f06_out.exists():
+                log_ok(f"Clips finaux prets: {f06_out}")
+            return
+        log_fail("Aucun run D-F06 dans le ledger")
         return
 
-    success, _ = wait_for_run(token, d04_run_id, timeout=300, interval=15)
+    success, _ = wait_for_run(token, f06_run_id, timeout=300, interval=15)
     if not success:
-        log_fail(f"Run D-F04 #{d04_run_id} non termine")
+        log_fail(f"Run D-F06 #{f06_run_id} non termine")
         return
 
-    f04_out = SCRIPT_DIR / "F04_ASSEMBLY" / "OUT"
-    f04_out.mkdir(parents=True, exist_ok=True)
-    download_artifact(token, d04_run_id, "d04-output", str(f04_out))
+    f06_path = SCRIPT_DIR / "F06_LUTHER" / "OUT"
+    f06_path.mkdir(parents=True, exist_ok=True)
+    download_artifact(token, f06_run_id, "d06-output", str(f06_path))
 
-    ledger["artefacts"]["clips_finaux"] = "F04_ASSEMBLY/OUT/clips_finaux"
-    ledger["gate_actuelle"] = "CLOSE"
-    ledger["statut"] = "TERMINE"
+    ledger["artefacts"]["clips_finaux"] = "F06_LUTHER/OUT/clips_finaux"
     save_ledger(ledger)
 
     print()
     print("=" * 52)
     print(" VICTORIA AETERNA - Production terminee")
-    print(" Clips finaux: F04_ASSEMBLY/OUT/clips_finaux/")
+    print(f" Clips finaux: {f06_path / 'clips_finaux'}")
     print("=" * 52)
 
 
@@ -430,11 +538,11 @@ def main():
     parser = argparse.ArgumentParser(
         description="OMNIS_EXECUTEUR_DELTA - Orchestrateur flotte delta"
     )
-    parser.add_argument("--start", action="store_true", help="Initialiser une production")
+    parser.add_argument("--start", action="store_true", help="Initialiser une production (G1)")
     parser.add_argument("--title", help="Titre de la production")
     parser.add_argument("--url", help="URL YouTube source")
-    parser.add_argument("--gate", choices=["G2", "G3", "G4"], help="Passer a une gate")
-    parser.add_argument("--close", action="store_true", help="Terminer et telecharger")
+    parser.add_argument("--gate", choices=["G2", "G3", "G4", "G5"], help="Passer a une gate")
+    parser.add_argument("--close", action="store_true", help="Telecharger clips finaux")
     parser.add_argument("--resume", action="store_true", help="Reprendre depuis ledger")
     args = parser.parse_args()
 
@@ -450,13 +558,15 @@ def main():
         if not args.title:
             log_fail("--title requis avec --start")
             sys.exit(1)
-        cmd_start(args.title, args.url, token, ledger)
+        cmd_gate_g1(args.title, args.url, token, ledger)
     elif args.gate == "G2":
         cmd_gate_g2(token, ledger)
     elif args.gate == "G3":
         cmd_gate_g3(token, ledger)
     elif args.gate == "G4":
         cmd_gate_g4(token, ledger)
+    elif args.gate == "G5":
+        cmd_gate_g5(token, ledger)
     elif args.close:
         cmd_close(token, ledger)
     elif args.resume:
@@ -470,6 +580,8 @@ def main():
             cmd_gate_g3(token, ledger)
         elif gate == "G4":
             cmd_gate_g4(token, ledger)
+        elif gate == "G5":
+            cmd_gate_g5(token, ledger)
         elif gate == "CLOSE":
             cmd_close(token, ledger)
         else:
