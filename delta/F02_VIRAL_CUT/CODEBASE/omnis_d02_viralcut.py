@@ -83,7 +83,7 @@ def call_openrouter(prompt_text, api_key, model="openai/gpt-4o"):
             {"role": "user", "content": prompt_text}
         ],
         "temperature": 0.3,
-        "max_tokens": 4096
+        "max_tokens": 1024
     }
     try:
         resp = requests.post(url, headers=headers, json=payload, timeout=120)
@@ -151,9 +151,9 @@ def prepare_prompt(input_dir, output_dir, channel_slug=None, clip_count=5, clip_
 
     log_ok("Regles PERTURABO recuperees")
 
-    scenes_summary = json.dumps(scenes_data["scenes"][:20], ensure_ascii=False, indent=2)
+    scenes_summary = json.dumps(scenes_data["scenes"][:12], ensure_ascii=False, indent=2)
     transcript_summary = json.dumps(
-        transcript_data["words"][:500], ensure_ascii=False, indent=2
+        transcript_data["words"][:300], ensure_ascii=False, indent=2
     )
 
     prompt = f"""# MISSION D-F02 - VIRAL CUT DETECTOR
