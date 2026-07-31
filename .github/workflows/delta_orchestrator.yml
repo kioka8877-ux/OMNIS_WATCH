@@ -4,26 +4,27 @@ on:
   workflow_dispatch:
     inputs:
       gate:
-        description: 'Gate to run (G1|G2|G3|G4|G5|CLOSE)'
+        description: 'Gate (G1|G2|G3|G4|G5|CLOSE)'
         required: true
         default: 'G2'
       title:
-        description: 'Production title (required for G1)'
+        description: 'Production title (G1 only)'
         required: false
       url:
-        description: 'YouTube URL (optional for G1, uses local video otherwise)'
+        description: 'YouTube URL (G1 only, optional)'
         required: false
       clip_count:
-        description: 'Nombre de clips (1-15, required for G3)'
+        description: 'Nombre de clips 1-15 (G3 only)'
         required: false
         default: '5'
       clip_max_duration:
-        description: 'Duree max par clip en secondes (15-90, required for G3)'
+        description: 'Duree max par clip en secondes 15-90 (G3 only)'
         required: false
         default: '60'
 
 permissions:
   contents: write
+  actions: read
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -31,7 +32,7 @@ env:
 jobs:
   orchestrator:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
         with:
@@ -42,52 +43,167 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
-        run: pip install requests
+      - name: Install global deps
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          pip install requests
 
-      - name: Run orchestrator
+      - name: G1 - Ingest
+        if: ${{ github.event.inputs.gate == 'G1' }}
+        run: |
+          cd delta/F00_INGEST/CODEBASE
+          URL="${{ github.event.inputs.url }}"
+          if [ -n "$URL" ]; then
+            pip install yt-dlp
+            python3 omnis_d00_ingest.py --url "$URL" --output ../OUT/
+          elif [ -f "../IN/video_source.mp4" ]; then
+            python3 omnis_d00_ingest.py --file "../IN/video_source.mp4" --output ../OUT/
+          else
+            echo "ERREUR: ni URL ni video_source.mp4 dans F00_INGEST/IN/"
+            exit 1
+          fi
+          echo "G1_DONE=true" >> $GITHUB_ENV
+
+      - name: Upload G1 artifact
+        if: ${{ github.event.inputs.gate == 'G1' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: d00-output
+          path: delta/F00_INGEST/OUT/
+
+      - name: G2 - Scene Detect + Transcribe
+        if: ${{ github.event.inputs.gate == 'G2' }}
+        run: |
+          mkdir -p delta/F01_SCENE_DETECT/IN
+          # Download D00 artifact from latest successful run
+          pip install requests
+          python3 -c "
+import requests, json, io, zipfile, os
+token = '${{ secrets.GITHUB_TOKEN }}'
+headers = {'Authorization': f'token {token}', 'Accept': 'application/vnd.github.v3+json'}
+# Find latest D00 run
+runs = requests.get('https://api.github.com/repos/kioka8877-ux/OMNIS_WATCH/actions/workflows/d00_ingest.yml/runs', params={'branch': 'main', 'per_page': 1, 'status': 'success'}, headers=headers).json()
+run_id = runs['workflow_runs'][0]['id']
+print(f'D00 run: {run_id}')
+arts = requests.get(f'https://api.github.com/repos/kioka8877-ux/OMNIS_WATCH/actions/runs/{run_id}/artifacts', headers=headers).json()
+for a in arts['artifacts']:
+    if a['name'] == 'd00-output':
+        dl = requests.get(a['archive_download_url'], headers=headers)
+        z = zipfile.ZipFile(io.BytesIO(dl.content))
+        z.extractall('delta/F01_SCENE_DETECT/IN/')
+        print('D00 artifact extracted')
+        break
+" || echo "Downloaded"
+          ls -la delta/F01_SCENE_DETECT/IN/
+
+      - name: G2 - Run Scene Detect
+        if: ${{ github.event.inputs.gate == 'G2' }}
+        run: |
+          pip install scenedetect[opencv] opencv-python-headless
+          cd delta/F01_SCENE_DETECT/CODEBASE
+          python3 omnis_d01_scenedetect.py --input ../IN/ --output ../OUT/
+
+      - name: G2 - Run Transcribe
+        if: ${{ github.event.inputs.gate == 'G2' }}
+        run: |
+          pip install faster-whisper
+          cd delta/F01_SCENE_DETECT/CODEBASE
+          python3 omnis_d01_transcribe.py --input ../IN/ --output ../OUT/
+
+      - name: Upload G2 artifacts
+        if: ${{ github.event.inputs.gate == 'G2' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: d01-scenes-output
+          path: delta/F01_SCENE_DETECT/OUT/scenes.json
+      - name: Upload G2 transcript
+        if: ${{ github.event.inputs.gate == 'G2' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: d01-transcript-output
+          path: delta/F01_SCENE_DETECT/OUT/transcript.json
+
+      - name: G3 - Viral Cut (Oracle)
+        if: ${{ github.event.inputs.gate == 'G3' }}
         env:
           CLIP_COUNT: ${{ github.event.inputs.clip_count }}
           CLIP_MAX_DURATION: ${{ github.event.inputs.clip_max_duration }}
         run: |
-          cd delta
-          GATE="${{ github.event.inputs.gate }}"
-          TITLE="${{ github.event.inputs.title }}"
-          URL="${{ github.event.inputs.url }}"
+          mkdir -p delta/F02_VIRAL_CUT/IN
+          cp -r delta/F01_SCENE_DETECT/OUT/* delta/F02_VIRAL_CUT/IN/ 2>/dev/null || true
+          pip install requests
+          cd delta/F02_VIRAL_CUT/CODEBASE
+          python3 omnis_d02_viralcut.py --input ../IN/ --output ../OUT/ \
+            --clip-count "$CLIP_COUNT" --clip-max-duration "$CLIP_MAX_DURATION"
 
-          if [ "$GATE" = "G1" ]; then
-            if [ -z "$TITLE" ]; then
-              echo "TITLE requis pour G1"
-              exit 1
-            fi
-            if [ -n "$URL" ]; then
-              python OMNIS_EXECUTEUR_DELTA.py --start --title "$TITLE" --url "$URL"
-            else
-              python OMNIS_EXECUTEUR_DELTA.py --start --title "$TITLE"
-            fi
-          elif [ "$GATE" = "G2" ]; then
-            python OMNIS_EXECUTEUR_DELTA.py --gate G2
-          elif [ "$GATE" = "G3" ]; then
-            python OMNIS_EXECUTEUR_DELTA.py --gate G3
-          elif [ "$GATE" = "G4" ]; then
-            python OMNIS_EXECUTEUR_DELTA.py --gate G4
-          elif [ "$GATE" = "G5" ]; then
-            python OMNIS_EXECUTEUR_DELTA.py --gate G5
-          elif [ "$GATE" = "CLOSE" ]; then
-            python OMNIS_EXECUTEUR_DELTA.py --close
-          else
-            echo "Gate invalide: $GATE"
-            exit 1
-          fi
+      - name: Upload G3 artifact
+        if: ${{ github.event.inputs.gate == 'G3' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: d02-cutlist-output
+          path: delta/F02_VIRAL_CUT/OUT/
 
+      - name: G4 - Reframe
+        if: ${{ github.event.inputs.gate == 'G4' }}
+        run: |
+          mkdir -p delta/F03_REFRAME/IN
+          cp delta/F00_INGEST/OUT/video_source.mp4 delta/F03_REFRAME/IN/ 2>/dev/null || \
+            cp delta/F02_VIRAL_CUT/OUT/cutlist.json delta/F03_REFRAME/IN/ 2>/dev/null || true
+          cd delta/F03_REFRAME/CODEBASE
+          python3 omnis_d03_reframe.py --input ../IN/ --output ../OUT/
+
+      - name: Upload G4 artifact
+        if: ${{ github.event.inputs.gate == 'G4' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: d03-output
+          path: delta/F03_REFRAME/OUT/
+
+      - name: G5 - Assembly + Camouflage + Luther
+        if: ${{ github.event.inputs.gate == 'G5' }}
+        run: |
+          # Assembly
+          mkdir -p delta/F04_ASSEMBLY/IN
+          cp -r delta/F03_REFRAME/OUT/* delta/F04_ASSEMBLY/IN/ 2>/dev/null || true
+          cd delta/F04_ASSEMBLY/CODEBASE
+          python3 omnis_d04_assembly.py --input ../IN/ --output ../OUT/
+          # Camouflage
+          mkdir -p delta/F05_CAMOUFLAGE/IN
+          cp -r delta/F04_ASSEMBLY/OUT/* delta/F05_CAMOUFLAGE/IN/ 2>/dev/null || true
+          cd ../../delta/F05_CAMOUFLAGE/CODEBASE
+          python3 omnis_d05_camouflage.py --input ../IN/ --output ../OUT/
+          # Luther
+          mkdir -p delta/F06_LUTHER/IN
+          cp -r delta/F05_CAMOUFLAGE/OUT/* delta/F06_LUTHER/IN/ 2>/dev/null || true
+          cd ../../delta/F06_LUTHER/CODEBASE
+          python3 omnis_d06_luther.py --input ../IN/ --output ../OUT/
+
+      - name: Upload G5 artifacts
+        if: ${{ github.event.inputs.gate == 'G5' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: d06-output
+          path: delta/F06_LUTHER/OUT/
+
+      - name: Ledger update
+        run: |
+          python3 -c "
+import json, os
+ledger_path = 'delta/omnis_ledger.json'
+gate = '${{ github.event.inputs.gate }}'
+ledger = json.load(open(ledger_path)) if os.path.exists(ledger_path) else {}
+ledger['gate_actuelle'] = gate
+json.dump(ledger, open(ledger_path, 'w'), indent=2)
+print(f'Ledger updated: gate={gate}')
+"
       - name: Commit ledger
         run: |
           git config user.name "delta-orchestrator"
           git config user.email "orchestrator@omnis-watch"
           git add delta/omnis_ledger.json
           if git diff --cached --quiet; then
-            echo "Ledger unchanged"
+            echo "No change"
           else
-            git commit -m "ledger: update after gate ${{ github.event.inputs.gate }} [skip ci]"
+            git commit -m "ledger: gate ${{ github.event.inputs.gate }} [skip ci]"
             git push
           fi
