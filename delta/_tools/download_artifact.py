@@ -23,28 +23,35 @@ def main():
     }
 
     runs_url = f"{GH_API}/{REPO}/actions/workflows/{workflow}/runs"
-    params = {"branch": branch, "per_page": 1, "status": "success"}
-    runs = requests.get(runs_url, headers=headers, params=params).json()
-    if not runs.get("workflow_runs"):
-        print(f"No successful runs for {workflow}")
+    page = 1
+    run_id = None
+    found = False
+    while page <= 10 and not found:
+        params = {"branch": branch, "per_page": 20, "status": "success", "page": page}
+        runs = requests.get(runs_url, headers=headers, params=params).json()
+        if not runs.get("workflow_runs"):
+            break
+        for run in runs["workflow_runs"]:
+            run_id = run["id"]
+            arts_url = f"{GH_API}/{REPO}/actions/runs/{run_id}/artifacts"
+            arts = requests.get(arts_url, headers=headers).json()
+            for a in arts.get("artifacts", []):
+                if a["name"] == artifact_name:
+                    print(f"Run #{run_id}")
+                    dl = requests.get(a["archive_download_url"], headers=headers)
+                    z = zipfile.ZipFile(io.BytesIO(dl.content))
+                    os.makedirs(output_dir, exist_ok=True)
+                    z.extractall(output_dir)
+                    print(f"Extracted {artifact_name} -> {output_dir}")
+                    found = True
+                    break
+            if found:
+                break
+        page += 1
+
+    if not found:
+        print(f"Artifact {artifact_name} not found in last successful runs")
         sys.exit(1)
-
-    run_id = runs["workflow_runs"][0]["id"]
-    print(f"Run #{run_id}")
-
-    arts_url = f"{GH_API}/{REPO}/actions/runs/{run_id}/artifacts"
-    arts = requests.get(arts_url, headers=headers).json()
-    for a in arts.get("artifacts", []):
-        if a["name"] == artifact_name:
-            dl = requests.get(a["archive_download_url"], headers=headers)
-            z = zipfile.ZipFile(io.BytesIO(dl.content))
-            os.makedirs(output_dir, exist_ok=True)
-            z.extractall(output_dir)
-            print(f"Extracted {artifact_name} -> {output_dir}")
-            return
-
-    print(f"Artifact {artifact_name} not found in run #{run_id}")
-    sys.exit(1)
 
 
 if __name__ == "__main__":
