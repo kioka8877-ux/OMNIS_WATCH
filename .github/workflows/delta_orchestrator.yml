@@ -112,17 +112,19 @@ jobs:
           path: delta/F01_SCENE_DETECT/OUT/transcript.json
 
       - name: G3 - Viral Cut (Oracle)
-        if: ${{ github.event.inputs.gate == 'G3' }}
+        if: github.event.inputs.gate == 'G3'
         env:
           CLIP_COUNT: ${{ github.event.inputs.clip_count }}
           CLIP_MAX_DURATION: ${{ github.event.inputs.clip_max_duration }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           mkdir -p delta/F02_VIRAL_CUT/IN
           cp -r delta/F01_SCENE_DETECT/OUT/* delta/F02_VIRAL_CUT/IN/ 2>/dev/null || true
           pip install requests
           cd delta/F02_VIRAL_CUT/CODEBASE
           python3 omnis_d02_viralcut.py --input ../IN/ --output ../OUT/ \
-            --clip-count "$CLIP_COUNT" --clip-max-duration "$CLIP_MAX_DURATION"
+            --clip-count "$CLIP_COUNT" --clip-max-duration "$CLIP_MAX_DURATION" \
+            --oracle
 
       - name: Upload G3 artifact
         if: ${{ github.event.inputs.gate == 'G3' }}
