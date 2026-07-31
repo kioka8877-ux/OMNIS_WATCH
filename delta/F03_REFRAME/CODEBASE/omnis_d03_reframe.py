@@ -31,19 +31,19 @@ FPS_TARGET = 30
 EMOTION_PROFILES = {
     "triste": {
         "zoom_factor": 1.1, "zoom_speed": 0.3,
-        "color": "eq=saturation=0.6:brightness=0.9:contrast=0.95",
+        "color": "eq=saturation=0.6:brightness=-0.05:contrast=0.95",
     },
     "wholesome": {
         "zoom_factor": 1.08, "zoom_speed": 0.5,
-        "color": "eq=saturation=1.2:brightness=1.05:contrast=1.0",
+        "color": "eq=saturation=1.2:brightness=0.0:contrast=1.0",
     },
     "tension": {
         "zoom_factor": 1.2, "zoom_speed": 1.0,
-        "color": "eq=saturation=0.8:brightness=0.95:contrast=1.3",
+        "color": "eq=saturation=0.8:brightness=0.0:contrast=1.3",
     },
     "surprise": {
         "zoom_factor": 1.15, "zoom_speed": 0.8,
-        "color": "eq=saturation=1.4:brightness=1.1:contrast=1.1",
+        "color": "eq=saturation=1.4:brightness=0.02:contrast=1.1",
     },
 }
 DEFAULT_PROFILE = EMOTION_PROFILES["wholesome"]
@@ -137,9 +137,7 @@ def reframe_clip(segment_path, tracking_data, emotion_mode, output_path):
     if tracking_data:
         log_info(f"Reframe TRACK mode (emotion={emotion_mode})")
         filter_str = (
-            f"crop=ih*9/16:ih:"
-            f"enable='between(t,0,999)':"
-            f"x='iw/2-ih*9/32':y=0,"
+            f"crop=ih*9/16:ih:x='iw/2-ih*9/32':y=0,"
             f"scale={TARGET_WIDTH}:{TARGET_HEIGHT},"
             f"{profile['color']}"
         )
