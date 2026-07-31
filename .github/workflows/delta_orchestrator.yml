@@ -1,0 +1,93 @@
+name: DELTA Orchestrator
+
+on:
+  workflow_dispatch:
+    inputs:
+      gate:
+        description: 'Gate to run (G1|G2|G3|G4|G5|CLOSE)'
+        required: true
+        default: 'G2'
+      title:
+        description: 'Production title (required for G1)'
+        required: false
+      url:
+        description: 'YouTube URL (optional for G1, uses local video otherwise)'
+        required: false
+      clip_count:
+        description: 'Nombre de clips (1-15, required for G3)'
+        required: false
+        default: '5'
+      clip_max_duration:
+        description: 'Duree max par clip en secondes (15-90, required for G3)'
+        required: false
+        default: '60'
+
+permissions:
+  contents: write
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  orchestrator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run orchestrator
+        env:
+          CLIP_COUNT: ${{ github.event.inputs.clip_count }}
+          CLIP_MAX_DURATION: ${{ github.event.inputs.clip_max_duration }}
+        run: |
+          cd delta
+          GATE="${{ github.event.inputs.gate }}"
+          TITLE="${{ github.event.inputs.title }}"
+          URL="${{ github.event.inputs.url }}"
+
+          if [ "$GATE" = "G1" ]; then
+            if [ -z "$TITLE" ]; then
+              echo "TITLE requis pour G1"
+              exit 1
+            fi
+            if [ -n "$URL" ]; then
+              python OMNIS_EXECUTEUR_DELTA.py --start --title "$TITLE" --url "$URL"
+            else
+              python OMNIS_EXECUTEUR_DELTA.py --start --title "$TITLE"
+            fi
+          elif [ "$GATE" = "G2" ]; then
+            python OMNIS_EXECUTEUR_DELTA.py --gate G2
+          elif [ "$GATE" = "G3" ]; then
+            python OMNIS_EXECUTEUR_DELTA.py --gate G3
+          elif [ "$GATE" = "G4" ]; then
+            python OMNIS_EXECUTEUR_DELTA.py --gate G4
+          elif [ "$GATE" = "G5" ]; then
+            python OMNIS_EXECUTEUR_DELTA.py --gate G5
+          elif [ "$GATE" = "CLOSE" ]; then
+            python OMNIS_EXECUTEUR_DELTA.py --close
+          else
+            echo "Gate invalide: $GATE"
+            exit 1
+          fi
+
+      - name: Commit ledger
+        run: |
+          git config user.name "delta-orchestrator"
+          git config user.email "orchestrator@omnis-watch"
+          git add delta/omnis_ledger.json
+          if git diff --cached --quiet; then
+            echo "Ledger unchanged"
+          else
+            git commit -m "ledger: update after gate ${{ github.event.inputs.gate }} [skip ci]"
+            git push
+          fi

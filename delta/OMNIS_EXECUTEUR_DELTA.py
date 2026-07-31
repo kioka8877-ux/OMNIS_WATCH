@@ -305,23 +305,24 @@ def cmd_gate_g3(token, ledger):
     for f in f01_out.iterdir():
         shutil.copy2(f, f02_in / f.name)
 
-    print()
-    print("-- Interaction operateur pour D-F02 Viral Cut --")
-    print()
-
-    clip_count = input("  Nombre de clips a generer (1-15, defaut 5): ").strip()
-    if not clip_count:
-        clip_count = "5"
-    elif not clip_count.isdigit() or int(clip_count) < 1 or int(clip_count) > 15:
-        log_fail("Nombre invalide, utilisation de 5")
-        clip_count = "5"
-
-    clip_duration = input("  Duree max par clip en secondes (15-90, defaut 60): ").strip()
-    if not clip_duration:
-        clip_duration = "60"
-    elif not clip_duration.isdigit() or int(clip_duration) < 15 or int(clip_duration) > 90:
-        log_fail("Duree invalide, utilisation de 60s")
-        clip_duration = "60"
+    clip_count = os.environ.get("CLIP_COUNT", "").strip()
+    clip_duration = os.environ.get("CLIP_MAX_DURATION", "").strip()
+    if not clip_count or not clip_duration:
+        print()
+        print("-- Interaction operateur pour D-F02 Viral Cut --")
+        print()
+        clip_count = input("  Nombre de clips a generer (1-15, defaut 5): ").strip()
+        if not clip_count:
+            clip_count = "5"
+        elif not clip_count.isdigit() or int(clip_count) < 1 or int(clip_count) > 15:
+            log_fail("Nombre invalide, utilisation de 5")
+            clip_count = "5"
+        clip_duration = input("  Duree max par clip en secondes (15-90, defaut 60): ").strip()
+        if not clip_duration:
+            clip_duration = "60"
+        elif not clip_duration.isdigit() or int(clip_duration) < 15 or int(clip_duration) > 90:
+            log_fail("Duree invalide, utilisation de 60s")
+            clip_duration = "60"
 
     log_ok(f"{clip_count} clips, max {clip_duration}s chacun")
 
