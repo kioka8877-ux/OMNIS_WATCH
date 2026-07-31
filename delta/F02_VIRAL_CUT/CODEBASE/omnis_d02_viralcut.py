@@ -82,7 +82,7 @@ def call_oracle(prompt_text, api_key, model="openai/gpt-4o", base_url="https://o
             {"role": "user", "content": prompt_text}
         ],
         "temperature": 0.3,
-        "max_tokens": 2048,
+        "max_tokens": 4096,
         "response_format": {"type": "json_object"}
     }
     try:
@@ -225,7 +225,8 @@ REGLES DE SORTIE:
   - payoff : 3-5s avant la fin, repond au hook, satisfaction maximale
   - loop_hook : derniere seconde, reconnecte au debut (S4), 2+ techniques combinees
 - Les sous-moments sont des fenetres RELATIVES au debut du clip (relative_start_sec/relative_end_sec)
-- Chaque sous-moment a une description et un mode emotionnel (triste/wholesome/tension/surprise)
+- Chaque sous-moment a une description courte (MAX 15 mots) et un mode emotionnel (triste/wholesome/tension/surprise)
+- phrase_exacte = MAX 12 mots, vide_cognitif = MAX 10 mots, setup_du_payoff = MAX 10 mots
 
 FORMAT DE SORTIE (JSON valide uniquement):
 ```json
