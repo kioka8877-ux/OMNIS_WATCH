@@ -2,7 +2,7 @@
   "version": "1.0",
   "run_id": "DELTA_20260731_0144",
   "production_title": "Test pipeline delta",
-  "gate_actuelle": "G3",
+  "gate_actuelle": "G4",
   "statut": "G1_COMPLETE",
   "etapes_completees": [
     "D-F00",
@@ -16,7 +16,7 @@
   "gh_runs": {
     "d00": 30594553281
   },
-  "derniere_mise_a_jour": "2026-07-31T11:14:31",
+  "derniere_mise_a_jour": "2026-07-31T11:25:29",
   "instructions_cold_start": "Lire OMNIS_COLD_START.md. Cloner le repo. Mode delta sur delta-dev. python OMNIS_EXECUTEUR_DELTA.py --resume",
   "error_log": [],
   "process_notes": {}
