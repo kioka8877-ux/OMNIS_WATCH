@@ -31,17 +31,18 @@ def section(title):
 
 def detect_scenes(video_path, threshold=27.0, min_scene_len_sec=2.0):
     """Detecte les scenes via PySceneDetect."""
-    from scenedetect import detect, ContentDetector
+    from scenedetect import SceneManager, ContentDetector, open_video
 
     section(f"Detection de scenes: {os.path.basename(video_path)}")
     log_info(f"Seuil: {threshold}, scene min: {min_scene_len_sec}s")
 
-    scene_list = detect(
-        str(video_path),
-        ContentDetector(threshold=threshold),
-        min_scene_len=int(min_scene_len_sec * 30),
-        show_progress=True,
-    )
+    min_frames = max(1, int(min_scene_len_sec * 30))
+
+    scene_manager = SceneManager()
+    scene_manager.add_detector(ContentDetector(threshold=threshold, min_scene_len=min_frames))
+    video = open_video(str(video_path))
+    scene_manager.detect_scenes(video, show_progress=True)
+    scene_list = scene_manager.get_scene_list()
 
     scenes = []
     for i, (start, end) in enumerate(scene_list):
