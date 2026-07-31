@@ -119,8 +119,20 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           mkdir -p delta/F02_VIRAL_CUT/IN
-          cp -r delta/F01_SCENE_DETECT/OUT/* delta/F02_VIRAL_CUT/IN/ 2>/dev/null || true
-          pip install requests
+          pip install requests -q
+          python3 delta/_tools/download_artifact.py \
+            "${{ secrets.GITHUB_TOKEN }}" \
+            delta_orchestrator.yml \
+            d01-scenes-output \
+            delta/F02_VIRAL_CUT/IN/ \
+            main
+          python3 delta/_tools/download_artifact.py \
+            "${{ secrets.GITHUB_TOKEN }}" \
+            delta_orchestrator.yml \
+            d01-transcript-output \
+            delta/F02_VIRAL_CUT/IN/ \
+            main
+          ls -la delta/F02_VIRAL_CUT/IN/
           cd delta/F02_VIRAL_CUT/CODEBASE
           python3 omnis_d02_viralcut.py --input ../IN/ --output ../OUT/ \
             --clip-count "$CLIP_COUNT" --clip-max-duration "$CLIP_MAX_DURATION" \
