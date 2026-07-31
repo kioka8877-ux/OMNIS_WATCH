@@ -16,6 +16,7 @@ import json
 import os
 import re
 import sys
+import time
 from pathlib import Path
 
 try:
@@ -67,14 +68,12 @@ def fetch_channel_identity(channel_slug):
     return fetch_perturabo(url)
 
 
-def call_openrouter(prompt_text, api_key, model="openai/gpt-4o"):
-    log_info("Appel OpenRouter Oracle...")
-    url = "https://openrouter.ai/api/v1/chat/completions"
+def call_oracle(prompt_text, api_key, model="openai/gpt-4o", base_url="https://openrouter.ai/api/v1"):
+    log_info(f"Appel Oracle ({base_url} / {model})...")
+    url = base_url.rstrip("/") + "/chat/completions"
     headers = {
         "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://github.com/kioka8877-ux/OMNIS_WATCH",
-        "X-Title": "OMNIS-Delta-Oracle"
+        "Content-Type": "application/json"
     }
     payload = {
         "model": model,
@@ -86,39 +85,60 @@ def call_openrouter(prompt_text, api_key, model="openai/gpt-4o"):
         "max_tokens": 1024
     }
     try:
-        resp = requests.post(url, headers=headers, json=payload, timeout=120)
-        if resp.status_code != 200:
-            log_fail(f"OpenRouter error {resp.status_code}: {resp.text[:300]}")
-            return None
-        result = resp.json()
-        raw = result["choices"][0]["message"]["content"]
-        json_match = re.search(r'`(?:json)?\s*([\s\S]*?)\s*`', raw)
-        if json_match:
-            raw_json = json_match.group(1)
-        else:
-            raw_json = raw.strip()
-        return json.loads(raw_json)
+        last_err = ""
+        for attempt in range(3):
+            try:
+                resp = requests.post(url, headers=headers, json=payload, timeout=120)
+                if resp.status_code != 200:
+                    last_err = f"HTTP {resp.status_code}: {resp.text[:300]}"
+                else:
+                    result = resp.json()
+                    raw = result["choices"][0]["message"]["content"]
+                    json_match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', raw)
+                    if json_match:
+                        raw_json = json_match.group(1)
+                    else:
+                        raw_json = raw.strip()
+                    return json.loads(raw_json)
+            except Exception as e:
+                last_err = str(e)
+            log_fail(f"Oracle tentative {attempt + 1}/3 echouee: {last_err} - retry dans 10s")
+            time.sleep(10)
+        log_fail(f"Oracle call failed apres 3 tentatives: {last_err}")
+        return None
     except Exception as e:
-        log_fail(f"OpenRouter call failed: {e}")
+        log_fail(f"Oracle call failed: {e}")
         return None
 
-def run_oracle(input_dir, output_dir, clip_count=5, clip_max_duration=60, channel_slug=None, model="openai/gpt-4o"):
-    api_key = os.environ.get("OPENROUTER_API_KEY")
+def run_oracle(input_dir, output_dir, clip_count=5, clip_max_duration=60, channel_slug=None, model=None):
+    api_key = os.environ.get("ORACLE_API_KEY") or os.environ.get("OPENROUTER_API_KEY")
     if not api_key:
-        log_fail("OPENROUTER_API_KEY non definie dans l environnement")
+        log_fail("ORACLE_API_KEY (ou OPENROUTER_API_KEY) non definie dans l environnement")
         sys.exit(1)
+    base_url = os.environ.get("ORACLE_BASE_URL", "https://openrouter.ai/api/v1")
+    if not model:
+        model = os.environ.get("ORACLE_MODEL", "openai/gpt-4o")
     prepare_prompt(input_dir, output_dir, channel_slug, clip_count, clip_max_duration)
     prompt_path = output_dir / PROMPT_FILENAME
     with open(prompt_path, "r", encoding="utf-8") as f:
         prompt_text = f.read()
-    cutlist = call_openrouter(prompt_text, api_key, model)
-    if not cutlist:
+    cutlist = None
+    for attempt in range(3):
+        cutlist = call_oracle(prompt_text, api_key, model, base_url)
+        if not cutlist:
+            continue
+        cutlist_path = output_dir / OUTPUT_FILENAME
+        with open(cutlist_path, "w", encoding="utf-8") as f:
+            json.dump(cutlist, f, ensure_ascii=False, indent=2)
+        log_ok(f"Cutlist generee par Oracle: {cutlist_path}")
+        try:
+            validate_cutlist(input_dir, output_dir, OUTPUT_FILENAME, clip_max_duration)
+            break
+        except SystemExit:
+            log_fail(f"Cutlist invalide (tentative {attempt + 1}/3) - nouvel appel Oracle dans 10s")
+            time.sleep(10)
+    else:
         sys.exit(1)
-    cutlist_path = output_dir / OUTPUT_FILENAME
-    with open(cutlist_path, "w", encoding="utf-8") as f:
-        json.dump(cutlist, f, ensure_ascii=False, indent=2)
-    log_ok(f"Cutlist generee par Oracle: {cutlist_path}")
-    validate_cutlist(input_dir, output_dir, OUTPUT_FILENAME)
 
 def prepare_prompt(input_dir, output_dir, channel_slug=None, clip_count=5, clip_max_duration=60):
     """Genere le prompt pour l'Oracle (sandbox)."""
@@ -193,7 +213,7 @@ CRITERES (par ordre de priorite):
 
 REGLES DE SORTIE:
 - EXACTEMENT {clip_count} moments (ni plus, ni moins)
-- Chaque moment = 15-{clip_max_duration}s
+- Chaque moment = 10-{clip_max_duration}s
 - Ordre chronologique
 - Premier moment = HOOK (capture dans les 3s)
 - Dernier moment = PAYOFF ou LOOP
@@ -235,7 +255,7 @@ Aucun texte avant ou apres le JSON."""
     print(f"Puis validez: python omnis_d02_viralcut.py --input {input_dir} --output {output_dir} --validate cutlist.json")
 
 
-def validate_cutlist(input_dir, output_dir, cutlist_file):
+def validate_cutlist(input_dir, output_dir, cutlist_file, clip_max_duration=60):
     """Valide le schema de la cutlistgeneree par l'Oracle."""
     section("D-F02 VALIDATE - Verification cutlist")
 
@@ -270,11 +290,11 @@ def validate_cutlist(input_dir, output_dir, cutlist_file):
     if not has_foreshadow:
         errors.append("Pas de moment type FORESHADOW")
 
-    video_dur = cutlist.get("video_duration_sec", 0)
-    if video_dur > 30:
+    clip_max_dur = cutlist.get("clip_max_duration_sec", 0) or clip_max_duration
+    if clip_max_dur > 30:
         has_loop = any(m.get("viral_type") == "loop" for m in moments)
         if not has_loop:
-            errors.append("Pas de LOOP hook (Regle S4) pour video >30s")
+            errors.append("Pas de LOOP hook (Regle S4) pour clips >30s")
 
     for i, m in enumerate(moments):
         if not m.get("perturabo_rule"):
@@ -324,7 +344,7 @@ def main():
     group.add_argument("--validate", metavar="FILE",
                        help="Valide la cutlist generee par l'Oracle")
     group.add_argument("--oracle", action="store_true",
-                       help="Mode complet: prepare + appelle OpenRouter + valide")
+                       help="Mode complet: prepare + appelle l'Oracle + valide")
     args = parser.parse_args()
 
     input_dir = Path(args.input)
@@ -333,7 +353,7 @@ def main():
     if args.prepare:
         prepare_prompt(input_dir, output_dir, args.channel, args.clip_count, args.clip_max_duration)
     elif args.validate:
-        validate_cutlist(input_dir, output_dir, args.validate)
+        validate_cutlist(input_dir, output_dir, args.validate, args.clip_max_duration)
     elif args.oracle:
         run_oracle(input_dir, output_dir, args.clip_count, args.clip_max_duration, args.channel)
 

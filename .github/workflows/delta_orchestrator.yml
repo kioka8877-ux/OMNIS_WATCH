@@ -116,7 +116,9 @@ jobs:
         env:
           CLIP_COUNT: ${{ github.event.inputs.clip_count }}
           CLIP_MAX_DURATION: ${{ github.event.inputs.clip_max_duration }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          ORACLE_BASE_URL: ${{ vars.ORACLE_BASE_URL }}
+          ORACLE_MODEL: ${{ vars.ORACLE_MODEL }}
+          ORACLE_API_KEY: ${{ secrets.ORACLE_API_KEY }}
         run: |
           mkdir -p delta/F02_VIRAL_CUT/IN
           pip install requests -q
