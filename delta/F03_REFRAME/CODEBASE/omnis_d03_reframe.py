@@ -190,23 +190,23 @@ def main():
     with open(cutlist_path, "r", encoding="utf-8") as f:
         cutlist = json.load(f)
 
-    moments = cutlist.get("moments", [])
-    if not moments:
-        log_fail("Aucun moment dans la cutlist")
+    clips = cutlist.get("clips", [])
+    if not clips:
+        log_fail("Aucun clip dans la cutlist")
         sys.exit(1)
 
-    section(f"D-F03 REFRAME - {len(moments)} moments a reframer")
+    section(f"D-F03 REFRAME - {len(clips)} clips a reframer")
 
     results = []
     with tempfile.TemporaryDirectory() as tmpdir:
-        for moment in moments:
-            idx = moment["index"]
-            start = moment["start_sec"]
-            end = moment["end_sec"]
-            emotion = moment.get("emotion_mode", "wholesome")
-            vtype = moment.get("viral_type", "unknown")
+        for clip in clips:
+            idx = clip["index"]
+            start = clip["start_sec"]
+            end = clip["end_sec"]
+            emotion = clip.get("emotion_mode", "wholesome")
+            angle = clip.get("viral_angle", "unknown")
 
-            section(f"Moment {idx}: [{start}s-{end}s] {vtype} ({emotion})")
+            section(f"Clip {idx}: [{start}s-{end}s] {angle} ({emotion})")
 
             seg_path = os.path.join(tmpdir, f"seg_{idx:03d}.mp4")
             extract_segment(video_path, start, end, seg_path)
@@ -227,7 +227,7 @@ def main():
                 "end_sec": end,
                 "duration_sec": end - start,
                 "emotion_mode": emotion,
-                "viral_type": vtype,
+                "viral_angle": angle,
                 "reframe_mode": reframe_mode,
                 "output": f"{OUTPUT_DIR_CLIPS}/clip_{idx:03d}.mp4",
                 "size_mb": size_mb,

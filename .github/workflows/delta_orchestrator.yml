@@ -151,8 +151,19 @@ jobs:
         if: ${{ github.event.inputs.gate == 'G4' }}
         run: |
           mkdir -p delta/F03_REFRAME/IN
-          cp delta/F00_INGEST/OUT/video_source.mp4 delta/F03_REFRAME/IN/ 2>/dev/null || \
-            cp delta/F02_VIRAL_CUT/OUT/cutlist.json delta/F03_REFRAME/IN/ 2>/dev/null || true
+          python3 delta/_tools/download_artifact.py \
+            "${{ secrets.GITHUB_TOKEN }}" \
+            delta_orchestrator.yml \
+            d00-output \
+            delta/F03_REFRAME/IN/ \
+            main
+          python3 delta/_tools/download_artifact.py \
+            "${{ secrets.GITHUB_TOKEN }}" \
+            delta_orchestrator.yml \
+            d02-cutlist-output \
+            delta/F03_REFRAME/IN/ \
+            main
+          ls -la delta/F03_REFRAME/IN/
           cd delta/F03_REFRAME/CODEBASE
           python3 omnis_d03_reframe.py --input ../IN/ --output ../OUT/
 
