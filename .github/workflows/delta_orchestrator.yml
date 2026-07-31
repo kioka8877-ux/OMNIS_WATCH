@@ -81,7 +81,7 @@ jobs:
             d00_ingest.yml \
             d00-output \
             delta/F01_SCENE_DETECT/IN/ \
-            main
+            delta-dev
           ls -la delta/F01_SCENE_DETECT/IN/
 
       - name: G2 - Run Scene Detect
