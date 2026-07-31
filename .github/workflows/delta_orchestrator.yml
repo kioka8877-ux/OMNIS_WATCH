@@ -14,13 +14,13 @@ on:
         description: 'YouTube URL (G1 only, optional)'
         required: false
       clip_count:
-        description: 'Nombre de clips 1-15 (G3 only)'
+        description: 'Nombre de clips 1-10 (G3 only)'
         required: false
-        default: '5'
+        default: '3'
       clip_max_duration:
-        description: 'Duree max par clip en secondes 15-90 (G3 only)'
+        description: 'Duree max par clip en secondes 10-60 (G3 only)'
         required: false
-        default: '60'
+        default: '30'
 
 permissions:
   contents: write

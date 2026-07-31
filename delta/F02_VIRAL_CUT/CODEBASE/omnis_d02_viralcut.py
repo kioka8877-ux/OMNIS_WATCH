@@ -82,7 +82,8 @@ def call_oracle(prompt_text, api_key, model="openai/gpt-4o", base_url="https://o
             {"role": "user", "content": prompt_text}
         ],
         "temperature": 0.3,
-        "max_tokens": 1024
+        "max_tokens": 2048,
+        "response_format": {"type": "json_object"}
     }
     try:
         last_err = ""
@@ -202,41 +203,53 @@ def prepare_prompt(input_dir, output_dir, channel_slug=None, clip_count=5, clip_
 
 ## MISSION:
 Tu es un VIRAL CUT DETECTOR pour YouTube Shorts.
-Identifie les {clip_count} MEILLEURS moments de cette video qui deviendront des Shorts viraux.
+Identifie les {clip_count} MEILLEURS fenetres de cette video qui deviendront des Shorts viraux COMPLETS.
+CHAQUE clip est un Short autonome qui doit respecter LA FORMULE S1: Hook -> Explain Payoff -> Foreshadow Payoff -> Reveal Payoff (+ Loop).
 
-CRITERES (par ordre de priorite):
-1. Hook potential : la premiere frame fonctionne SANS SON (Regle S3)
-2. Payoff potential : le moment a un payoff identifiable (Regle S1)
-3. Emotion : le moment est emotionnellement fort
-4. Rythme : Hook -> Context -> Foreshadow -> Payoff -> Loop (Regle S1)
+CRITERES DE SELECTION D'UNE FENETRE (par ordre de priorite):
+1. La fenetre contient un payoff identifiable et satisfaisant (Regle S1)
+2. La fenetre commence par un hook visuel fort fonctionnant SANS SON (Regle S3)
+3. Le hook cree un vide cognitif ET prepare le payoff (Regle S2)
+4. Emotion : le moment est emotionnellement fort
 5. Sujet : visage ou personne identifiable pour le reframe
 
 REGLES DE SORTIE:
-- EXACTEMENT {clip_count} moments (ni plus, ni moins)
-- Chaque moment = 10-{clip_max_duration}s
-- Ordre chronologique
-- Premier moment = HOOK (capture dans les 3s)
-- Dernier moment = PAYOFF ou LOOP
-- Au moins 1 foreshadow entre 40-60% de la duree
-- Loop hook si clip >30s (Regle S4)
-- Chaque moment a un mode emotionnel (triste/wholesome/tension/surprise)
+- EXACTEMENT {clip_count} clips (ni plus, ni moins), ordre chronologique
+- Chaque clip = 10-{clip_max_duration}s
+- CHAQUE clip contient SA PROPRE structure interne (la formule S1 complete) :
+  - visual_hook_frame : premiere frame 0-0.5s, stoppe le scroll SANS SON (S3)
+  - verbal_text_hook : 0-3s, phrase qui cree un vide cognitif ET set up le payoff (S2)
+  - context : 3-10s, contexte rapide, pas de temps mort
+  - foreshadow : integre au hook ou juste apres, le viewer sait ce qu'il va gagner
+  - escalade_rythme : milieu, chaque seconde = info nouvelle, pas de sag
+  - payoff : 3-5s avant la fin, repond au hook, satisfaction maximale
+  - loop_hook : derniere seconde, reconnecte au debut (S4), 2+ techniques combinees
+- Les sous-moments sont des fenetres RELATIVES au debut du clip (relative_start_sec/relative_end_sec)
+- Chaque sous-moment a une description et un mode emotionnel (triste/wholesome/tension/surprise)
 
 FORMAT DE SORTIE (JSON valide uniquement):
 ```json
 {{
   "video_duration_sec": 0,
-  "moment_count": 0,
-  "moments": [
+  "clip_count": 0,
+  "clips": [
     {{
       "index": 0,
       "start_sec": 0,
       "end_sec": 0,
       "duration_sec": 0,
-      "viral_type": "hook|context|foreshadow|payoff|loop",
-      "perturabo_rule": "Regle S1/S2/S3/S4/S5/S6 ou Tim Danilov 1-6",
+      "scene_source": 0,
       "emotion_mode": "triste|wholesome|tension|surprise",
-      "hook_summary": "Description courte du hook (2-10 mots)",
-      "scene_source": 0
+      "viral_angle": "Description de l'angle viral (2-10 mots)",
+      "structure": {{
+        "visual_hook_frame": {{"relative_start_sec": 0, "relative_end_sec": 0.5, "description": "...", "emotion_mode": "..."}},
+        "verbal_text_hook": {{"relative_start_sec": 0, "relative_end_sec": 3, "phrase_exacte": "...", "vide_cognitif": "...", "setup_du_payoff": "..."}},
+        "context": {{"relative_start_sec": 3, "relative_end_sec": 10, "description": "..."}},
+        "foreshadow": {{"relative_start_sec": 0, "relative_end_sec": 5, "description": "...", "force": "faible|moyen|eleve"}},
+        "escalade_rythme": {{"relative_start_sec": 10, "relative_end_sec": 25, "description": "..."}},
+        "payoff": {{"relative_start_sec": 25, "relative_end_sec": 29, "phrase_exacte": "...", "satisfaction_cible": "...", "reponse_au_hook": "..."}},
+        "loop_hook": {{"relative_start_sec": 29, "relative_end_sec": 30, "techniques": ["callback_hook|visual_match_cut|audio_continuity|cliffhanger_reversal|open_question_close"], "description": "..."}}
+      }}
     }}
   ]
 }}
@@ -271,39 +284,61 @@ def validate_cutlist(input_dir, output_dir, cutlist_file, clip_max_duration=60):
 
     errors = []
 
-    moments = cutlist.get("moments", [])
-    if not moments:
-        errors.append("Aucun moment dans la cutlist")
-    if len(moments) < 3:
-        errors.append(f"Trop peu de moments: {len(moments)} (min 3)")
-    if len(moments) > 15:
-        errors.append(f"Trop de moments: {len(moments)} (max 15)")
+    clips = cutlist.get("clips", [])
+    if not clips:
+        errors.append("Aucun clip dans la cutlist")
+    if len(clips) < 1:
+        errors.append(f"Trop peu de clips: {len(clips)} (min 1)")
+    if len(clips) > 10:
+        errors.append(f"Trop de clips: {len(clips)} (max 10)")
 
-    has_hook = any(m.get("viral_type") == "hook" for m in moments)
-    has_payoff = any(m.get("viral_type") == "payoff" for m in moments)
-    has_foreshadow = any(m.get("viral_type") == "foreshadow" for m in moments)
+    STRUCTURE_KEYS = ["visual_hook_frame", "verbal_text_hook", "context", "foreshadow", "escalade_rythme", "payoff", "loop_hook"]
 
-    if not has_hook:
-        errors.append("Pas de moment type HOOK")
-    if not has_payoff:
-        errors.append("Pas de moment type PAYOFF")
-    if not has_foreshadow:
-        errors.append("Pas de moment type FORESHADOW")
+    for i, c in enumerate(clips):
+        dur = c.get("duration_sec", 0)
+        if dur < 10 or dur > clip_max_duration:
+            errors.append(f"Clip {i}: duree {dur}s hors plage (10-{clip_max_duration}s)")
+        if not c.get("emotion_mode"):
+            errors.append(f"Clip {i}: pas de mode emotionnel")
+        if not c.get("viral_angle"):
+            errors.append(f"Clip {i}: pas d'angle viral")
+        start, end = c.get("start_sec", 0), c.get("end_sec", 0)
+        if end <= start:
+            errors.append(f"Clip {i}: fenetre invalide ({start}-{end}s)")
 
-    clip_max_dur = cutlist.get("clip_max_duration_sec", 0) or clip_max_duration
-    if clip_max_dur > 30:
-        has_loop = any(m.get("viral_type") == "loop" for m in moments)
-        if not has_loop:
-            errors.append("Pas de LOOP hook (Regle S4) pour clips >30s")
-
-    for i, m in enumerate(moments):
-        if not m.get("perturabo_rule"):
-            errors.append(f"Moment {i}: pas de regle PERTURABO justificative")
-        if not m.get("emotion_mode"):
-            errors.append(f"Moment {i}: pas de mode emotionnel")
-        dur = m.get("duration_sec", 0)
-        if dur < 10 or dur > 90:
-            errors.append(f"Moment {i}: duree {dur}s hors plage (10-90s)")
+        structure = c.get("structure", {})
+        for key in STRUCTURE_KEYS:
+            if key not in structure:
+                errors.append(f"Clip {i}: element de structure manquant: {key}")
+        if structure:
+            vhf = structure.get("visual_hook_frame", {})
+            if vhf.get("relative_start_sec", -1) != 0:
+                errors.append(f"Clip {i}: visual_hook_frame doit commencer a 0s")
+            vth = structure.get("verbal_text_hook", {})
+            if vth.get("relative_start_sec", 99) > 1:
+                errors.append(f"Clip {i}: verbal_text_hook doit demarrer dans la 1ere seconde")
+            ctx = structure.get("context", {})
+            if ctx.get("relative_start_sec", 99) < vth.get("relative_start_sec", 0):
+                errors.append(f"Clip {i}: context ne peut pas commencer avant le verbal hook")
+            esc = structure.get("escalade_rythme", {})
+            payoff = structure.get("payoff", {})
+            if esc and payoff and esc.get("relative_start_sec", 0) > payoff.get("relative_start_sec", 999):
+                errors.append(f"Clip {i}: escalade_rythme doit preceder le payoff")
+            if payoff.get("relative_end_sec", 0) < dur - 8:
+                errors.append(f"Clip {i}: payoff doit etre dans les 8 dernieres secondes")
+            loop = structure.get("loop_hook", {})
+            if loop.get("relative_start_sec", 0) < dur - 3:
+                errors.append(f"Clip {i}: loop_hook doit etre dans les 3 dernieres secondes")
+            for key in STRUCTURE_KEYS:
+                el = structure.get(key)
+                if not el:
+                    continue
+                rel_start = el.get("relative_start_sec", 0)
+                rel_end = el.get("relative_end_sec", 0)
+                if rel_end < rel_start:
+                    errors.append(f"Clip {i}: {key} fenetre invalide ({rel_start}-{rel_end}s)")
+                if rel_end > dur + 1:
+                    errors.append(f"Clip {i}: {key} depasse la duree du clip ({rel_end}s > {dur}s)")
 
     if errors:
         section("ERREURS DE VALIDATION")
@@ -318,10 +353,10 @@ def validate_cutlist(input_dir, output_dir, cutlist_file, clip_max_duration=60):
     print()
     print("=" * 52)
     print(" D-F02 VALIDATE - CUTLIST VALIDEE")
-    print(f"  Moments    : {len(moments)}")
-    print(f"  Hook       : {'OK' if has_hook else 'MANQUANT'}")
-    print(f"  Payoff     : {'OK' if has_payoff else 'MANQUANT'}")
-    print(f"  Foreshadow : {'OK' if has_foreshadow else 'MANQUANT'}")
+    print(f"  Clips      : {len(clips)}")
+    for i, c in enumerate(clips):
+        struct_ok = all(k in c.get("structure", {}) for k in STRUCTURE_KEYS)
+        print(f"  Clip {i}    : {c.get('duration_sec', 0)}s ({c.get('start_sec', 0)}-{c.get('end_sec', 0)}s) structure {'OK' if struct_ok else 'MANQUANTE'}")
     print(f"  Fichier    : {OUTPUT_FILENAME}")
     print("=" * 52)
 
