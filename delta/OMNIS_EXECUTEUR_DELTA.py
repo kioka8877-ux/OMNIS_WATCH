@@ -182,26 +182,42 @@ def cmd_gate_g1(title, url, token, ledger):
     log_ok(f"Production: {title}")
     log_ok(f"Run ID: {run_id}")
 
+    local_video = SCRIPT_DIR / "F00_INGEST" / "IN" / "video_source.mp4"
+
     if url:
         log_ok(f"URL source: {url}")
         inputs = {"mode": MODE, "url": url}
-        section("Trigger D-F00 Ingest sur GitHub Actions")
-        if trigger_workflow(token, "d00_ingest.yml", inputs=inputs):
-            time.sleep(5)
-            run_id_gh = get_latest_run_id(token, "d00_ingest.yml")
-            if run_id_gh:
-                ledger["gh_runs"]["d00"] = run_id_gh
-                log_ok(f"Run D-F00 GitHub Actions: #{run_id_gh}")
+    elif local_video.exists():
+        log_ok(f"Video locale detectee: {local_video}")
+        inputs = {"mode": MODE}
     else:
-        log_info("Pas d'URL - upload manuel requis")
-        log_info("Placez video_source.mp4 dans delta/F00_INGEST/IN/")
-        log_info("Puis lancez le workflow d00_ingest.yml manuellement ou --gate G2 si deja fait")
+        log_info("Ni URL ni video locale - upload manuel requis")
+        log_info(f"Placez video_source.mp4 dans {SCRIPT_DIR / 'F00_INGEST' / 'IN' / ''}")
+        save_ledger(ledger)
+        print()
+        print("=" * 52)
+        print(" GATE G1 - En attente de fichier")
+        print(" Deposez la video, puis relancez --start")
+        print("=" * 52)
+        return
+
+    section("Trigger D-F00 Ingest sur GitHub Actions")
+    trig_ok = trigger_workflow(token, "d00_ingest.yml", inputs=inputs)
+    if trig_ok:
+        time.sleep(5)
+        run_id_gh = get_latest_run_id(token, "d00_ingest.yml")
+        if run_id_gh:
+            ledger["gh_runs"]["d00"] = run_id_gh
+            log_ok(f"Run D-F00 GitHub Actions: #{run_id_gh}")
 
     save_ledger(ledger)
     print()
     print("=" * 52)
-    print(" GATE G1 - D-F00 lance (ou upload manuel)")
-    print(f" Quand F00 est termine et valide:")
+    print(" GATE G1 - D-F00 lance sur GitHub Actions" if trig_ok else " GATE G1 - Echec trigger D-F00")
+    if trig_ok and run_id_gh:
+        print(f" Run: #{run_id_gh}")
+        print(f" Surveillez: https://github.com/{REPO_NAME}/actions")
+    print(f" Quand F00 est termine, lancez:")
     print(f"   python OMNIS_EXECUTEUR_DELTA.py --gate G2")
     print("=" * 52)
 
