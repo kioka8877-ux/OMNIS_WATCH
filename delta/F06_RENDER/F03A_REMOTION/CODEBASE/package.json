@@ -1,0 +1,17 @@
+{
+  "name": "omnis-f03a-remotion",
+  "version": "1.0.0",
+  "description": "OMNIS-WATCH F03A — Remotion render engine",
+  "type": "module",
+  "scripts": {
+    "render": "remotion render src/index.jsx OmniComposition OUT/video_visuelle.mp4",
+    "preview": "remotion studio src/index.jsx"
+  },
+  "dependencies": {
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "remotion": "^4.0.0",
+    "@remotion/cli": "^4.0.0",
+    "@remotion/google-fonts": "^4.0.0"
+  }
+}
