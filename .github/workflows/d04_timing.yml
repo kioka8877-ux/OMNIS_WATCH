@@ -1,0 +1,56 @@
+# D04 TIMING — Extract timing.json par clip
+name: D04 Timing
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Mode (delta)'
+        required: true
+        default: 'delta'
+
+permissions:
+  contents: write
+
+jobs:
+  d04:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Download D03 artifact
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          workflow: d03_reframe.yml
+          run_id: ${{ github.event.inputs.d03_run_id }}
+          name: d03-output
+          path: delta/F03_REFRAME/IN/
+
+      - name: Download D02 artifact (cutlist.json)
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          workflow: d02_viralcut.yml
+          run_id: ${{ github.event.inputs.d02_run_id }}
+          name: d02-output
+          path: delta/F04_TIMING/IN/
+
+      - name: Run D-F04 Timing
+        run: |
+          cd delta/F04_TIMING/CODEBASE
+          python3 extract_timing.py \
+            --input ../IN/ \
+            --output ../OUT/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: d04-output
+          path: delta/F04_TIMING/OUT/
