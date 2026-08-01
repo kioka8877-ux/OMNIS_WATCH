@@ -85,9 +85,9 @@ D-F08 (final_001.mp4, final_002.mp4...) ✅
 | 4 | Créer D-F05 PREVIEW | d05_preview.yml (deploy to GitHub Pages) | ✅ FAIT |
 | 5 | Copier gamma/F03_RENDER → delta/F06_RENDER | F03A + F03B | ✅ FAIT |
 | 6 | Créer D-F06 RENDER | d06_render.yml (wrapper Remotion + Mixer) | ✅ FAIT |
-| 7 | Renommer D-F05 → D-F07 | Camouflage | ⬜ TODO |
-| 8 | Renommer D-F06 → D-F08 | Luther | ⬜ TODO |
-| 9 | Supprimer D-F04 ASSEMBLY | Obsolète | ⬜ TODO |
+| 7 | Renommer D-F05 → D-F07 | Camouflage | ✅ FAIT |
+| 8 | Renommer D-F06 → D-F08 | Luther | ✅ FAIT |
+| 9 | Supprimer D-F04 ASSEMBLY | Obsolète | ✅ FAIT |
 | 10 | Créer delta/SHARED/IN/sfx/ | Copier SFX de gamma | ✅ FAIT |
 | 11 | Test G5 (boucle par clip) | 3 clips → 3 finals | ⬜ TODO |
 
