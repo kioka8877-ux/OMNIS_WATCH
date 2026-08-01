@@ -81,7 +81,7 @@ D-F08 (final_001.mp4, final_002.mp4...) ✅
 |-------|--------|--------|--------|
 | 1 | Mettre à jour TRACKING.md | Ce document | ✅ FAIT |
 | 2 | Créer D-F04 TIMING | extract_timing.py + d04_timing.yml | ✅ FAIT |
-| 3 | Copier gamma/F02_PREVIEW → delta/F05_PREVIEW | Preview React app | ⬜ TODO |
+| 3 | Copier gamma/F02_PREVIEW → delta/F05_PREVIEW | Preview React app | ✅ FAIT |
 | 4 | Créer D-F05 PREVIEW | d05_preview.yml (deploy to GitHub Pages) | ⬜ TODO |
 | 5 | Copier gamma/F03_RENDER → delta/F06_RENDER | F03A + F03B | ⬜ TODO |
 | 6 | Créer D-F06 RENDER | d06_render.yml (wrapper Remotion + Mixer) | ⬜ TODO |
