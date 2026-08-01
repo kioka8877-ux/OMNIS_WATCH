@@ -1,0 +1,35 @@
+name: D08 Luther
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Mode (delta)'
+        required: true
+        default: 'delta'
+
+permissions:
+  contents: write
+
+jobs:
+  d08:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Run D-F08 Luther
+        run: |
+          cd delta/F08_LUTHER/CODEBASE
+          python3 omnis_d06_luther.py \
+            --input ../IN/ \
+            --output ../OUT/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: d08-output
+          path: delta/F08_LUTHER/OUT/
