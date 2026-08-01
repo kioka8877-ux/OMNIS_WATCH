@@ -1,0 +1,109 @@
+# D06 RENDER — Remotion + Mixer per clip
+name: D06 Render
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Mode (delta)'
+        required: true
+        default: 'delta'
+      num_clips:
+        description: 'Number of clips to process'
+        required: true
+        default: '3'
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      matrix:
+        clip_index: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Download D05 artifact
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          workflow: d05_preview.yml
+          run_id: ${{ github.event.inputs.d05_run_id }}
+          name: d05-output
+          path: delta/F06_RENDER/IN/
+
+      - name: Prepare clip ${{ matrix.clip_index }}
+        run: |
+          CLIP_IDX=${{ matrix.clip_index }}
+          mkdir -p delta/F06_RENDER/F03A_REMOTION/CODEBASE/public
+          mkdir -p delta/F06_RENDER/F03A_REMOTION/CODEBASE/OUT
+          mkdir -p delta/F06_RENDER/F03B_MIXER/CODEBASE/IN
+          mkdir -p delta/F06_RENDER/F03B_MIXER/CODEBASE/OUT
+
+          # Copy clip and codex to F03A IN
+          cp "delta/F06_RENDER/IN/clip_$(printf '%03d' $CLIP_IDX).mp4" \
+             delta/F06_RENDER/F03A_REMOTION/CODEBASE/public/video_coupee.mp4
+          cp "delta/F06_RENDER/IN/codex_$(printf '%03d' $CLIP_IDX).json" \
+             delta/F06_RENDER/F03A_REMOTION/CODEBASE/public/codex.json
+
+          echo "Clip $CLIP_IDX prepared"
+
+      - name: Install F03A dependencies
+        run: |
+          cd delta/F06_RENDER/F03A_REMOTION/CODEBASE
+          npm install
+
+      - name: Render F03A (clip ${{ matrix.clip_index }})
+        run: |
+          cd delta/F06_RENDER/F03A_REMOTION/CODEBASE
+          
+          # Get video properties from codex.json
+          FPS=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['fps'])")
+          FRAMES=$(python3 -c "import json; print(json.load(open('public/codex.json'))['video']['total_frames'])")
+          
+          echo "Rendering clip ${{ matrix.clip_index }}: ${FRAMES} frames @ ${FPS}fps"
+          
+          npx remotion render src/index.jsx OmniComposition \
+            OUT/video_visuelle.mp4 \
+            --codec h264 \
+            --image-format jpeg \
+            --concurrency 1
+
+      - name: Mix SFX F03B (clip ${{ matrix.clip_index }})
+        run: |
+          # Copy video_visuelle to F03B input
+          cp delta/F06_RENDER/F03A_REMOTION/CODEBASE/OUT/video_visuelle.mp4 \
+             delta/F06_RENDER/F03B_MIXER/CODEBASE/IN/video_visuelle.mp4
+          
+          # Copy codex.json
+          cp delta/F06_RENDER/F03A_REMOTION/CODEBASE/public/codex.json \
+             delta/F06_RENDER/F03B_MIXER/CODEBASE/IN/codex.json
+          
+          # Run mixer (without voiceover for delta)
+          cd delta/F06_RENDER/F03B_MIXER/CODEBASE
+          python3 omnis_f03b_mixer.py \
+            --input IN/ \
+            --output OUT/ \
+            --sfx-dir ../../../SHARED/IN/sfx/
+
+      - name: Upload artifact (clip ${{ matrix.clip_index }})
+        uses: actions/upload-artifact@v4
+        with:
+          name: d06-output-clip-${{ matrix.clip_index }}
+          path: delta/F06_RENDER/F03B_MIXER/CODEBASE/OUT/video_complete.mp4
