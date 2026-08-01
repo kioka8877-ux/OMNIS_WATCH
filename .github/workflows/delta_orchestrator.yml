@@ -208,16 +208,19 @@ jobs:
             # Setup directories for this clip
             mkdir -p delta/F04_ASSEMBLY/IN delta/F04_ASSEMBLY/OUT
             mkdir -p delta/F05_CAMOUFLAGE/IN delta/F05_CAMOUFLAGE/OUT
+            mkdir -p delta/F06_LUTHER/IN delta/F06_LUTHER/OUT
             
-            # Copy single clip to assembly IN
-            cp delta/F03_REFRAME/OUT/clips_reframes/clip_${IDX}.mp4 delta/F04_ASSEMBLY/IN/
+            # Copy single clip to assembly IN (clips are in IN from download_artifact)
+            cp delta/F03_REFRAME/IN/clips_reframes/clip_${IDX}.mp4 delta/F04_ASSEMBLY/IN/
             cp delta/F03_REFRAME/IN/cutlist.json delta/F04_ASSEMBLY/IN/
+            ls -la delta/F04_ASSEMBLY/IN/
             
             # Run Assembly for this clip
             cd delta/F04_ASSEMBLY/CODEBASE
             python3 omnis_d04_assembly.py --input ../IN/ --output ../OUT/
             
             # Copy assembly output to camouflage IN
+            ls -la delta/F04_ASSEMBLY/OUT/clips_finaux/
             cp delta/F04_ASSEMBLY/OUT/clips_finaux/clip_final_${IDX}.mp4 delta/F05_CAMOUFLAGE/IN/
             
             # Run Camouflage for this clip
@@ -225,6 +228,7 @@ jobs:
             python3 omnis_d05_camouflage.py --input ../IN/ --output ../OUT/
             
             # Copy camouflage output to luther IN
+            ls -la delta/F05_CAMOUFLAGE/OUT/
             cp delta/F05_CAMOUFLAGE/OUT/*.mp4 delta/F06_LUTHER/IN/ 2>/dev/null || true
             
             # Run Luther for this clip
@@ -232,9 +236,8 @@ jobs:
             python3 omnis_d06_luther.py --input ../IN/ --output ../OUT/
             
             # Move final to finals folder with proper naming
-            if [ -f "../OUT/"*.mp4 ]; then
-              mv ../OUT/*.mp4 ../OUT/finals/final_${IDX}.mp4 2>/dev/null || true
-            fi
+            ls -la ../OUT/
+            find ../OUT/ -name "*.mp4" -exec mv {} ../OUT/finals/final_${IDX}.mp4 \; 2>/dev/null || true
             
             echo "===== CLIP $IDX DONE ====="
           done
