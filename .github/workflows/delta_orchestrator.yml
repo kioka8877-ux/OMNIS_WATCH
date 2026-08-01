@@ -217,7 +217,7 @@ jobs:
             
             # Run Assembly for this clip
             cd delta/F04_ASSEMBLY/CODEBASE
-            python3 omnis_d04_assembly.py --input ../IN/ --output ../OUT/
+            python3 omnis_d04_assembly.py --input ../IN/ --output ../OUT/ --sfx-dir ../sfx/
             
             # Copy assembly output to camouflage IN
             ls -la delta/F04_ASSEMBLY/OUT/clips_finaux/
