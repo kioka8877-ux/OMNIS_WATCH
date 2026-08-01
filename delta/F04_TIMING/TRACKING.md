@@ -65,8 +65,8 @@ D-F05 PREVIEW prend le relais (manuel)
 - Runner : GitHub Actions
 
 ## Todo
-- [ ] Créer `CODEBASE/extract_timing.py`
-- [ ] Vérifier `IN/` avec .gitkeep
-- [ ] Vérifier `OUT/` avec .gitkeep
-- [ ] Créer `d04_timing.yml`
+- [x] Créer `CODEBASE/extract_timing.py`
+- [x] Vérifier `IN/` avec .gitkeep
+- [x] Vérifier `OUT/` avec .gitkeep
+- [x] Créer `d04_timing.yml`
 - [ ] Tester avec transcript.json de 3 clips
