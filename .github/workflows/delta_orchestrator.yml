@@ -174,31 +174,81 @@ jobs:
           name: d03-output
           path: delta/F03_REFRAME/OUT/
 
-      - name: G5 - Assembly + Camouflage + Luther
+      - name: G5 - Per-Clip Assembly + Camouflage + Luther
         if: ${{ github.event.inputs.gate == 'G5' }}
         run: |
-          # Assembly
-          mkdir -p delta/F04_ASSEMBLY/IN
-          cp -r delta/F03_REFRAME/OUT/* delta/F04_ASSEMBLY/IN/ 2>/dev/null || true
-          cd delta/F04_ASSEMBLY/CODEBASE
-          python3 omnis_d04_assembly.py --input ../IN/ --output ../OUT/
-          # Camouflage
-          mkdir -p delta/F05_CAMOUFLAGE/IN
-          cp -r delta/F04_ASSEMBLY/OUT/* delta/F05_CAMOUFLAGE/IN/ 2>/dev/null || true
-          cd ../../delta/F05_CAMOUFLAGE/CODEBASE
-          python3 omnis_d05_camouflage.py --input ../IN/ --output ../OUT/
-          # Luther
-          mkdir -p delta/F06_LUTHER/IN
-          cp -r delta/F05_CAMOUFLAGE/OUT/* delta/F06_LUTHER/IN/ 2>/dev/null || true
-          cd ../../delta/F06_LUTHER/CODEBASE
-          python3 omnis_d06_luther.py --input ../IN/ --output ../OUT/
+          # Download G4 artifacts (clips + cutlist)
+          mkdir -p delta/F03_REFRAME/IN
+          python3 delta/_tools/download_artifact.py \
+            "${{ secrets.GITHUB_TOKEN }}" \
+            delta_orchestrator.yml \
+            d03-output \
+            delta/F03_REFRAME/IN/ \
+            main
+          python3 delta/_tools/download_artifact.py \
+            "${{ secrets.GITHUB_TOKEN }}" \
+            delta_orchestrator.yml \
+            d02-cutlist-output \
+            delta/F03_REFRAME/IN/ \
+            main
+          
+          # Count clips from cutlist
+          CLIPS_JSON=$(python3 -c "import json; d=json.load(open('delta/F03_REFRAME/IN/cutlist.json')); print(len(d.get('clips',[])))")
+          echo "Processing $CLIPS_JSON clips..."
+          
+          # Create output directory for finals
+          mkdir -p delta/F06_LUTHER/OUT/finals
+          
+          # Loop through each clip
+          for CLIP_NUM in $(seq 0 $((CLIPS_JSON - 1))); do
+            IDX=$(printf "%03d" $((CLIPS_NUM + 1)))
+            echo ""
+            echo "===== PROCESSING CLIP $IDX ====="
+            
+            # Setup directories for this clip
+            mkdir -p delta/F04_ASSEMBLY/IN delta/F04_ASSEMBLY/OUT
+            mkdir -p delta/F05_CAMOUFLAGE/IN delta/F05_CAMOUFLAGE/OUT
+            
+            # Copy single clip to assembly IN
+            cp delta/F03_REFRAME/OUT/clips_reframes/clip_${IDX}.mp4 delta/F04_ASSEMBLY/IN/
+            cp delta/F03_REFRAME/IN/cutlist.json delta/F04_ASSEMBLY/IN/
+            
+            # Run Assembly for this clip
+            cd delta/F04_ASSEMBLY/CODEBASE
+            python3 omnis_d04_assembly.py --input ../IN/ --output ../OUT/
+            
+            # Copy assembly output to camouflage IN
+            cp delta/F04_ASSEMBLY/OUT/clips_finaux/clip_final_${IDX}.mp4 delta/F05_CAMOUFLAGE/IN/
+            
+            # Run Camouflage for this clip
+            cd ../../delta/F05_CAMOUFLAGE/CODEBASE
+            python3 omnis_d05_camouflage.py --input ../IN/ --output ../OUT/
+            
+            # Copy camouflage output to luther IN
+            cp delta/F05_CAMOUFLAGE/OUT/*.mp4 delta/F06_LUTHER/IN/ 2>/dev/null || true
+            
+            # Run Luther for this clip
+            cd ../../delta/F06_LUTHER/CODEBASE
+            python3 omnis_d06_luther.py --input ../IN/ --output ../OUT/
+            
+            # Move final to finals folder with proper naming
+            if [ -f "../OUT/"*.mp4 ]; then
+              mv ../OUT/*.mp4 ../OUT/finals/final_${IDX}.mp4 2>/dev/null || true
+            fi
+            
+            echo "===== CLIP $IDX DONE ====="
+          done
+          
+          echo ""
+          echo "===== ALL $CLIPS_JSON CLIPS PROCESSED ====="
+          ls -la delta/F06_LUTHER/OUT/finals/
 
       - name: Upload G5 artifacts
         if: ${{ github.event.inputs.gate == 'G5' }}
         uses: actions/upload-artifact@v4
         with:
           name: d06-output
-          path: delta/F06_LUTHER/OUT/
+          path: delta/F06_LUTHER/OUT/finals/
 
       - name: Ledger update
         run: python3 delta/_tools/update_ledger.py "${{ github.event.inputs.gate }}"
@@ -213,3 +263,4 @@ jobs:
             git commit -m "ledger: gate ${{ github.event.inputs.gate }} [skip ci]"
             git push
           fi
+
