@@ -56,6 +56,6 @@ delta/F05_PREVIEW/
 ## Todo
 - [x] Créer structure dossiers
 - [x] Copier gamma/F02_PREVIEW → delta/F05_PREVIEW
-- [ ] Créer `d05_preview.yml` (deploy to GitHub Pages)
-- [ ] Configurer GitHub Pages pour F05_PREVIEW
+- [x] Créer `d05_preview.yml` (deploy to GitHub Pages)
+- [ ] Configurer GitHub Pages pour F05_PREVIEW (Settings → Pages → Source: GitHub Actions)
 - [ ] Tester le workflow de déploiement
