@@ -58,5 +58,5 @@ F06_RENDER/
 - [x] Créer structure dossiers
 - [x] Copier gamma/F03_RENDER/F03A_REMOTION/CODEBASE → F06_RENDER/F03A_REMOTION/CODEBASE
 - [x] Copier gamma/F03_RENDER/F03B_MIXER/CODEBASE → F06_RENDER/F03B_MIXER/CODEBASE
-- [ ] Créer `d06_render.yml` (boucle par clip)
+- [x] Créer `d06_render.yml` (boucle par clip)
 - [ ] Tester avec 3 clips
