@@ -153,8 +153,8 @@ export default function App() {
     },
     GRIS: {
       color_preset: "argent",
-      color_css_filter: "contrast(1.25) saturate(0.35) brightness(0.92) hue-rotate(210deg)",
-      text_defaults: { color: "#F0F0F0", stroke_color: "#1a1a2e", stroke_width: 4 }
+      color_css_filter: "contrast(1.3) saturate(0.15) brightness(0.85) grayscale(0.8)",
+      text_defaults: { color: "#C0C0C0", stroke_color: "#000000", stroke_width: 4 }
     }
   };
 
@@ -362,9 +362,9 @@ export default function App() {
               <select style={styles.select} value={style.color_preset} onChange={(e) => {
                 const val = e.target.value;
                 updateField('color_preset', val);
-                // Apply specific filter for argent
+                // Apply specific filter for argent (black + silver, no blue)
                 if (val === 'argent') {
-                  updateField('color_css_filter', 'contrast(1.2) saturate(0.4) brightness(0.9) hue-rotate(200deg)');
+                  updateField('color_css_filter', 'contrast(1.3) saturate(0.15) brightness(0.85) grayscale(0.8)');
                 }
               }}>
                 <option value="warm_vibrant">Warm Vibrant</option>
