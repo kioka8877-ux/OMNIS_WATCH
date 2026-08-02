@@ -145,6 +145,16 @@ export default function App() {
     MYSTERIOUS: {
       color_preset: "cool_moody",
       color_css_filter: "contrast(1.2) saturate(0.8) brightness(0.9) hue-rotate(10deg)"
+    },
+    MOTIVATION: {
+      color_preset: "high_energy",
+      color_css_filter: "contrast(1.35) saturate(1.4) brightness(1.1) hue-rotate(-5deg)",
+      text_defaults: { color: "#FFD700", stroke_color: "#000000", stroke_width: 5 }
+    },
+    GRIS: {
+      color_preset: "argent",
+      color_css_filter: "contrast(1.1) saturate(0.3) brightness(0.95) hue-rotate(0deg)",
+      text_defaults: { color: "#E8E8E8", stroke_color: "#333333", stroke_width: 3 }
     }
   };
 
@@ -344,6 +354,8 @@ export default function App() {
                 <option value="COMEDY">Comedie</option>
                 <option value="ACTION">Action</option>
                 <option value="MYSTERIOUS">Mysterieux</option>
+                <option value="MOTIVATION">Motivation</option>
+                <option value="GRIS">Gris / Argent</option>
               </select>
 
               <label style={styles.label}>Preset couleur</label>
