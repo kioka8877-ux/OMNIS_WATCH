@@ -52,8 +52,17 @@ const DEFAULT_STYLE = {
 
 export default function App() {
   const [style, setStyle] = useState(DEFAULT_STYLE);
-  const [activeTab, setActiveTab] = useState('style');
+  const [activeTab, setActiveTab] = useState('preview');
   const [exported, setExported] = useState(false);
+  const [videoUrl, setVideoUrl] = useState(null);
+  const [previewStyle, setPreviewStyle] = useState('style');
+
+  const handleVideoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setVideoUrl(URL.createObjectURL(file));
+    }
+  };
 
   const updateField = (path, value) => {
     const newStyle = JSON.parse(JSON.stringify(style));
@@ -177,11 +186,70 @@ export default function App() {
         <div style={{ ...styles.panel, flex: 2 }}>
           {/* Tabs */}
           <div style={styles.tabs}>
+            <button style={activeTab === 'preview' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('preview')}>Preview</button>
             <button style={activeTab === 'style' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('style')}>Style</button>
             <button style={activeTab === 'text' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('text')}>Texte</button>
             <button style={activeTab === 'video' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('video')}>Video</button>
             <button style={activeTab === 'zoom' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('zoom')}>Zoom</button>
           </div>
+
+          {/* Preview tab */}
+          {activeTab === 'preview' && (
+            <div style={styles.tabContent}>
+              <label style={styles.label}>Video de test (MP4)</label>
+              <input 
+                type="file" 
+                accept="video/*" 
+                onChange={handleVideoUpload}
+                style={{ marginBottom: '20px' }}
+              />
+              
+              {videoUrl && (
+                <div style={styles.videoContainer}>
+                  <div style={styles.videoWrapper}>
+                    <video
+                      src={videoUrl}
+                      controls
+                      autoPlay
+                      loop
+                      style={{
+                        width: '100%',
+                        maxHeight: '400px',
+                        borderRadius: '8px',
+                        filter: style.color_css_filter + 
+                          (style.enhance_4k ? ' contrast(1.15) saturate(1.2) brightness(1.08)' : ''),
+                        transform: `scale(${style.zoom.min_scale})`,
+                        transition: 'filter 0.3s, transform 0.3s'
+                      }}
+                    />
+                    {/* Vignette overlay */}
+                    <div style={{
+                      position: 'absolute',
+                      top: 0, left: 0, right: 0, bottom: 0,
+                      borderRadius: '8px',
+                      boxShadow: `inset 0 0 ${style.vignette * 200}px rgba(0,0,0,${style.vignette})`,
+                      pointerEvents: 'none'
+                    }} />
+                  </div>
+                  <div style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
+                    Filtre appliqué: {style.color_css_filter}
+                  </div>
+                </div>
+              )}
+              
+              {!videoUrl && (
+                <div style={{
+                  padding: '40px',
+                  textAlign: 'center',
+                  color: '#666',
+                  border: '2px dashed #333',
+                  borderRadius: '8px'
+                }}>
+                  Uploade une video MP4 pour tester le style
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Style tab */}
           {activeTab === 'style' && (
@@ -339,5 +407,7 @@ const styles = {
   codeBlock: { padding: '8px', background: '#1a1a1a', borderRadius: '6px', fontSize: '11px', color: '#666', fontFamily: 'monospace' },
   infoBox: { padding: '12px', background: '#1a1a1a', borderRadius: '8px', fontSize: '12px', color: '#888' },
   exportBtn: { width: '100%', padding: '12px', background: '#1a2a1a', border: '1px solid #2a4a2a', borderRadius: '8px', color: '#88ff88', cursor: 'pointer', fontSize: '14px', fontWeight: 700 },
-  exportedBtn: { width: '100%', padding: '12px', background: '#2a4a2a', border: '1px solid #4a8a4a', borderRadius: '8px', color: '#aaffaa', cursor: 'pointer', fontSize: '14px', fontWeight: 700 }
+  exportedBtn: { width: '100%', padding: '12px', background: '#2a4a2a', border: '1px solid #4a8a4a', borderRadius: '8px', color: '#aaffaa', cursor: 'pointer', fontSize: '14px', fontWeight: 700 },
+  videoContainer: { marginTop: '20px' },
+  videoWrapper: { position: 'relative', display: 'inline-block', width: '100%' }
 };
