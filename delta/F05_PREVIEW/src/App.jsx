@@ -153,8 +153,8 @@ export default function App() {
     },
     GRIS: {
       color_preset: "argent",
-      color_css_filter: "contrast(1.1) saturate(0.3) brightness(0.95) hue-rotate(0deg)",
-      text_defaults: { color: "#E8E8E8", stroke_color: "#333333", stroke_width: 3 }
+      color_css_filter: "contrast(1.25) saturate(0.35) brightness(0.92) hue-rotate(210deg)",
+      text_defaults: { color: "#F0F0F0", stroke_color: "#1a1a2e", stroke_width: 4 }
     }
   };
 
@@ -359,11 +359,19 @@ export default function App() {
               </select>
 
               <label style={styles.label}>Preset couleur</label>
-              <select style={styles.select} value={style.color_preset} onChange={(e) => updateField('color_preset', e.target.value)}>
+              <select style={styles.select} value={style.color_preset} onChange={(e) => {
+                const val = e.target.value;
+                updateField('color_preset', val);
+                // Apply specific filter for argent
+                if (val === 'argent') {
+                  updateField('color_css_filter', 'contrast(1.2) saturate(0.4) brightness(0.9) hue-rotate(200deg)');
+                }
+              }}>
                 <option value="warm_vibrant">Warm Vibrant</option>
                 <option value="cool_moody">Cool Moody</option>
                 <option value="cinematic">Cinematic</option>
                 <option value="high_contrast">High Contrast</option>
+                <option value="argent">Argent Scintillant</option>
                 <option value="none">None</option>
               </select>
 
