@@ -55,6 +55,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('preview');
   const [exported, setExported] = useState(false);
   const [videoUrl, setVideoUrl] = useState(null);
+  const [timingJson, setTimingJson] = useState(null);
   const [previewStyle, setPreviewStyle] = useState('style');
 
   const handleVideoUpload = (e) => {
@@ -62,6 +63,43 @@ export default function App() {
     if (file) {
       setVideoUrl(URL.createObjectURL(file));
     }
+  };
+
+  const handleTimingUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const json = JSON.parse(event.target.result);
+          setTimingJson(json);
+        } catch (err) {
+          alert('Invalid JSON file');
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const exportMergedCodex = () => {
+    const mergedCodex = {
+      ...style,
+      text_overlays: timingJson?.text_overlays || [],
+      zoom_keyframes: timingJson?.zoom_keyframes || [],
+      sfx_keyframes: timingJson?.sfx_keyframes || [],
+      _merged_from: {
+        codex_STYLE_version: style.version,
+        timing_file: timingJson?.filename || 'unknown'
+      }
+    };
+    const blob = new Blob([JSON.stringify(mergedCodex, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'codex_final.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    setExported(true);
   };
 
   const updateField = (path, value) => {
@@ -196,14 +234,29 @@ export default function App() {
           {/* Preview tab */}
           {activeTab === 'preview' && (
             <div style={styles.tabContent}>
-              <label style={styles.label}>Video de test (MP4)</label>
-              <input 
-                type="file" 
-                accept="video/*" 
-                onChange={handleVideoUpload}
-                style={{ marginBottom: '20px' }}
-              />
-              
+              {/* Upload section */}
+              <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={styles.label}>Video (MP4)</label>
+                  <input 
+                    type="file" 
+                    accept="video/*" 
+                    onChange={handleVideoUpload}
+                  />
+                  {videoUrl && <span style={{ color: '#00ff88', fontSize: '12px' }}>✓ Video chargée</span>}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={styles.label}>Timing JSON (de D04)</label>
+                  <input 
+                    type="file" 
+                    accept=".json" 
+                    onChange={handleTimingUpload}
+                  />
+                  {timingJson && <span style={{ color: '#00ff88', fontSize: '12px' }}>✓ Timing chargé</span>}
+                </div>
+              </div>
+
+              {/* Video preview */}
               {videoUrl && (
                 <div style={styles.videoContainer}>
                   <div style={styles.videoWrapper}>
@@ -214,7 +267,7 @@ export default function App() {
                       loop
                       style={{
                         width: '100%',
-                        maxHeight: '400px',
+                        maxHeight: '300px',
                         borderRadius: '8px',
                         filter: style.color_css_filter + 
                           (style.enhance_4k ? ' contrast(1.15) saturate(1.2) brightness(1.08)' : ''),
@@ -232,7 +285,7 @@ export default function App() {
                     }} />
                   </div>
                   <div style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
-                    Filtre appliqué: {style.color_css_filter}
+                    Filtre: {style.color_css_filter}
                   </div>
                 </div>
               )}
@@ -243,9 +296,34 @@ export default function App() {
                   textAlign: 'center',
                   color: '#666',
                   border: '2px dashed #333',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
+                  marginBottom: '20px'
                 }}>
                   Uploade une video MP4 pour tester le style
+                </div>
+              )}
+
+              {/* Timing info */}
+              {timingJson && (
+                <div style={{ ...styles.infoBox, marginBottom: '20px' }}>
+                  <strong style={{ color: '#00ff88' }}>Timing chargé:</strong><br/>
+                  {timingJson.text_overlays?.length || 0} overlays texte<br/>
+                  {timingJson.zoom_keyframes?.length || 0} keyframes zoom<br/>
+                  {timingJson.sfx_keyframes?.length || 0} SFX
+                </div>
+              )}
+
+              {/* Export merged codex */}
+              <button 
+                style={exported ? styles.exportedBtn : styles.exportBtn}
+                onClick={exportMergedCodex}
+                disabled={!timingJson}
+              >
+                {exported ? '✓ codex_final.json téléchargé!' : 'Exporter codex_final.json'}
+              </button>
+              {!timingJson && (
+                <div style={{ fontSize: '11px', color: '#666', marginTop: '8px' }}>
+                  (Uploade le timing JSON pour activer l'export)
                 </div>
               )}
             </div>
