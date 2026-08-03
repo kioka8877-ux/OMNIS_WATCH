@@ -130,23 +130,28 @@ export default function App() {
   const presets = {
     WHOLESOME: {
       color_preset: "warm_vibrant",
-      color_css_filter: "contrast(1.2) saturate(1.15) brightness(1.05) hue-rotate(3deg)"
+      color_css_filter: "contrast(1.2) saturate(1.15) brightness(1.05) hue-rotate(3deg)",
+      text_defaults: { color: "#FFB6C1", stroke_color: "#8B0000", stroke_width: 3 }
     },
     DRAMATIC: {
       color_preset: "cinematic",
-      color_css_filter: "contrast(1.3) saturate(0.9) brightness(0.95)"
+      color_css_filter: "contrast(1.3) saturate(0.9) brightness(0.95)",
+      text_defaults: { color: "#FFFFFF", stroke_color: "#000000", stroke_width: 4 }
     },
     COMEDY: {
       color_preset: "high_contrast",
-      color_css_filter: "contrast(1.1) saturate(1.3) brightness(1.1)"
+      color_css_filter: "contrast(1.1) saturate(1.3) brightness(1.1)",
+      text_defaults: { color: "#FFFF00", stroke_color: "#FF4500", stroke_width: 3 }
     },
     ACTION: {
       color_preset: "high_contrast",
-      color_css_filter: "contrast(1.4) saturate(1.2) brightness(1.0)"
+      color_css_filter: "contrast(1.4) saturate(1.2) brightness(1.0)",
+      text_defaults: { color: "#FF4500", stroke_color: "#000000", stroke_width: 4 }
     },
     MYSTERIOUS: {
       color_preset: "cool_moody",
-      color_css_filter: "contrast(1.2) saturate(0.8) brightness(0.9) hue-rotate(10deg)"
+      color_css_filter: "contrast(1.2) saturate(0.8) brightness(0.9) hue-rotate(10deg)",
+      text_defaults: { color: "#9370DB", stroke_color: "#4B0082", stroke_width: 3 }
     },
     MOTIVATION: {
       color_preset: "high_energy",
