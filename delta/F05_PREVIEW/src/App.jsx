@@ -297,50 +297,61 @@ export default function App() {
                       boxShadow: `inset 0 0 ${style.vignette * 200}px rgba(0,0,0,${style.vignette})`,
                       pointerEvents: 'none'
                     }} />
-                    {/* Text overlays (subtitles) */}
+                    {/* Text overlays (subtitles) - inside video frame only */}
                     {timingJson?.words?.filter(w => 
                       currentTime >= w.start && currentTime <= w.end
-                    ).map((word, idx) => (
-                      <div
-                        key={idx}
-                        style={{
-                          position: 'absolute',
-                          bottom: '60px',
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          color: style.text_defaults.color,
-                          fontSize: `${style.text_defaults.size * 0.4}px`,
-                          fontFamily: style.text_defaults.font,
-                          fontWeight: 'bold',
-                          textShadow: `${style.text_defaults.stroke_width}px ${style.text_defaults.stroke_width}px 0 ${style.text_defaults.stroke_color}, -${style.text_defaults.stroke_width}px -${style.text_defaults.stroke_width}px 0 ${style.text_defaults.stroke_color}`,
-                          textAlign: 'center',
-                          whiteSpace: 'nowrap',
-                          pointerEvents: 'none',
-                          letterSpacing: style.text_defaults.letter_spacing
-                        }}
-                      >
-                        {word.word}
-                      </div>
-                    ))}
-                    {/* Segment text (full sentences) */}
+                    ).map((word, idx) => {
+                      const glow = style.text_defaults.glow_intensity > 0 
+                        ? `0 0 ${style.text_defaults.glow_intensity * 20}px ${style.text_defaults.color}`
+                        : '';
+                      return (
+                        <div
+                          key={idx}
+                          style={{
+                            position: 'absolute',
+                            bottom: '25%',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            color: style.text_defaults.color,
+                            fontSize: `${style.text_defaults.size * 0.35}px`,
+                            fontFamily: style.text_defaults.font,
+                            fontWeight: 'bold',
+                            textShadow: `
+                              ${style.text_defaults.stroke_width}px ${style.text_defaults.stroke_width}px 0 ${style.text_defaults.stroke_color},
+                              -${style.text_defaults.stroke_width}px -${style.text_defaults.stroke_width}px 0 ${style.text_defaults.stroke_color},
+                              ${glow}
+                            `,
+                            textAlign: 'center',
+                            whiteSpace: 'nowrap',
+                            pointerEvents: 'none',
+                            letterSpacing: style.text_defaults.letter_spacing,
+                            zIndex: 10
+                          }}
+                        >
+                          {word.word}
+                        </div>
+                      );
+                    })}
+                    {/* Segment text (full sentences) - inside video frame only */}
                     {timingJson?.segments?.find(s => 
                       currentTime >= s.start && currentTime <= s.end
                     ) && (
                       <div
                         style={{
                           position: 'absolute',
-                          bottom: '20px',
+                          bottom: '10%',
                           left: '50%',
                           transform: 'translateX(-50%)',
                           color: '#ffffff',
-                          fontSize: '24px',
+                          fontSize: '20px',
                           fontFamily: 'Arial, sans-serif',
                           fontWeight: 'bold',
-                          textShadow: '2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000',
+                          textShadow: `2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000`,
                           textAlign: 'center',
                           whiteSpace: 'nowrap',
                           pointerEvents: 'none',
-                          maxWidth: '90%'
+                          maxWidth: '90%',
+                          zIndex: 10
                         }}
                       >
                         {timingJson?.segments?.find(s => currentTime >= s.start && currentTime <= s.end)?.text}
@@ -559,6 +570,6 @@ const styles = {
   infoBox: { padding: '12px', background: '#1a1a1a', borderRadius: '8px', fontSize: '12px', color: '#888' },
   exportBtn: { width: '100%', padding: '12px', background: '#1a2a1a', border: '1px solid #2a4a2a', borderRadius: '8px', color: '#88ff88', cursor: 'pointer', fontSize: '14px', fontWeight: 700 },
   exportedBtn: { width: '100%', padding: '12px', background: '#2a4a2a', border: '1px solid #4a8a4a', borderRadius: '8px', color: '#aaffaa', cursor: 'pointer', fontSize: '14px', fontWeight: 700 },
-  videoContainer: { marginTop: '20px' },
-  videoWrapper: { position: 'relative', display: 'inline-block', width: '100%' }
+  videoContainer: { marginTop: '20px', overflow: 'hidden', borderRadius: '8px' },
+  videoWrapper: { position: 'relative', display: 'inline-block', width: '100%', overflow: 'hidden' }
 };
