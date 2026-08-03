@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 /**
  * App — F05 PREVIEW (DELTA MODE)
@@ -57,6 +57,8 @@ export default function App() {
   const [videoUrl, setVideoUrl] = useState(null);
   const [timingJson, setTimingJson] = useState(null);
   const [previewStyle, setPreviewStyle] = useState('style');
+  const [currentTime, setCurrentTime] = useState(0);
+  const videoRef = useRef(null);
 
   const handleVideoUpload = (e) => {
     const file = e.target.files[0];
@@ -271,10 +273,12 @@ export default function App() {
                 <div style={styles.videoContainer}>
                   <div style={styles.videoWrapper}>
                     <video
+                      ref={videoRef}
                       src={videoUrl}
                       controls
                       autoPlay
                       loop
+                      onTimeUpdate={() => setCurrentTime(videoRef.current?.currentTime || 0)}
                       style={{
                         width: '100%',
                         maxHeight: '300px',
@@ -293,6 +297,55 @@ export default function App() {
                       boxShadow: `inset 0 0 ${style.vignette * 200}px rgba(0,0,0,${style.vignette})`,
                       pointerEvents: 'none'
                     }} />
+                    {/* Text overlays (subtitles) */}
+                    {timingJson?.words?.filter(w => 
+                      currentTime >= w.start && currentTime <= w.end
+                    ).map((word, idx) => (
+                      <div
+                        key={idx}
+                        style={{
+                          position: 'absolute',
+                          bottom: '60px',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          color: style.text_defaults.color,
+                          fontSize: `${style.text_defaults.size * 0.4}px`,
+                          fontFamily: style.text_defaults.font,
+                          fontWeight: 'bold',
+                          textShadow: `${style.text_defaults.stroke_width}px ${style.text_defaults.stroke_width}px 0 ${style.text_defaults.stroke_color}, -${style.text_defaults.stroke_width}px -${style.text_defaults.stroke_width}px 0 ${style.text_defaults.stroke_color}`,
+                          textAlign: 'center',
+                          whiteSpace: 'nowrap',
+                          pointerEvents: 'none',
+                          letterSpacing: style.text_defaults.letter_spacing
+                        }}
+                      >
+                        {word.word}
+                      </div>
+                    ))}
+                    {/* Segment text (full sentences) */}
+                    {timingJson?.segments?.find(s => 
+                      currentTime >= s.start && currentTime <= s.end
+                    ) && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          bottom: '20px',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          color: '#ffffff',
+                          fontSize: '24px',
+                          fontFamily: 'Arial, sans-serif',
+                          fontWeight: 'bold',
+                          textShadow: '2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000',
+                          textAlign: 'center',
+                          whiteSpace: 'nowrap',
+                          pointerEvents: 'none',
+                          maxWidth: '90%'
+                        }}
+                      >
+                        {timingJson?.segments?.find(s => currentTime >= s.start && currentTime <= s.end)?.text}
+                      </div>
+                    )}
                   </div>
                   <div style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
                     Filtre: {style.color_css_filter}
