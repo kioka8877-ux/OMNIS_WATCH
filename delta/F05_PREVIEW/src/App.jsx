@@ -304,63 +304,46 @@ export default function App() {
                       boxShadow: `inset 0 0 ${style.vignette * 200}px rgba(0,0,0,${style.vignette})`,
                       pointerEvents: 'none'
                     }} />
-                    {/* Text overlays (subtitles) - inside video frame only */}
-                    {timingJson?.words?.filter(w => 
-                      currentTime >= w.start && currentTime <= w.end
-                    ).map((word, idx) => {
-                      // Glow - always compute it based on glow_intensity
-                      const glowPx = style.text_defaults.glow_intensity * 4; // 0-400px glow
+                    {/* Full sentence subtitles with typewriter effect */}
+                    {(() => {
+                      const currentSegment = timingJson?.segments?.find(s => 
+                        currentTime >= s.start && currentTime <= s.end
+                      );
+                      if (!currentSegment) return null;
+                      
+                      const segmentDuration = currentSegment.end - currentSegment.start;
+                      const segmentProgress = Math.min(1, Math.max(0, (currentTime - currentSegment.start) / segmentDuration));
+                      
+                      const fullText = currentSegment.text;
+                      const totalChars = fullText.length;
+                      
+                      // Speed factor based on animation setting
+                      const speedMap = { fast: 2.0, normal: 1.2, slow: 0.6 };
+                      const speedFactor = speedMap[style.text_defaults.animation] || 1.2;
+                      
+                      const charsToShow = Math.floor(segmentProgress * totalChars * speedFactor);
+                      const visibleText = fullText.substring(0, Math.min(charsToShow, totalChars));
+                      
+                      // Glow
+                      const glowPx = style.text_defaults.glow_intensity * 4;
                       const glowShadow = glowPx > 0 
                         ? `0 0 ${glowPx}px ${style.text_defaults.color}, 0 0 ${glowPx * 2}px ${style.text_defaults.color}`
                         : '';
                       
-                      // Calculate animation progress
-                      const wordDuration = word.end - word.start;
-                      const wordProgress = Math.min(1, Math.max(0, (currentTime - word.start) / wordDuration));
-                      
-                      // For fade_in: word appears with fade effect at the start of its duration
-                      const fadeProgress = Math.min(1, wordProgress * 3); // Faster fade in
-                      
-                      // Animation styles based on selection
-                      let animationStyle = {};
-                      let finalTransform = 'translateX(-50%)';
-                      
-                      switch(style.text_defaults.animation) {
-                        case 'fade_in':
-                          animationStyle = { opacity: fadeProgress };
-                          break;
-                        case 'fade_in_out':
-                          const fadeOut = wordProgress > 0.7 ? 1 - ((wordProgress - 0.7) / 0.3) : 1;
-                          animationStyle = { opacity: Math.min(fadeProgress, fadeOut) };
-                          break;
-                        case 'pop':
-                          const popScale = wordProgress < 0.3 ? wordProgress / 0.3 : (wordProgress < 0.5 ? 1 + 0.2 * Math.sin((wordProgress - 0.3) / 0.2 * Math.PI) : 1);
-                          finalTransform = `translateX(-50%) scale(${popScale})`;
-                          animationStyle = { opacity: 1 };
-                          break;
-                        case 'scale':
-                          finalTransform = `translateX(-50%) scale(${fadeProgress})`;
-                          animationStyle = { opacity: fadeProgress };
-                          break;
-                        default: // word_by_word
-                          animationStyle = { opacity: 1 };
-                      }
-                      
-                      // Position calculation based on style.text_defaults.position
+                      // Position
                       const pos = style.text_defaults.position;
                       const posStyle = {
                         top: pos === 'top' ? '15%' : (pos === 'center' ? '45%' : 'auto'),
-                        bottom: pos === 'bottom' ? '15%' : (pos === 'center' ? 'auto' : 'auto'),
+                        bottom: pos === 'bottom' ? '15%' : 'auto',
                       };
                       
                       return (
                         <div
-                          key={idx}
                           style={{
                             position: 'absolute',
                             ...posStyle,
                             left: '50%',
-                            transform: finalTransform,
+                            transform: 'translateX(-50%)',
                             color: style.text_defaults.color,
                             fontSize: `${style.text_defaults.size * 0.35}px`,
                             fontFamily: style.text_defaults.font,
@@ -369,42 +352,19 @@ export default function App() {
                               ? `${style.text_defaults.stroke_width}px ${style.text_defaults.stroke_width}px 0 ${style.text_defaults.stroke_color}, -${style.text_defaults.stroke_width}px -${style.text_defaults.stroke_width}px 0 ${style.text_defaults.stroke_color}, ${glowShadow}`
                               : `${style.text_defaults.stroke_width}px ${style.text_defaults.stroke_width}px 0 ${style.text_defaults.stroke_color}, -${style.text_defaults.stroke_width}px -${style.text_defaults.stroke_width}px 0 ${style.text_defaults.stroke_color}`,
                             textAlign: 'center',
-                            whiteSpace: 'nowrap',
+                            whiteSpace: 'normal',
+                            maxWidth: '90%',
                             pointerEvents: 'none',
                             letterSpacing: style.text_defaults.letter_spacing,
                             zIndex: 10,
-                            ...animationStyle
+                            opacity: segmentProgress > 0.1 ? 1 : segmentProgress * 10
                           }}
                         >
-                          {word.word}
+                          {visibleText}
+                          {charsToShow < totalChars && <span style={{ opacity: 0.7 }}>|</span>}
                         </div>
                       );
-                    })}
-                    {/* Segment text (full sentences) - inside video frame only */}
-                    {timingJson?.segments?.find(s => 
-                      currentTime >= s.start && currentTime <= s.end
-                    ) && (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          bottom: '10%',
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          color: '#ffffff',
-                          fontSize: '20px',
-                          fontFamily: 'Arial, sans-serif',
-                          fontWeight: 'bold',
-                          textShadow: `2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000`,
-                          textAlign: 'center',
-                          whiteSpace: 'nowrap',
-                          pointerEvents: 'none',
-                          maxWidth: '90%',
-                          zIndex: 10
-                        }}
-                      >
-                        {timingJson?.segments?.find(s => currentTime >= s.start && currentTime <= s.end)?.text}
-                      </div>
-                    )}
+                    })()}
                   </div>
                   <div style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
                     Filtre: {style.color_css_filter}
@@ -548,20 +508,15 @@ export default function App() {
                 onChange={(e) => updateField('text_defaults.glow_intensity', Number(e.target.value))} 
               />
 
-              <label style={styles.label}>Animation</label>
+              <label style={styles.label}>Vitesse typewriter</label>
               <select 
                 style={styles.select} 
-                value={style.text_defaults.animation || 'word_by_word'} 
-                onChange={(e) => {
-                  console.log('Animation changed to:', e.target.value);
-                  updateField('text_defaults.animation', e.target.value);
-                }}
+                value={style.text_defaults.animation || 'normal'} 
+                onChange={(e) => updateField('text_defaults.animation', e.target.value)}
               >
-                <option value="word_by_word">Mot par mot</option>
-                <option value="fade_in">Fade in</option>
-                <option value="fade_in_out">Fade in/out</option>
-                <option value="pop">Pop</option>
-                <option value="scale">Scale</option>
+                <option value="fast">Rapide</option>
+                <option value="normal">Normal</option>
+                <option value="slow">Lent</option>
               </select>
             </div>
           )}
