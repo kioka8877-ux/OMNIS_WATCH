@@ -105,14 +105,16 @@ export default function App() {
   };
 
   const updateField = (path, value) => {
-    const newStyle = JSON.parse(JSON.stringify(style));
-    const keys = path.split('.');
-    let obj = newStyle;
-    for (let i = 0; i < keys.length - 1; i++) {
-      obj = obj[keys[i]];
-    }
-    obj[keys[keys.length - 1]] = value;
-    setStyle(newStyle);
+    setStyle(prevStyle => {
+      const newStyle = JSON.parse(JSON.stringify(prevStyle));
+      const keys = path.split('.');
+      let obj = newStyle;
+      for (let i = 0; i < keys.length - 1; i++) {
+        obj = obj[keys[i]];
+      }
+      obj[keys[keys.length - 1]] = value;
+      return newStyle;
+    });
     setExported(false);
   };
 
