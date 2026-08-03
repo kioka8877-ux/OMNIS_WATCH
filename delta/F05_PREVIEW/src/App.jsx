@@ -26,7 +26,7 @@ const DEFAULT_STYLE = {
     stroke_color: "#000000",
     stroke_width: 4,
     shadow: "2px 4px 8px rgba(0,0,0,0.9)",
-    position: "center",
+    position: "bottom",
     letter_spacing: "0em",
     glow_intensity: 0,
     depth_3d: 0,
@@ -346,12 +346,19 @@ export default function App() {
                           animationStyle = { opacity: 1 };
                       }
                       
+                      // Position calculation based on style.text_defaults.position
+                      const pos = style.text_defaults.position;
+                      const posStyle = {
+                        top: pos === 'top' ? '15%' : (pos === 'center' ? '45%' : 'auto'),
+                        bottom: pos === 'bottom' ? '15%' : (pos === 'center' ? 'auto' : 'auto'),
+                      };
+                      
                       return (
                         <div
                           key={idx}
                           style={{
                             position: 'absolute',
-                            bottom: '25%',
+                            ...posStyle,
                             left: '50%',
                             transform: finalTransform,
                             color: style.text_defaults.color,
@@ -496,9 +503,11 @@ export default function App() {
             <div style={styles.tabContent}>
               <label style={styles.label}>Police</label>
               <select style={styles.select} value={style.text_defaults.font} onChange={(e) => updateField('text_defaults.font', e.target.value)}>
-                <option value="Anton, Arial Black, sans-serif">Anton (rec.)</option>
+                <option value="Anton, Arial Black, sans-serif">Anton</option>
                 <option value="Impact, Arial Black, sans-serif">Impact</option>
                 <option value="Bebas Neue, Impact, sans-serif">Bebas Neue</option>
+                <option value="Arial Black, Arial, sans-serif">Arial Black</option>
+                <option value="Helvetica Neue, Helvetica, Arial, sans-serif">Helvetica</option>
               </select>
 
               <label style={styles.label}>Taille: {style.text_defaults.size}px</label>
@@ -523,7 +532,7 @@ export default function App() {
 
               <label style={styles.label}>Position</label>
               <div style={{ display: 'flex', gap: '8px' }}>
-                {[['center', 'CENTER'], ['top', 'TOP'], ['center_bottom', 'BOTTOM']].map(([pos, label]) => (
+                {[['top', 'TOP'], ['center', 'CENTER'], ['bottom', 'BOTTOM']].map(([pos, label]) => (
                   <button key={pos} style={style.text_defaults.position === pos ? styles.posBtnActive : styles.posBtn} onClick={() => updateField('text_defaults.position', pos)}>{label}</button>
                 ))}
               </div>
@@ -540,7 +549,14 @@ export default function App() {
               />
 
               <label style={styles.label}>Animation</label>
-              <select style={styles.select} value={style.text_defaults.animation} onChange={(e) => updateField('text_defaults.animation', e.target.value)}>
+              <select 
+                style={styles.select} 
+                value={style.text_defaults.animation || 'word_by_word'} 
+                onChange={(e) => {
+                  console.log('Animation changed to:', e.target.value);
+                  updateField('text_defaults.animation', e.target.value);
+                }}
+              >
                 <option value="word_by_word">Mot par mot</option>
                 <option value="fade_in">Fade in</option>
                 <option value="fade_in_out">Fade in/out</option>
