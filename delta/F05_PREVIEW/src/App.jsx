@@ -307,8 +307,34 @@ export default function App() {
                       currentTime >= w.start && currentTime <= w.end
                     ).map((word, idx) => {
                       const glow = style.text_defaults.glow_intensity > 0 
-                        ? `0 0 ${style.text_defaults.glow_intensity * 20}px ${style.text_defaults.color}`
+                        ? `0 0 ${style.text_defaults.glow_intensity * 3}px ${style.text_defaults.color}, 0 0 ${style.text_defaults.glow_intensity * 6}px ${style.text_defaults.color}`
                         : '';
+                      
+                      // Calculate animation progress
+                      const wordDuration = word.end - word.start;
+                      const wordProgress = Math.min(1, Math.max(0, (currentTime - word.start) / wordDuration));
+                      
+                      // Animation styles based on selection
+                      let animationStyle = {};
+                      switch(style.text_defaults.animation) {
+                        case 'fade_in':
+                          animationStyle = { opacity: wordProgress };
+                          break;
+                        case 'fade_in_out':
+                          const fadeOut = wordProgress > 0.7 ? 1 - ((wordProgress - 0.7) / 0.3) : 1;
+                          animationStyle = { opacity: Math.min(wordProgress * 1.5, fadeOut) };
+                          break;
+                        case 'pop':
+                          const popScale = wordProgress < 0.3 ? wordProgress / 0.3 : (wordProgress < 0.5 ? 1 + 0.2 * Math.sin((wordProgress - 0.3) / 0.2 * Math.PI) : 1);
+                          animationStyle = { transform: `translateX(-50%) scale(${popScale})`, opacity: 1 };
+                          break;
+                        case 'scale':
+                          animationStyle = { transform: `translateX(-50%) scale(${wordProgress})`, opacity: wordProgress };
+                          break;
+                        default: // word_by_word
+                          animationStyle = { opacity: 1 };
+                      }
+                      
                       return (
                         <div
                           key={idx}
@@ -330,7 +356,9 @@ export default function App() {
                             whiteSpace: 'nowrap',
                             pointerEvents: 'none',
                             letterSpacing: style.text_defaults.letter_spacing,
-                            zIndex: 10
+                            zIndex: 10,
+                            transition: 'none',
+                            ...animationStyle
                           }}
                         >
                           {word.word}
@@ -490,8 +518,10 @@ export default function App() {
               <label style={styles.label}>Animation</label>
               <select style={styles.select} value={style.text_defaults.animation} onChange={(e) => updateField('text_defaults.animation', e.target.value)}>
                 <option value="word_by_word">Mot par mot</option>
-                <option value="pop">Pop</option>
                 <option value="fade_in">Fade in</option>
+                <option value="fade_in_out">Fade in/out</option>
+                <option value="pop">Pop</option>
+                <option value="scale">Scale</option>
               </select>
             </div>
           )}
