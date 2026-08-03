@@ -308,30 +308,39 @@ export default function App() {
                     {timingJson?.words?.filter(w => 
                       currentTime >= w.start && currentTime <= w.end
                     ).map((word, idx) => {
-                      const glow = style.text_defaults.glow_intensity > 0 
-                        ? `0 0 ${style.text_defaults.glow_intensity * 3}px ${style.text_defaults.color}, 0 0 ${style.text_defaults.glow_intensity * 6}px ${style.text_defaults.color}`
+                      // Glow - always compute it based on glow_intensity
+                      const glowPx = style.text_defaults.glow_intensity * 4; // 0-400px glow
+                      const glowShadow = glowPx > 0 
+                        ? `0 0 ${glowPx}px ${style.text_defaults.color}, 0 0 ${glowPx * 2}px ${style.text_defaults.color}`
                         : '';
                       
                       // Calculate animation progress
                       const wordDuration = word.end - word.start;
                       const wordProgress = Math.min(1, Math.max(0, (currentTime - word.start) / wordDuration));
                       
+                      // For fade_in: word appears with fade effect at the start of its duration
+                      const fadeProgress = Math.min(1, wordProgress * 3); // Faster fade in
+                      
                       // Animation styles based on selection
                       let animationStyle = {};
+                      let finalTransform = 'translateX(-50%)';
+                      
                       switch(style.text_defaults.animation) {
                         case 'fade_in':
-                          animationStyle = { opacity: wordProgress };
+                          animationStyle = { opacity: fadeProgress };
                           break;
                         case 'fade_in_out':
                           const fadeOut = wordProgress > 0.7 ? 1 - ((wordProgress - 0.7) / 0.3) : 1;
-                          animationStyle = { opacity: Math.min(wordProgress * 1.5, fadeOut) };
+                          animationStyle = { opacity: Math.min(fadeProgress, fadeOut) };
                           break;
                         case 'pop':
                           const popScale = wordProgress < 0.3 ? wordProgress / 0.3 : (wordProgress < 0.5 ? 1 + 0.2 * Math.sin((wordProgress - 0.3) / 0.2 * Math.PI) : 1);
-                          animationStyle = { transform: `translateX(-50%) scale(${popScale})`, opacity: 1 };
+                          finalTransform = `translateX(-50%) scale(${popScale})`;
+                          animationStyle = { opacity: 1 };
                           break;
                         case 'scale':
-                          animationStyle = { transform: `translateX(-50%) scale(${wordProgress})`, opacity: wordProgress };
+                          finalTransform = `translateX(-50%) scale(${fadeProgress})`;
+                          animationStyle = { opacity: fadeProgress };
                           break;
                         default: // word_by_word
                           animationStyle = { opacity: 1 };
@@ -344,22 +353,19 @@ export default function App() {
                             position: 'absolute',
                             bottom: '25%',
                             left: '50%',
-                            transform: 'translateX(-50%)',
+                            transform: finalTransform,
                             color: style.text_defaults.color,
                             fontSize: `${style.text_defaults.size * 0.35}px`,
                             fontFamily: style.text_defaults.font,
                             fontWeight: 'bold',
-                            textShadow: `
-                              ${style.text_defaults.stroke_width}px ${style.text_defaults.stroke_width}px 0 ${style.text_defaults.stroke_color},
-                              -${style.text_defaults.stroke_width}px -${style.text_defaults.stroke_width}px 0 ${style.text_defaults.stroke_color},
-                              ${glow}
-                            `,
+                            textShadow: glowShadow
+                              ? `${style.text_defaults.stroke_width}px ${style.text_defaults.stroke_width}px 0 ${style.text_defaults.stroke_color}, -${style.text_defaults.stroke_width}px -${style.text_defaults.stroke_width}px 0 ${style.text_defaults.stroke_color}, ${glowShadow}`
+                              : `${style.text_defaults.stroke_width}px ${style.text_defaults.stroke_width}px 0 ${style.text_defaults.stroke_color}, -${style.text_defaults.stroke_width}px -${style.text_defaults.stroke_width}px 0 ${style.text_defaults.stroke_color}`,
                             textAlign: 'center',
                             whiteSpace: 'nowrap',
                             pointerEvents: 'none',
                             letterSpacing: style.text_defaults.letter_spacing,
                             zIndex: 10,
-                            transition: 'none',
                             ...animationStyle
                           }}
                         >
@@ -496,7 +502,15 @@ export default function App() {
               </select>
 
               <label style={styles.label}>Taille: {style.text_defaults.size}px</label>
-              <input style={styles.slider} type="range" min="60" max="150" value={style.text_defaults.size} onChange={(e) => updateField('text_defaults.size', parseInt(e.target.value))} />
+              <input 
+                style={styles.slider} 
+                type="range" 
+                min="20" 
+                max="200" 
+                step="1"
+                value={style.text_defaults.size || 96} 
+                onChange={(e) => updateField('text_defaults.size', Number(e.target.value))} 
+              />
 
               <label style={styles.label}>Couleur texte</label>
               <input style={{ ...styles.colorPicker, width: '100%', height: '40px' }} type="color" value={style.text_defaults.color} onChange={(e) => updateField('text_defaults.color', e.target.value)} />
@@ -515,7 +529,15 @@ export default function App() {
               </div>
 
               <label style={styles.label}>Glow: {style.text_defaults.glow_intensity}</label>
-              <input style={styles.slider} type="range" min="0" max="100" value={style.text_defaults.glow_intensity} onChange={(e) => updateField('text_defaults.glow_intensity', parseInt(e.target.value))} />
+              <input 
+                style={styles.slider} 
+                type="range" 
+                min="0" 
+                max="100" 
+                step="1"
+                value={style.text_defaults.glow_intensity || 0} 
+                onChange={(e) => updateField('text_defaults.glow_intensity', Number(e.target.value))} 
+              />
 
               <label style={styles.label}>Animation</label>
               <select style={styles.select} value={style.text_defaults.animation} onChange={(e) => updateField('text_defaults.animation', e.target.value)}>
