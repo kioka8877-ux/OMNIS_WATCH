@@ -1,172 +1,172 @@
 {
-  "video_duration_sec": 376.4,
+  "video_duration_sec": 684,
   "clip_count": 3,
   "clips": [
     {
       "index": 0,
-      "start_sec": 0.0,
-      "end_sec": 30.28,
-      "duration_sec": 30.28,
-      "scene_source": 0,
+      "start_sec": 58.2,
+      "end_sec": 99.96,
+      "duration_sec": 41.76,
+      "scene_source": 10,
       "emotion_mode": "surprise",
-      "viral_angle": "Erreur commune avec Claude",
+      "viral_angle": "Claude repond a 100 questions en meme temps",
       "structure": {
         "visual_hook_frame": {
           "relative_start_sec": 0,
           "relative_end_sec": 0.5,
-          "description": "Visage perplexe",
+          "description": "Ecran de questions Claude qui defilent",
           "emotion_mode": "surprise"
         },
         "verbal_text_hook": {
           "relative_start_sec": 0,
           "relative_end_sec": 3,
-          "phrase_exacte": "Tu utilises Claude comme un humain",
-          "vide_cognitif": "Comment utiliser Claude",
-          "setup_du_payoff": "Erreur à éviter"
+          "phrase_exacte": "Claude peut repondre a 100 questions",
+          "vide_cognitif": "Comment une IA tient 100 questions",
+          "setup_du_payoff": "La reponse va etre bluffante"
         },
         "context": {
           "relative_start_sec": 3,
           "relative_end_sec": 10,
-          "description": "Explication de l'erreur"
+          "description": "Je pose mes questions une par une, rien ne semble le deranger"
         },
         "foreshadow": {
           "relative_start_sec": 0,
           "relative_end_sec": 5,
-          "description": "Solution imminente",
+          "description": "Le nombre de questions monte",
           "force": "eleve"
         },
         "escalade_rythme": {
           "relative_start_sec": 10,
-          "relative_end_sec": 25,
-          "description": "Exemples concrets d'utilisation"
+          "relative_end_sec": 34,
+          "description": "Chaque question, une reponse plus precise, la verite sans se tromper"
         },
         "payoff": {
-          "relative_start_sec": 25,
-          "relative_end_sec": 29,
-          "phrase_exacte": "Modifier la personnalité de Claude",
-          "satisfaction_cible": "Solution claire",
-          "reponse_au_hook": "Corrige l'erreur"
+          "relative_start_sec": 36,
+          "relative_end_sec": 40.5,
+          "phrase_exacte": "Il repond sans jamais se tromper",
+          "satisfaction_cible": "Le viewer est bluffe",
+          "reponse_au_hook": "Oui, 100 questions traitees"
         },
         "loop_hook": {
-          "relative_start_sec": 27,
-          "relative_end_sec": 30,
+          "relative_start_sec": 38.76,
+          "relative_end_sec": 41.76,
           "techniques": [
             "callback_hook",
-            "visual_match_cut"
+            "cliffhanger_reversal"
           ],
-          "description": "Retour au visage perplexe"
+          "description": "Retour sur la 1ere question, invitant a revoir"
         }
       }
     },
     {
       "index": 1,
-      "start_sec": 108.52,
-      "end_sec": 148.2,
-      "duration_sec": 39.68,
-      "scene_source": 18,
-      "emotion_mode": "tension",
-      "viral_angle": "Hack emails avec Claude",
-      "structure": {
-        "visual_hook_frame": {
-          "relative_start_sec": 0,
-          "relative_end_sec": 0.5,
-          "description": "Ecran d'email",
-          "emotion_mode": "tension"
-        },
-        "verbal_text_hook": {
-          "relative_start_sec": 0,
-          "relative_end_sec": 3,
-          "phrase_exacte": "Je déteste les mails",
-          "vide_cognitif": "Problème emails",
-          "setup_du_payoff": "Solution Claude"
-        },
-        "context": {
-          "relative_start_sec": 3,
-          "relative_end_sec": 10,
-          "description": "Explication connexion Gmail"
-        },
-        "foreshadow": {
-          "relative_start_sec": 0,
-          "relative_end_sec": 5,
-          "description": "Gain de temps imminent",
-          "force": "eleve"
-        },
-        "escalade_rythme": {
-          "relative_start_sec": 10,
-          "relative_end_sec": 34,
-          "description": "Démos rapides de réponses"
-        },
-        "payoff": {
-          "relative_start_sec": 34,
-          "relative_end_sec": 38,
-          "phrase_exacte": "Claude répond à tes mails",
-          "satisfaction_cible": "Libération",
-          "reponse_au_hook": "Résout la haine des mails"
-        },
-        "loop_hook": {
-          "relative_start_sec": 37,
-          "relative_end_sec": 39.68,
-          "techniques": [
-            "audio_continuity",
-            "open_question_close"
-          ],
-          "description": "Retour écran email vide"
-        }
-      }
-    },
-    {
-      "index": 2,
-      "start_sec": 245.88,
-      "end_sec": 285.48,
-      "duration_sec": 39.6,
-      "scene_source": 44,
+      "start_sec": 164.64,
+      "end_sec": 185.08,
+      "duration_sec": 20.44,
+      "scene_source": 30,
       "emotion_mode": "wholesome",
-      "viral_angle": "Claude comme employé",
+      "viral_angle": "Je pose des questions de vie a Claude",
       "structure": {
         "visual_hook_frame": {
           "relative_start_sec": 0,
           "relative_end_sec": 0.5,
-          "description": "Claude logo animé",
+          "description": "Titre de la question de vie a l'ecran",
           "emotion_mode": "wholesome"
         },
         "verbal_text_hook": {
           "relative_start_sec": 0,
           "relative_end_sec": 3,
-          "phrase_exacte": "Claude coûte moins cher",
-          "vide_cognitif": "Coût employés",
-          "setup_du_payoff": "Alternative Claude"
+          "phrase_exacte": "Je lui pose des questions de vie",
+          "vide_cognitif": "Une IA repond sur la vie ?",
+          "setup_du_payoff": "Sa reponse est simple et juste"
         },
         "context": {
           "relative_start_sec": 3,
           "relative_end_sec": 10,
-          "description": "Comparaison coûts"
+          "description": "La question est posee, on attend la reponse avec une pointe de doute"
         },
         "foreshadow": {
           "relative_start_sec": 0,
           "relative_end_sec": 5,
-          "description": "Capacités impressionnantes",
+          "description": "La reponse arrive, toute simple",
+          "force": "moyen"
+        },
+        "escalade_rythme": {
+          "relative_start_sec": 10,
+          "relative_end_sec": 16,
+          "description": "Il repond juste, pas de blabla, c'est destabilisant"
+        },
+        "payoff": {
+          "relative_start_sec": 15.44,
+          "relative_end_sec": 18.5,
+          "phrase_exacte": "Sa reponse est d'une simplicite folle",
+          "satisfaction_cible": "Le viewer sourit",
+          "reponse_au_hook": "Oui il repond vraiment"
+        },
+        "loop_hook": {
+          "relative_start_sec": 17.44,
+          "relative_end_sec": 20.44,
+          "techniques": [
+            "audio_continuity",
+            "open_question_close"
+          ],
+          "description": "La reponse laisse une autre question ouverte"
+        }
+      }
+    },
+    {
+      "index": 2,
+      "start_sec": 323.24,
+      "end_sec": 358.52,
+      "duration_sec": 35.28,
+      "scene_source": 51,
+      "emotion_mode": "tension",
+      "viral_angle": "La difference de capacite entre IA et humain",
+      "structure": {
+        "visual_hook_frame": {
+          "relative_start_sec": 0,
+          "relative_end_sec": 0.5,
+          "description": "Split screen IA vs humain, contraste net",
+          "emotion_mode": "tension"
+        },
+        "verbal_text_hook": {
+          "relative_start_sec": 0,
+          "relative_end_sec": 3,
+          "phrase_exacte": "Vous voyez vraiment la difference",
+          "vide_cognitif": "Quelle difference entre les deux ?",
+          "setup_du_payoff": "La capacite de Claude parle d'elle-meme"
+        },
+        "context": {
+          "relative_start_sec": 3,
+          "relative_end_sec": 10,
+          "description": "Comparaison des taches cote a cote, une charge enorme cote humain"
+        },
+        "foreshadow": {
+          "relative_start_sec": 0,
+          "relative_end_sec": 5,
+          "description": "La difference se voit deja",
           "force": "eleve"
         },
         "escalade_rythme": {
           "relative_start_sec": 10,
-          "relative_end_sec": 34,
-          "description": "Exemples tâches complexes"
+          "relative_end_sec": 28,
+          "description": "Tache apres tache, Claude garde le meme niveau, superieur"
         },
         "payoff": {
-          "relative_start_sec": 34,
-          "relative_end_sec": 38,
-          "phrase_exacte": "90% des tâches automatisées",
-          "satisfaction_cible": "Emerveillement",
-          "reponse_au_hook": "Solution économique"
+          "relative_start_sec": 30.28,
+          "relative_end_sec": 33.5,
+          "phrase_exacte": "La capacite est nettement superieure",
+          "satisfaction_cible": "Le viewer est convaincu",
+          "reponse_au_hook": "La difference est enorme"
         },
         "loop_hook": {
-          "relative_start_sec": 37,
-          "relative_end_sec": 39.6,
+          "relative_start_sec": 32.28,
+          "relative_end_sec": 35.28,
           "techniques": [
             "visual_match_cut",
-            "cliffhanger_reversal"
+            "callback_hook"
           ],
-          "description": "Logo qui s'illumine"
+          "description": "Retour au split screen du debut pour recomparer"
         }
       }
     }

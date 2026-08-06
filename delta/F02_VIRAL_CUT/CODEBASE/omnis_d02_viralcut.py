@@ -184,7 +184,9 @@ def prepare_prompt(input_dir, output_dir, channel_slug=None, clip_count=5, clip_
 
     log_ok("Regles PERTURABO recuperees")
 
-    scenes_summary = json.dumps(scenes_in_window, ensure_ascii=False, indent=2)
+    scenes_compact = " ".join(
+        f"{s['scene_index']}:{s['start_sec']}-{s['end_sec']}" for s in scenes_in_window
+    )
     transcript_compact = " ".join(
         f"{w['start']}:{w['word']}" for w in words_in_window
     )
@@ -194,21 +196,21 @@ def prepare_prompt(input_dir, output_dir, channel_slug=None, clip_count=5, clip_
 ## PERTURABO REGLES (OBLIGATOIRE - appliquer sur la cutlist)
 
 ### SHORTS RULES:
-{shorts_rules[:3000]}
+{shorts_rules[:2000]}
 
 ### TIM DANILOV RULES:
-{tim_rules[:3000]}
+{tim_rules[:2000]}
 
 ### SKELETON CHECKLIST:
-{skeleton[:2000]}
+{skeleton[:1500]}
 
 ### CHANNEL IDENTITY:
 {channel_id[:1000] if channel_id else "(aucune)"}
 
 ## DONNEES SOURCE
 
-### SCENES ({len(scenes_in_window)}/{len(scenes_all)} scenes, fenetre {window_sec}s):
-{scenes_summary}
+### SCENES ({len(scenes_in_window)}/{len(scenes_all)} scenes, fenetre {window_sec}s, format index:start-end):
+{scenes_compact}
 
 ### TRANSCRIPT ({len(words_in_window)}/{len(words_all)} mots, langue={transcript_data.get('language', '?')}, format start_sec:mot):
 {transcript_compact}
