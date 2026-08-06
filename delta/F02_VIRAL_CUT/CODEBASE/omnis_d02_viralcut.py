@@ -82,7 +82,7 @@ def call_oracle(prompt_text, api_key, model="openai/gpt-4o", base_url="https://o
             {"role": "user", "content": prompt_text}
         ],
         "temperature": 0.3,
-        "max_tokens": 4096,
+        "max_tokens": int(os.environ.get("ORACLE_MAX_TOKENS", "4096")),
         "response_format": {"type": "json_object"}
     }
     try:
@@ -111,7 +111,7 @@ def call_oracle(prompt_text, api_key, model="openai/gpt-4o", base_url="https://o
         log_fail(f"Oracle call failed: {e}")
         return None
 
-def run_oracle(input_dir, output_dir, clip_count=5, clip_max_duration=60, channel_slug=None, model=None):
+def run_oracle(input_dir, output_dir, clip_count=5, clip_max_duration=60, channel_slug=None, model=None, window_sec=360):
     api_key = os.environ.get("ORACLE_API_KEY") or os.environ.get("OPENROUTER_API_KEY")
     if not api_key:
         log_fail("ORACLE_API_KEY (ou OPENROUTER_API_KEY) non definie dans l environnement")
@@ -119,7 +119,7 @@ def run_oracle(input_dir, output_dir, clip_count=5, clip_max_duration=60, channe
     base_url = os.environ.get("ORACLE_BASE_URL", "https://openrouter.ai/api/v1")
     if not model:
         model = os.environ.get("ORACLE_MODEL", "openai/gpt-4o")
-    prepare_prompt(input_dir, output_dir, channel_slug, clip_count, clip_max_duration)
+    prepare_prompt(input_dir, output_dir, channel_slug, clip_count, clip_max_duration, window_sec)
     prompt_path = output_dir / PROMPT_FILENAME
     with open(prompt_path, "r", encoding="utf-8") as f:
         prompt_text = f.read()
@@ -141,10 +141,10 @@ def run_oracle(input_dir, output_dir, clip_count=5, clip_max_duration=60, channe
     else:
         sys.exit(1)
 
-def prepare_prompt(input_dir, output_dir, channel_slug=None, clip_count=5, clip_max_duration=60):
+def prepare_prompt(input_dir, output_dir, channel_slug=None, clip_count=5, clip_max_duration=60, window_sec=360):
     """Genere le prompt pour l'Oracle (sandbox)."""
     section("D-F02 PREPARE - Generation du prompt Oracle")
-    log_info(f"Parametres operateur: {clip_count} clips, max {clip_max_duration}s")
+    log_info(f"Parametres operateur: {clip_count} clips, max {clip_max_duration}s, fenetre {window_sec}s")
 
     scenes_path = input_dir / SCENES_FILENAME
     transcript_path = input_dir / TRANSCRIPT_FILENAME
@@ -161,8 +161,20 @@ def prepare_prompt(input_dir, output_dir, channel_slug=None, clip_count=5, clip_
     with open(transcript_path, "r", encoding="utf-8") as f:
         transcript_data = json.load(f)
 
-    log_ok(f"Scenes: {scenes_data.get('scene_count', 0)}")
-    log_ok(f"Transcript: {transcript_data.get('word_count', 0)} mots")
+    scenes_all = scenes_data.get("scenes", [])
+    words_all = transcript_data.get("words", [])
+
+    scenes_in_window = [s for s in scenes_all if s["start_sec"] <= window_sec]
+    words_in_window = [w for w in words_all if w["start"] <= window_sec]
+
+    max_prompt_words = int(os.environ.get("ORACLE_MAX_PROMPT_WORDS", "800"))
+    if len(words_in_window) > max_prompt_words:
+        step = len(words_in_window) / max_prompt_words
+        words_in_window = [words_in_window[int(i * step)] for i in range(max_prompt_words)]
+        log_info(f"Transcript sous-echantillonne a {max_prompt_words} mots (fenetre {window_sec}s)")
+
+    log_ok(f"Scenes: {len(scenes_in_window)}/{len(scenes_all)} dans la fenetre {window_sec}s")
+    log_ok(f"Transcript: {len(words_in_window)}/{len(words_all)} mots dans la fenetre {window_sec}s")
 
     section("PERTURABO Bridge - Fetch regles")
     shorts_rules = fetch_perturabo(RULES_SHORTS)
@@ -172,9 +184,9 @@ def prepare_prompt(input_dir, output_dir, channel_slug=None, clip_count=5, clip_
 
     log_ok("Regles PERTURABO recuperees")
 
-    scenes_summary = json.dumps(scenes_data["scenes"][:12], ensure_ascii=False, indent=2)
-    transcript_summary = json.dumps(
-        transcript_data["words"][:300], ensure_ascii=False, indent=2
+    scenes_summary = json.dumps(scenes_in_window, ensure_ascii=False, indent=2)
+    transcript_compact = " ".join(
+        f"{w['start']}:{w['word']}" for w in words_in_window
     )
 
     prompt = f"""# MISSION D-F02 - VIRAL CUT DETECTOR
@@ -182,24 +194,24 @@ def prepare_prompt(input_dir, output_dir, channel_slug=None, clip_count=5, clip_
 ## PERTURABO REGLES (OBLIGATOIRE - appliquer sur la cutlist)
 
 ### SHORTS RULES:
-{shorts_rules[:5000]}
+{shorts_rules[:3000]}
 
 ### TIM DANILOV RULES:
-{tim_rules[:5000]}
+{tim_rules[:3000]}
 
 ### SKELETON CHECKLIST:
-{skeleton[:3000]}
+{skeleton[:2000]}
 
 ### CHANNEL IDENTITY:
-{channel_id[:2000] if channel_id else "(aucune)"}
+{channel_id[:1000] if channel_id else "(aucune)"}
 
 ## DONNEES SOURCE
 
-### SCENES ({scenes_data.get('scene_count', 0)} scenes):
+### SCENES ({len(scenes_in_window)}/{len(scenes_all)} scenes, fenetre {window_sec}s):
 {scenes_summary}
 
-### TRANSCRIPT ({transcript_data.get('word_count', 0)} mots, langue={transcript_data.get('language', '?')}):
-{transcript_summary}
+### TRANSCRIPT ({len(words_in_window)}/{len(words_all)} mots, langue={transcript_data.get('language', '?')}, format start_sec:mot):
+{transcript_compact}
 
 ## MISSION:
 Tu es un VIRAL CUT DETECTOR pour YouTube Shorts.
@@ -225,6 +237,7 @@ REGLES DE SORTIE:
   - payoff : 3-5s avant la fin, repond au hook, satisfaction maximale
   - loop_hook : derniere seconde, reconnecte au debut (S4), 2+ techniques combinees
 - Les sous-moments sont des fenetres RELATIVES au debut du clip (relative_start_sec/relative_end_sec)
+- **IMPORTANT - ADAPTATION A LA DUREE DU CLIP : les fenetres relatives doivent etre ADAPTEES a la duree reelle du clip (duration_sec), PAS au modele 30s. Regle stricte : payoff.relative_end_sec doit etre >= duration_sec - 5, loop_hook.relative_start_sec doit etre >= duration_sec - 3, et loop_hook.relative_end_sec = duration_sec. Si le clip dure 41s, le payoff finit vers 36-40s et le loop vers 39-41s, jamais vers 29s.**
 - Chaque sous-moment a une description courte (MAX 15 mots) et un mode emotionnel (triste/wholesome/tension/surprise)
 - phrase_exacte = MAX 12 mots, vide_cognitif = MAX 10 mots, setup_du_payoff = MAX 10 mots
 
@@ -374,6 +387,8 @@ def main():
                         help="Nombre de clips a generer (defaut 5)")
     parser.add_argument("--clip-max-duration", type=int, default=60,
                         help="Duree max par clip en secondes (defaut 60)")
+    parser.add_argument("--window-sec", type=int, default=360,
+                        help="Fenetre temporelle analysee en secondes (defaut 360)")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--prepare", action="store_true",
                        help="Genere le prompt Oracle")
@@ -387,11 +402,11 @@ def main():
     output_dir = Path(args.output)
 
     if args.prepare:
-        prepare_prompt(input_dir, output_dir, args.channel, args.clip_count, args.clip_max_duration)
+        prepare_prompt(input_dir, output_dir, args.channel, args.clip_count, args.clip_max_duration, args.window_sec)
     elif args.validate:
         validate_cutlist(input_dir, output_dir, args.validate, args.clip_max_duration)
     elif args.oracle:
-        run_oracle(input_dir, output_dir, args.clip_count, args.clip_max_duration, args.channel)
+        run_oracle(input_dir, output_dir, args.clip_count, args.clip_max_duration, args.channel, window_sec=args.window_sec)
 
 
 if __name__ == "__main__":

@@ -3,12 +3,12 @@
   "source": "../IN/video_source.mp4",
   "output": "video_source.mp4",
   "meta": {
-    "duration_seconds": 797.419683,
-    "fps": 30.0,
+    "duration_seconds": 684.129524,
+    "fps": 25.0,
     "width": 640,
     "height": 360,
     "codec": "h264",
-    "bitrate": 470702,
-    "size_bytes": 46918479
+    "bitrate": 312053,
+    "size_bytes": 26685626
   }
 }

@@ -1,0 +1,174 @@
+{
+  "video_duration_sec": 376.4,
+  "clip_count": 3,
+  "clips": [
+    {
+      "index": 0,
+      "start_sec": 0.0,
+      "end_sec": 30.28,
+      "duration_sec": 30.28,
+      "scene_source": 0,
+      "emotion_mode": "surprise",
+      "viral_angle": "Erreur commune avec Claude",
+      "structure": {
+        "visual_hook_frame": {
+          "relative_start_sec": 0,
+          "relative_end_sec": 0.5,
+          "description": "Visage perplexe",
+          "emotion_mode": "surprise"
+        },
+        "verbal_text_hook": {
+          "relative_start_sec": 0,
+          "relative_end_sec": 3,
+          "phrase_exacte": "Tu utilises Claude comme un humain",
+          "vide_cognitif": "Comment utiliser Claude",
+          "setup_du_payoff": "Erreur à éviter"
+        },
+        "context": {
+          "relative_start_sec": 3,
+          "relative_end_sec": 10,
+          "description": "Explication de l'erreur"
+        },
+        "foreshadow": {
+          "relative_start_sec": 0,
+          "relative_end_sec": 5,
+          "description": "Solution imminente",
+          "force": "eleve"
+        },
+        "escalade_rythme": {
+          "relative_start_sec": 10,
+          "relative_end_sec": 25,
+          "description": "Exemples concrets d'utilisation"
+        },
+        "payoff": {
+          "relative_start_sec": 25,
+          "relative_end_sec": 29,
+          "phrase_exacte": "Modifier la personnalité de Claude",
+          "satisfaction_cible": "Solution claire",
+          "reponse_au_hook": "Corrige l'erreur"
+        },
+        "loop_hook": {
+          "relative_start_sec": 27,
+          "relative_end_sec": 30,
+          "techniques": [
+            "callback_hook",
+            "visual_match_cut"
+          ],
+          "description": "Retour au visage perplexe"
+        }
+      }
+    },
+    {
+      "index": 1,
+      "start_sec": 108.52,
+      "end_sec": 148.2,
+      "duration_sec": 39.68,
+      "scene_source": 18,
+      "emotion_mode": "tension",
+      "viral_angle": "Hack emails avec Claude",
+      "structure": {
+        "visual_hook_frame": {
+          "relative_start_sec": 0,
+          "relative_end_sec": 0.5,
+          "description": "Ecran d'email",
+          "emotion_mode": "tension"
+        },
+        "verbal_text_hook": {
+          "relative_start_sec": 0,
+          "relative_end_sec": 3,
+          "phrase_exacte": "Je déteste les mails",
+          "vide_cognitif": "Problème emails",
+          "setup_du_payoff": "Solution Claude"
+        },
+        "context": {
+          "relative_start_sec": 3,
+          "relative_end_sec": 10,
+          "description": "Explication connexion Gmail"
+        },
+        "foreshadow": {
+          "relative_start_sec": 0,
+          "relative_end_sec": 5,
+          "description": "Gain de temps imminent",
+          "force": "eleve"
+        },
+        "escalade_rythme": {
+          "relative_start_sec": 10,
+          "relative_end_sec": 34,
+          "description": "Démos rapides de réponses"
+        },
+        "payoff": {
+          "relative_start_sec": 34,
+          "relative_end_sec": 38,
+          "phrase_exacte": "Claude répond à tes mails",
+          "satisfaction_cible": "Libération",
+          "reponse_au_hook": "Résout la haine des mails"
+        },
+        "loop_hook": {
+          "relative_start_sec": 37,
+          "relative_end_sec": 39.68,
+          "techniques": [
+            "audio_continuity",
+            "open_question_close"
+          ],
+          "description": "Retour écran email vide"
+        }
+      }
+    },
+    {
+      "index": 2,
+      "start_sec": 245.88,
+      "end_sec": 285.48,
+      "duration_sec": 39.6,
+      "scene_source": 44,
+      "emotion_mode": "wholesome",
+      "viral_angle": "Claude comme employé",
+      "structure": {
+        "visual_hook_frame": {
+          "relative_start_sec": 0,
+          "relative_end_sec": 0.5,
+          "description": "Claude logo animé",
+          "emotion_mode": "wholesome"
+        },
+        "verbal_text_hook": {
+          "relative_start_sec": 0,
+          "relative_end_sec": 3,
+          "phrase_exacte": "Claude coûte moins cher",
+          "vide_cognitif": "Coût employés",
+          "setup_du_payoff": "Alternative Claude"
+        },
+        "context": {
+          "relative_start_sec": 3,
+          "relative_end_sec": 10,
+          "description": "Comparaison coûts"
+        },
+        "foreshadow": {
+          "relative_start_sec": 0,
+          "relative_end_sec": 5,
+          "description": "Capacités impressionnantes",
+          "force": "eleve"
+        },
+        "escalade_rythme": {
+          "relative_start_sec": 10,
+          "relative_end_sec": 34,
+          "description": "Exemples tâches complexes"
+        },
+        "payoff": {
+          "relative_start_sec": 34,
+          "relative_end_sec": 38,
+          "phrase_exacte": "90% des tâches automatisées",
+          "satisfaction_cible": "Emerveillement",
+          "reponse_au_hook": "Solution économique"
+        },
+        "loop_hook": {
+          "relative_start_sec": 37,
+          "relative_end_sec": 39.6,
+          "techniques": [
+            "visual_match_cut",
+            "cliffhanger_reversal"
+          ],
+          "description": "Logo qui s'illumine"
+        }
+      }
+    }
+  ]
+}
