@@ -46,13 +46,7 @@ jobs:
         run: |
           mkdir -p delta/F00_INGEST/IN
           cd delta/F00_INGEST/IN
-          gh release download "${{ github.event.inputs.release_tag }}" --repo ${{ github.repository }} --pattern '*.mp4' --clobber
-          count=$(ls *.mp4 2>/dev/null | wc -l)
-          if [ "$count" -ne 1 ]; then
-            echo "Attendu 1 fichier mp4 dans la release, trouvé $count"
-            exit 1
-          fi
-          mv -- *.mp4 video_source.mp4
+          gh release download "${{ github.event.inputs.release_tag }}" --repo ${{ github.repository }} --pattern '*.mp4' --output video_source.mp4 --clobber
           ls -la video_source.mp4
 
       - name: Run D-F00 Ingest
