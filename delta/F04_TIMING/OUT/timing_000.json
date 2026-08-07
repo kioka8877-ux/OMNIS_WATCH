@@ -3,168 +3,169 @@
   "source_start_sec": 58.2,
   "source_end_sec": 99.96,
   "word_count": 179,
+  "strong_word_count": 56,
   "words": [
     {
       "word": "je",
       "start": 0.0,
       "end": 0.02,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "vais",
       "start": 0.02,
       "end": 0.08,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "mettre",
       "start": 0.08,
       "end": 0.22,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "entrepreneur.",
       "start": 0.22,
       "end": 0.8,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "Et",
       "start": 1.06,
       "end": 1.06,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "donc,",
       "start": 1.06,
       "end": 1.18,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "juste",
       "start": 1.18,
       "end": 1.34,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "ici,",
       "start": 1.34,
       "end": 1.56,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "tu",
       "start": 1.58,
       "end": 1.66,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "vas",
       "start": 1.66,
       "end": 1.74,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "pouvoir",
       "start": 1.74,
       "end": 1.96,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "coller",
       "start": 1.96,
       "end": 2.26,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "un",
       "start": 2.26,
       "end": 2.42,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "prompt",
       "start": 2.42,
       "end": 2.64,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "que",
       "start": 2.64,
       "end": 2.88,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "je",
       "start": 2.88,
       "end": 3.0,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "te",
       "start": 3.0,
       "end": 3.06,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "mettrai",
       "start": 3.06,
       "end": 3.3,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "dans",
       "start": 3.3,
       "end": 3.52,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "la",
       "start": 3.52,
       "end": 3.64,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "description.",
       "start": 3.64,
       "end": 4.02,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "Il",
       "start": 4.2,
       "end": 4.26,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "va",
       "start": 4.26,
       "end": 4.34,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "pousser",
       "start": 4.34,
       "end": 4.58,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "Claude",
       "start": 4.58,
       "end": 4.82,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "à",
       "start": 4.82,
       "end": 4.9,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "se",
       "start": 4.9,
       "end": 5.02,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "donner",
@@ -182,7 +183,7 @@
       "word": "100",
       "start": 5.4,
       "end": 5.7,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "%",
@@ -200,7 +201,7 @@
       "word": "toutes",
       "start": 6.44,
       "end": 6.66,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "les",
@@ -920,163 +921,163 @@
       "word": "à",
       "start": 35.92,
       "end": 36.24,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "Claude.",
       "start": 36.24,
       "end": 36.46,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "Et",
       "start": 36.6,
       "end": 36.64,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "je",
       "start": 36.64,
       "end": 36.72,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "vais",
       "start": 36.72,
       "end": 36.78,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "partager",
       "start": 36.78,
       "end": 37.02,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "avec",
       "start": 37.02,
       "end": 37.26,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "toi",
       "start": 37.26,
       "end": 37.4,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "mes",
       "start": 37.4,
       "end": 37.58,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "deux",
       "start": 37.58,
       "end": 37.78,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "préférés.",
       "start": 37.78,
       "end": 38.06,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "La",
       "start": 38.24,
       "end": 38.3,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "première",
       "start": 38.3,
       "end": 38.54,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "et",
       "start": 38.54,
       "end": 38.68,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "la",
       "start": 38.68,
       "end": 38.74,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "plus",
       "start": 38.74,
       "end": 38.9,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "évidente,",
       "start": 38.9,
       "end": 39.28,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "ça",
       "start": 39.28,
       "end": 39.52,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "va",
       "start": 39.52,
       "end": 39.64,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "être",
       "start": 39.64,
       "end": 39.78,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "de",
       "start": 39.78,
       "end": 39.94,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "connecter",
       "start": 39.94,
       "end": 40.38,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "Claude",
       "start": 40.38,
       "end": 40.86,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "à",
       "start": 40.86,
       "end": 41.1,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "tes",
       "start": 41.1,
       "end": 41.28,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "mails.",
       "start": 41.28,
       "end": 41.6,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "Donc",
       "start": 41.74,
       "end": 41.8,
-      "is_strong": false
+      "is_strong": true
     }
   ]
 }

@@ -18,6 +18,10 @@ on:
       d04_run_id:
         description: 'D04 Timing run ID (for timing_*.json)'
         required: false
+      release_tag:
+        description: 'Release des clips reframes (d03-reframe-v2)'
+        required: false
+        default: 'd03-reframe-v2'
 
 permissions:
   contents: write
@@ -28,7 +32,7 @@ jobs:
     timeout-minutes: 90
     strategy:
       matrix:
-        clip_index: [1, 2, 3]
+        clip_index: [0, 1, 2]
     steps:
       - uses: actions/checkout@v4
 
@@ -53,6 +57,17 @@ jobs:
           mkdir -p delta/F06_RENDER/F03A_REMOTION/CODEBASE/OUT
           mkdir -p delta/F06_RENDER/F03B_MIXER/CODEBASE/IN
           mkdir -p delta/F06_RENDER/F03B_MIXER/CODEBASE/OUT
+
+      # ============================================================
+      # Telecharger le clip reframe depuis le release
+      # ============================================================
+      - name: Download clip ${{ matrix.clip_index }} from release
+        run: |
+          CLIP_IDX=${{ matrix.clip_index }}
+          TAG=${{ inputs.release_tag }}
+          curl -sL -o "delta/F06_RENDER/IN/clip_$(printf '%03d' $CLIP_IDX).mp4" \
+            "https://github.com/kioka8877-ux/OMNIS_WATCH/releases/download/${TAG}/clip_$(printf '%03d' $CLIP_IDX).mp4"
+          ls -la delta/F06_RENDER/IN/clip_$(printf '%03d' $CLIP_IDX).mp4
 
       # ============================================================
       # Telecharger artifacts precedents (si disponibles)
@@ -107,17 +122,14 @@ jobs:
       # ============================================================
       # F03A REMOTION - Render avec le codex genere
       # ============================================================
-      - name: Copy clip video
+      - name: Prepare F03A inputs (video + codex)
         run: |
-          # Utiliser la video de test si pas disponible
-          if [ ! -f "delta/F06_RENDER/IN/clip_$(printf '%03d' ${{ matrix.clip_index }}).mp4" ]; then
-            echo "Video non disponible, creation video test..."
-          fi
-          cp delta/F06_RENDER/IN/clip_$(printf '%03d' ${{ matrix.clip_index }}).mp4 \
-             delta/F06_RENDER/F03A_REMOTION/CODEBASE/public/video_coupee.mp4 2>/dev/null || \
-          cp delta/F06_RENDER/IN/codex_clip_$(printf '%03d' ${{ matrix.clip_index }}).json \
-             delta/F06_RENDER/F03A_REMOTION/CODEBASE/public/codex.json
-          cp delta/F06_RENDER/OUT/codex_clip_$(printf '%03d' ${{ matrix.clip_index }}).json \
+          CLIP_IDX=${{ matrix.clip_index }}
+          # La video du clip devient video_coupee.mp4 (source Remotion)
+          cp delta/F06_RENDER/IN/clip_$(printf '%03d' $CLIP_IDX).mp4 \
+             delta/F06_RENDER/F03A_REMOTION/CODEBASE/public/video_coupee.mp4
+          # Le codex merge devient le codex.json utilise par Remotion
+          cp delta/F06_RENDER/OUT/codex_clip_$(printf '%03d' $CLIP_IDX).json \
              delta/F06_RENDER/F03A_REMOTION/CODEBASE/public/codex.json
 
       - name: Install F03A dependencies
@@ -138,7 +150,7 @@ jobs:
             OUT/video_visuelle.mp4 \
             --codec h264 \
             --image-format jpeg \
-            --concurrency 1 || echo "Remotion render skipped (no video)"
+            --concurrency 1
 
       # ============================================================
       # F03B MIXER - Ajouter SFX
@@ -156,7 +168,7 @@ jobs:
             python3 omnis_f03b_mixer.py \
               --input IN/ \
               --output OUT/ \
-              --sfx-dir ../../../SHARED/IN/sfx/ || echo "Mixer skipped"
+              --sfx-dir ../../../SHARED/IN/sfx/
           else
             echo "No video to mix, creating placeholder"
             echo "placeholder" > delta/F06_RENDER/F03B_MIXER/CODEBASE/OUT/video_complete.mp4
@@ -169,4 +181,3 @@ jobs:
           path: |
             delta/F06_RENDER/OUT/codex_clip_$(printf '%03d' ${{ matrix.clip_index }}).json
             delta/F06_RENDER/F03B_MIXER/CODEBASE/OUT/video_complete.mp4
-

@@ -45,10 +45,51 @@ def save_json(path, data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
+EMOTION_KEYWORDS = {
+    "surprise": ["impossible", "incroyable", "quoi", "comment", "bluff", "jamais", "100", "toutes", "exactement", "sans"],
+    "wholesome": ["amour", "vie", "merci", "heureux", "maman", "papa", "enfant", "coeur", "doux", "gentil"],
+    "tension": ["danger", "erreur", "faux", "risque", "jamais", "pire", "humain", "machine", "limite"],
+    "comedy": ["rire", "rigolo", "drôle", "blague", "lol", "ha", "oups"],
+    "motivation": ["toujours", "jamais", "vaincre", "réussir", "force", "croire", "possible"],
+    "default": []
+}
+
+PUNCTUATION_STRONG = "?!"
+
+
+def build_strong_windows(clip, start_sec):
+    """Construit les fenêtres temporelles (sec absolues) où les mots sont forts."""
+    windows = []
+    structure = clip.get("structure", {})
+
+    for key in ("verbal_text_hook", "payoff", "loop_hook", "foreshadow"):
+        moment = structure.get(key)
+        if not moment:
+            continue
+        w_start = moment.get("relative_start_sec")
+        w_end = moment.get("relative_end_sec")
+        if w_start is None or w_end is None:
+            continue
+        windows.append((start_sec + w_start, start_sec + w_end))
+
+    return windows
+
+
+def is_word_in_windows(word_start, word_end, windows):
+    for w_start, w_end in windows:
+        if word_end > w_start and word_start < w_end:
+            return True
+    return False
+
+
 def extract_timing_for_clip(clip, words, clip_index):
     """Extrait les mots d'un clip et convertit en timestamps relatifs."""
     start_sec = clip["start_sec"]
     end_sec = clip["end_sec"]
+
+    emotion_mode = clip.get("emotion_mode", "default")
+    keywords = EMOTION_KEYWORDS.get(emotion_mode, EMOTION_KEYWORDS["default"])
+    strong_windows = build_strong_windows(clip, start_sec)
 
     # Filtrer les mots dans la plage du clip
     clip_words = []
@@ -58,12 +99,25 @@ def extract_timing_for_clip(clip, words, clip_index):
 
         # Le mot doit être dans la plage (au moins partiellement)
         if word_end > start_sec and word_start < end_sec:
+            raw_word = (word.get("word") or "").strip()
+            lowered = raw_word.lower().strip(".,;:…\"'")
+
+            # Mot fort si: déjà marqué, dans une fenêtre clé, mot-clé émotion, ou ponctuation forte
+            is_strong = word.get("is_strong", False)
+            if not is_strong:
+                if is_word_in_windows(word_start, word_end, strong_windows):
+                    is_strong = True
+                elif lowered in keywords:
+                    is_strong = True
+                elif raw_word and raw_word[-1] in PUNCTUATION_STRONG:
+                    is_strong = True
+
             # Convertir en timestamps relatifs au clip
             clip_words.append({
                 "word": word["word"],
                 "start": round(word_start - start_sec, 3),
                 "end": round(word_end - start_sec, 3),
-                "is_strong": word.get("is_strong", False)
+                "is_strong": is_strong
             })
 
     return {
@@ -71,6 +125,7 @@ def extract_timing_for_clip(clip, words, clip_index):
         "source_start_sec": start_sec,
         "source_end_sec": end_sec,
         "word_count": len(clip_words),
+        "strong_word_count": sum(1 for w in clip_words if w["is_strong"]),
         "words": clip_words
     }
 

@@ -3,144 +3,145 @@
   "source_start_sec": 164.64,
   "source_end_sec": 185.08,
   "word_count": 82,
+  "strong_word_count": 44,
   "words": [
     {
       "word": "Claude",
       "start": 0.1,
       "end": 0.22,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "n",
       "start": 0.22,
       "end": 0.32,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "'est",
       "start": 0.32,
       "end": 0.32,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "plus",
       "start": 0.32,
       "end": 0.44,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "simplement",
       "start": 0.44,
       "end": 0.86,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "en",
       "start": 0.86,
       "end": 1.02,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "train",
       "start": 1.02,
       "end": 1.1,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "de",
       "start": 1.1,
       "end": 1.24,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "répondre",
       "start": 1.24,
       "end": 1.56,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "à",
       "start": 1.56,
       "end": 1.82,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "mes",
       "start": 1.82,
       "end": 1.92,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "questions",
       "start": 1.92,
       "end": 2.3,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "que",
       "start": 2.3,
       "end": 2.78,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "les",
       "start": 2.78,
       "end": 2.84,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "en",
       "start": 2.84,
       "end": 3.0,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "train",
       "start": 3.0,
       "end": 3.16,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "de",
       "start": 3.16,
       "end": 3.32,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "travailler",
       "start": 3.32,
       "end": 3.78,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "à",
       "start": 3.78,
       "end": 4.28,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "ma",
       "start": 4.28,
       "end": 4.4,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "place",
       "start": 4.4,
       "end": 4.72,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "et",
       "start": 4.72,
       "end": 4.94,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "ça,",
       "start": 4.94,
       "end": 5.22,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "ça",
@@ -164,7 +165,7 @@
       "word": "vie.",
       "start": 6.32,
       "end": 6.48,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "Pour",
@@ -380,121 +381,121 @@
       "word": "hack,",
       "start": 15.38,
       "end": 15.7,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "ça",
       "start": 15.82,
       "end": 15.9,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "va",
       "start": 15.9,
       "end": 16.0,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "être",
       "start": 16.0,
       "end": 16.18,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "d",
       "start": 16.18,
       "end": 16.4,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "'utiliser",
       "start": 16.4,
       "end": 16.84,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "correctement",
       "start": 16.84,
       "end": 17.64,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "les",
       "start": 17.64,
       "end": 17.82,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "différents",
       "start": 17.82,
       "end": 18.2,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "modèles",
       "start": 18.2,
       "end": 18.76,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "de",
       "start": 18.76,
       "end": 19.04,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "Claude.",
       "start": 19.04,
       "end": 19.42,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "Alors,",
       "start": 19.52,
       "end": 19.6,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "tu",
       "start": 19.72,
       "end": 19.76,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "l",
       "start": 19.76,
       "end": 19.84,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "'as",
       "start": 19.84,
       "end": 19.84,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "peut",
       "start": 19.84,
       "end": 19.96,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "-être",
       "start": 19.96,
       "end": 20.0,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "déjà",
       "start": 20.0,
       "end": 20.26,
-      "is_strong": false
+      "is_strong": true
     },
     {
       "word": "vu,",
       "start": 20.26,
       "end": 20.44,
-      "is_strong": false
+      "is_strong": true
     }
   ]
 }

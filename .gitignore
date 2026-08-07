@@ -37,6 +37,8 @@ Thumbs.db
 # Exceptions
 !SHARED/IN/sfx/.gitkeep
 !**/.gitkeep
+!delta/SHARED/IN/sfx/
+!delta/SHARED/IN/sfx/*.mp3
 
 # Sandbox temp
 .tmp/
