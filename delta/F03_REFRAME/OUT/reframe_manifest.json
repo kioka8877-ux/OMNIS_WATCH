@@ -35,5 +35,9 @@
       "output": "clips_reframes/clip_002.mp4",
       "size_mb": 29
     }
-  ]
+  ],
+  "release": {
+    "tag": "d03-reframe-v1",
+    "url": "https://github.com/kioka8877-ux/OMNIS_WATCH/releases/tag/d03-reframe-v1"
+  }
 }
