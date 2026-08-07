@@ -1,0 +1,22 @@
+{
+  "clips": [
+    {
+      "index": 0,
+      "filename": "timing_000.json",
+      "word_count": 179,
+      "duration_sec": 41.76
+    },
+    {
+      "index": 1,
+      "filename": "timing_001.json",
+      "word_count": 82,
+      "duration_sec": 20.44
+    },
+    {
+      "index": 2,
+      "filename": "timing_002.json",
+      "word_count": 152,
+      "duration_sec": 35.28
+    }
+  ]
+}

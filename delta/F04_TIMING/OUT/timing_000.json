@@ -1,0 +1,1082 @@
+{
+  "clip_index": 0,
+  "source_start_sec": 58.2,
+  "source_end_sec": 99.96,
+  "word_count": 179,
+  "words": [
+    {
+      "word": "je",
+      "start": 0.0,
+      "end": 0.02,
+      "is_strong": false
+    },
+    {
+      "word": "vais",
+      "start": 0.02,
+      "end": 0.08,
+      "is_strong": false
+    },
+    {
+      "word": "mettre",
+      "start": 0.08,
+      "end": 0.22,
+      "is_strong": false
+    },
+    {
+      "word": "entrepreneur.",
+      "start": 0.22,
+      "end": 0.8,
+      "is_strong": false
+    },
+    {
+      "word": "Et",
+      "start": 1.06,
+      "end": 1.06,
+      "is_strong": false
+    },
+    {
+      "word": "donc,",
+      "start": 1.06,
+      "end": 1.18,
+      "is_strong": false
+    },
+    {
+      "word": "juste",
+      "start": 1.18,
+      "end": 1.34,
+      "is_strong": false
+    },
+    {
+      "word": "ici,",
+      "start": 1.34,
+      "end": 1.56,
+      "is_strong": false
+    },
+    {
+      "word": "tu",
+      "start": 1.58,
+      "end": 1.66,
+      "is_strong": false
+    },
+    {
+      "word": "vas",
+      "start": 1.66,
+      "end": 1.74,
+      "is_strong": false
+    },
+    {
+      "word": "pouvoir",
+      "start": 1.74,
+      "end": 1.96,
+      "is_strong": false
+    },
+    {
+      "word": "coller",
+      "start": 1.96,
+      "end": 2.26,
+      "is_strong": false
+    },
+    {
+      "word": "un",
+      "start": 2.26,
+      "end": 2.42,
+      "is_strong": false
+    },
+    {
+      "word": "prompt",
+      "start": 2.42,
+      "end": 2.64,
+      "is_strong": false
+    },
+    {
+      "word": "que",
+      "start": 2.64,
+      "end": 2.88,
+      "is_strong": false
+    },
+    {
+      "word": "je",
+      "start": 2.88,
+      "end": 3.0,
+      "is_strong": false
+    },
+    {
+      "word": "te",
+      "start": 3.0,
+      "end": 3.06,
+      "is_strong": false
+    },
+    {
+      "word": "mettrai",
+      "start": 3.06,
+      "end": 3.3,
+      "is_strong": false
+    },
+    {
+      "word": "dans",
+      "start": 3.3,
+      "end": 3.52,
+      "is_strong": false
+    },
+    {
+      "word": "la",
+      "start": 3.52,
+      "end": 3.64,
+      "is_strong": false
+    },
+    {
+      "word": "description.",
+      "start": 3.64,
+      "end": 4.02,
+      "is_strong": false
+    },
+    {
+      "word": "Il",
+      "start": 4.2,
+      "end": 4.26,
+      "is_strong": false
+    },
+    {
+      "word": "va",
+      "start": 4.26,
+      "end": 4.34,
+      "is_strong": false
+    },
+    {
+      "word": "pousser",
+      "start": 4.34,
+      "end": 4.58,
+      "is_strong": false
+    },
+    {
+      "word": "Claude",
+      "start": 4.58,
+      "end": 4.82,
+      "is_strong": false
+    },
+    {
+      "word": "à",
+      "start": 4.82,
+      "end": 4.9,
+      "is_strong": false
+    },
+    {
+      "word": "se",
+      "start": 4.9,
+      "end": 5.02,
+      "is_strong": false
+    },
+    {
+      "word": "donner",
+      "start": 5.02,
+      "end": 5.22,
+      "is_strong": false
+    },
+    {
+      "word": "à",
+      "start": 5.22,
+      "end": 5.4,
+      "is_strong": false
+    },
+    {
+      "word": "100",
+      "start": 5.4,
+      "end": 5.7,
+      "is_strong": false
+    },
+    {
+      "word": "%",
+      "start": 5.7,
+      "end": 6.06,
+      "is_strong": false
+    },
+    {
+      "word": "sur",
+      "start": 6.06,
+      "end": 6.44,
+      "is_strong": false
+    },
+    {
+      "word": "toutes",
+      "start": 6.44,
+      "end": 6.66,
+      "is_strong": false
+    },
+    {
+      "word": "les",
+      "start": 6.66,
+      "end": 6.84,
+      "is_strong": false
+    },
+    {
+      "word": "questions,",
+      "start": 6.84,
+      "end": 7.18,
+      "is_strong": false
+    },
+    {
+      "word": "réfléchir",
+      "start": 7.6,
+      "end": 7.96,
+      "is_strong": false
+    },
+    {
+      "word": "de",
+      "start": 7.96,
+      "end": 8.08,
+      "is_strong": false
+    },
+    {
+      "word": "la",
+      "start": 8.08,
+      "end": 8.18,
+      "is_strong": false
+    },
+    {
+      "word": "manière",
+      "start": 8.18,
+      "end": 8.34,
+      "is_strong": false
+    },
+    {
+      "word": "la",
+      "start": 8.34,
+      "end": 8.52,
+      "is_strong": false
+    },
+    {
+      "word": "plus",
+      "start": 8.52,
+      "end": 8.7,
+      "is_strong": false
+    },
+    {
+      "word": "logique",
+      "start": 8.7,
+      "end": 9.18,
+      "is_strong": false
+    },
+    {
+      "word": "possible.",
+      "start": 9.18,
+      "end": 9.54,
+      "is_strong": false
+    },
+    {
+      "word": "Et",
+      "start": 9.74,
+      "end": 9.76,
+      "is_strong": false
+    },
+    {
+      "word": "surtout,",
+      "start": 9.76,
+      "end": 10.04,
+      "is_strong": false
+    },
+    {
+      "word": "éviter",
+      "start": 10.1,
+      "end": 10.42,
+      "is_strong": false
+    },
+    {
+      "word": "un",
+      "start": 10.42,
+      "end": 10.52,
+      "is_strong": false
+    },
+    {
+      "word": "des",
+      "start": 10.52,
+      "end": 10.6,
+      "is_strong": false
+    },
+    {
+      "word": "problèmes",
+      "start": 10.6,
+      "end": 10.8,
+      "is_strong": false
+    },
+    {
+      "word": "les",
+      "start": 10.8,
+      "end": 10.96,
+      "is_strong": false
+    },
+    {
+      "word": "plus",
+      "start": 10.96,
+      "end": 11.08,
+      "is_strong": false
+    },
+    {
+      "word": "graves",
+      "start": 11.08,
+      "end": 11.48,
+      "is_strong": false
+    },
+    {
+      "word": "qu",
+      "start": 11.48,
+      "end": 11.76,
+      "is_strong": false
+    },
+    {
+      "word": "'il",
+      "start": 11.76,
+      "end": 11.82,
+      "is_strong": false
+    },
+    {
+      "word": "y",
+      "start": 11.82,
+      "end": 11.92,
+      "is_strong": false
+    },
+    {
+      "word": "a",
+      "start": 11.92,
+      "end": 11.98,
+      "is_strong": false
+    },
+    {
+      "word": "en",
+      "start": 11.98,
+      "end": 12.16,
+      "is_strong": false
+    },
+    {
+      "word": "ce",
+      "start": 12.16,
+      "end": 12.26,
+      "is_strong": false
+    },
+    {
+      "word": "moment,",
+      "start": 12.26,
+      "end": 12.48,
+      "is_strong": false
+    },
+    {
+      "word": "avec",
+      "start": 12.9,
+      "end": 13.1,
+      "is_strong": false
+    },
+    {
+      "word": "lesia,",
+      "start": 13.1,
+      "end": 13.56,
+      "is_strong": false
+    },
+    {
+      "word": "qui",
+      "start": 13.92,
+      "end": 14.06,
+      "is_strong": false
+    },
+    {
+      "word": "est",
+      "start": 14.06,
+      "end": 14.2,
+      "is_strong": false
+    },
+    {
+      "word": "le",
+      "start": 14.2,
+      "end": 14.48,
+      "is_strong": false
+    },
+    {
+      "word": "fait",
+      "start": 14.48,
+      "end": 14.7,
+      "is_strong": false
+    },
+    {
+      "word": "de",
+      "start": 14.7,
+      "end": 14.86,
+      "is_strong": false
+    },
+    {
+      "word": "te",
+      "start": 14.86,
+      "end": 15.0,
+      "is_strong": false
+    },
+    {
+      "word": "dire",
+      "start": 15.0,
+      "end": 15.22,
+      "is_strong": false
+    },
+    {
+      "word": "ce",
+      "start": 15.22,
+      "end": 15.38,
+      "is_strong": false
+    },
+    {
+      "word": "que",
+      "start": 15.38,
+      "end": 15.44,
+      "is_strong": false
+    },
+    {
+      "word": "tu",
+      "start": 15.44,
+      "end": 15.58,
+      "is_strong": false
+    },
+    {
+      "word": "as",
+      "start": 15.58,
+      "end": 15.68,
+      "is_strong": false
+    },
+    {
+      "word": "envie",
+      "start": 15.68,
+      "end": 16.02,
+      "is_strong": false
+    },
+    {
+      "word": "d",
+      "start": 16.02,
+      "end": 16.2,
+      "is_strong": false
+    },
+    {
+      "word": "'entendre.",
+      "start": 16.2,
+      "end": 16.4,
+      "is_strong": false
+    },
+    {
+      "word": "Avec",
+      "start": 16.84,
+      "end": 17.0,
+      "is_strong": false
+    },
+    {
+      "word": "ce",
+      "start": 17.0,
+      "end": 17.2,
+      "is_strong": false
+    },
+    {
+      "word": "prompt,",
+      "start": 17.2,
+      "end": 17.42,
+      "is_strong": false
+    },
+    {
+      "word": "Claude",
+      "start": 17.66,
+      "end": 17.98,
+      "is_strong": false
+    },
+    {
+      "word": "te",
+      "start": 17.98,
+      "end": 18.18,
+      "is_strong": false
+    },
+    {
+      "word": "dit",
+      "start": 18.18,
+      "end": 18.34,
+      "is_strong": false
+    },
+    {
+      "word": "la",
+      "start": 18.34,
+      "end": 18.52,
+      "is_strong": false
+    },
+    {
+      "word": "vérité",
+      "start": 18.52,
+      "end": 18.96,
+      "is_strong": false
+    },
+    {
+      "word": "même",
+      "start": 18.96,
+      "end": 19.14,
+      "is_strong": false
+    },
+    {
+      "word": "quand",
+      "start": 19.14,
+      "end": 19.36,
+      "is_strong": false
+    },
+    {
+      "word": "elle",
+      "start": 19.36,
+      "end": 19.52,
+      "is_strong": false
+    },
+    {
+      "word": "fait",
+      "start": 19.52,
+      "end": 19.7,
+      "is_strong": false
+    },
+    {
+      "word": "mal.",
+      "start": 19.7,
+      "end": 20.0,
+      "is_strong": false
+    },
+    {
+      "word": "Et",
+      "start": 20.18,
+      "end": 20.24,
+      "is_strong": false
+    },
+    {
+      "word": "ça",
+      "start": 20.24,
+      "end": 20.36,
+      "is_strong": false
+    },
+    {
+      "word": "va",
+      "start": 20.36,
+      "end": 20.46,
+      "is_strong": false
+    },
+    {
+      "word": "donc",
+      "start": 20.46,
+      "end": 20.64,
+      "is_strong": false
+    },
+    {
+      "word": "te",
+      "start": 20.64,
+      "end": 20.8,
+      "is_strong": false
+    },
+    {
+      "word": "permettre",
+      "start": 20.8,
+      "end": 21.12,
+      "is_strong": false
+    },
+    {
+      "word": "d",
+      "start": 21.12,
+      "end": 21.6,
+      "is_strong": false
+    },
+    {
+      "word": "'être",
+      "start": 21.6,
+      "end": 21.66,
+      "is_strong": false
+    },
+    {
+      "word": "beaucoup",
+      "start": 21.66,
+      "end": 21.98,
+      "is_strong": false
+    },
+    {
+      "word": "plus",
+      "start": 21.98,
+      "end": 22.24,
+      "is_strong": false
+    },
+    {
+      "word": "efficace.",
+      "start": 22.24,
+      "end": 22.66,
+      "is_strong": false
+    },
+    {
+      "word": "Aque",
+      "start": 22.82,
+      "end": 22.98,
+      "is_strong": false
+    },
+    {
+      "word": "numéro",
+      "start": 22.98,
+      "end": 23.14,
+      "is_strong": false
+    },
+    {
+      "word": "deux,",
+      "start": 23.14,
+      "end": 23.4,
+      "is_strong": false
+    },
+    {
+      "word": "qui",
+      "start": 23.46,
+      "end": 23.52,
+      "is_strong": false
+    },
+    {
+      "word": "va",
+      "start": 23.52,
+      "end": 23.6,
+      "is_strong": false
+    },
+    {
+      "word": "te",
+      "start": 23.6,
+      "end": 23.7,
+      "is_strong": false
+    },
+    {
+      "word": "permettre",
+      "start": 23.7,
+      "end": 23.82,
+      "is_strong": false
+    },
+    {
+      "word": "de",
+      "start": 23.82,
+      "end": 24.0,
+      "is_strong": false
+    },
+    {
+      "word": "faire",
+      "start": 24.0,
+      "end": 24.16,
+      "is_strong": false
+    },
+    {
+      "word": "beaucoup",
+      "start": 24.16,
+      "end": 24.64,
+      "is_strong": false
+    },
+    {
+      "word": "plus",
+      "start": 24.64,
+      "end": 24.9,
+      "is_strong": false
+    },
+    {
+      "word": "de",
+      "start": 24.9,
+      "end": 25.04,
+      "is_strong": false
+    },
+    {
+      "word": "choses",
+      "start": 25.04,
+      "end": 25.2,
+      "is_strong": false
+    },
+    {
+      "word": "avec",
+      "start": 25.2,
+      "end": 25.38,
+      "is_strong": false
+    },
+    {
+      "word": "Claude,",
+      "start": 25.38,
+      "end": 25.74,
+      "is_strong": false
+    },
+    {
+      "word": "c",
+      "start": 25.9,
+      "end": 25.9,
+      "is_strong": false
+    },
+    {
+      "word": "'est",
+      "start": 25.9,
+      "end": 25.96,
+      "is_strong": false
+    },
+    {
+      "word": "d",
+      "start": 25.96,
+      "end": 26.1,
+      "is_strong": false
+    },
+    {
+      "word": "'utiliser",
+      "start": 26.1,
+      "end": 26.5,
+      "is_strong": false
+    },
+    {
+      "word": "les",
+      "start": 26.5,
+      "end": 27.0,
+      "is_strong": false
+    },
+    {
+      "word": "connecteurs.",
+      "start": 27.0,
+      "end": 27.6,
+      "is_strong": false
+    },
+    {
+      "word": "En",
+      "start": 27.6,
+      "end": 27.76,
+      "is_strong": false
+    },
+    {
+      "word": "fait,",
+      "start": 27.76,
+      "end": 27.9,
+      "is_strong": false
+    },
+    {
+      "word": "si",
+      "start": 27.92,
+      "end": 28.04,
+      "is_strong": false
+    },
+    {
+      "word": "tu",
+      "start": 28.04,
+      "end": 28.16,
+      "is_strong": false
+    },
+    {
+      "word": "viens",
+      "start": 28.16,
+      "end": 28.34,
+      "is_strong": false
+    },
+    {
+      "word": "ici",
+      "start": 28.34,
+      "end": 28.58,
+      "is_strong": false
+    },
+    {
+      "word": "sur",
+      "start": 28.58,
+      "end": 28.9,
+      "is_strong": false
+    },
+    {
+      "word": "customiser",
+      "start": 28.9,
+      "end": 29.5,
+      "is_strong": false
+    },
+    {
+      "word": "et",
+      "start": 29.5,
+      "end": 29.7,
+      "is_strong": false
+    },
+    {
+      "word": "que",
+      "start": 29.7,
+      "end": 29.78,
+      "is_strong": false
+    },
+    {
+      "word": "tu",
+      "start": 29.78,
+      "end": 29.9,
+      "is_strong": false
+    },
+    {
+      "word": "cliques",
+      "start": 29.9,
+      "end": 30.08,
+      "is_strong": false
+    },
+    {
+      "word": "sur",
+      "start": 30.08,
+      "end": 30.38,
+      "is_strong": false
+    },
+    {
+      "word": "connecter",
+      "start": 30.38,
+      "end": 31.06,
+      "is_strong": false
+    },
+    {
+      "word": "tes",
+      "start": 31.06,
+      "end": 31.48,
+      "is_strong": false
+    },
+    {
+      "word": "applications,",
+      "start": 31.48,
+      "end": 31.98,
+      "is_strong": false
+    },
+    {
+      "word": "il",
+      "start": 32.44,
+      "end": 32.5,
+      "is_strong": false
+    },
+    {
+      "word": "va",
+      "start": 32.5,
+      "end": 32.5,
+      "is_strong": false
+    },
+    {
+      "word": "te",
+      "start": 32.5,
+      "end": 32.6,
+      "is_strong": false
+    },
+    {
+      "word": "voir",
+      "start": 32.6,
+      "end": 32.74,
+      "is_strong": false
+    },
+    {
+      "word": "qu",
+      "start": 32.74,
+      "end": 32.9,
+      "is_strong": false
+    },
+    {
+      "word": "'il",
+      "start": 32.9,
+      "end": 32.92,
+      "is_strong": false
+    },
+    {
+      "word": "y",
+      "start": 32.92,
+      "end": 32.96,
+      "is_strong": false
+    },
+    {
+      "word": "a",
+      "start": 32.96,
+      "end": 32.96,
+      "is_strong": false
+    },
+    {
+      "word": "plein",
+      "start": 32.96,
+      "end": 33.36,
+      "is_strong": false
+    },
+    {
+      "word": "d",
+      "start": 33.36,
+      "end": 33.82,
+      "is_strong": false
+    },
+    {
+      "word": "'autres",
+      "start": 33.82,
+      "end": 34.04,
+      "is_strong": false
+    },
+    {
+      "word": "applications",
+      "start": 34.04,
+      "end": 34.72,
+      "is_strong": false
+    },
+    {
+      "word": "qu",
+      "start": 34.72,
+      "end": 35.08,
+      "is_strong": false
+    },
+    {
+      "word": "'on",
+      "start": 35.08,
+      "end": 35.14,
+      "is_strong": false
+    },
+    {
+      "word": "peut",
+      "start": 35.14,
+      "end": 35.32,
+      "is_strong": false
+    },
+    {
+      "word": "connecter",
+      "start": 35.32,
+      "end": 35.92,
+      "is_strong": false
+    },
+    {
+      "word": "à",
+      "start": 35.92,
+      "end": 36.24,
+      "is_strong": false
+    },
+    {
+      "word": "Claude.",
+      "start": 36.24,
+      "end": 36.46,
+      "is_strong": false
+    },
+    {
+      "word": "Et",
+      "start": 36.6,
+      "end": 36.64,
+      "is_strong": false
+    },
+    {
+      "word": "je",
+      "start": 36.64,
+      "end": 36.72,
+      "is_strong": false
+    },
+    {
+      "word": "vais",
+      "start": 36.72,
+      "end": 36.78,
+      "is_strong": false
+    },
+    {
+      "word": "partager",
+      "start": 36.78,
+      "end": 37.02,
+      "is_strong": false
+    },
+    {
+      "word": "avec",
+      "start": 37.02,
+      "end": 37.26,
+      "is_strong": false
+    },
+    {
+      "word": "toi",
+      "start": 37.26,
+      "end": 37.4,
+      "is_strong": false
+    },
+    {
+      "word": "mes",
+      "start": 37.4,
+      "end": 37.58,
+      "is_strong": false
+    },
+    {
+      "word": "deux",
+      "start": 37.58,
+      "end": 37.78,
+      "is_strong": false
+    },
+    {
+      "word": "préférés.",
+      "start": 37.78,
+      "end": 38.06,
+      "is_strong": false
+    },
+    {
+      "word": "La",
+      "start": 38.24,
+      "end": 38.3,
+      "is_strong": false
+    },
+    {
+      "word": "première",
+      "start": 38.3,
+      "end": 38.54,
+      "is_strong": false
+    },
+    {
+      "word": "et",
+      "start": 38.54,
+      "end": 38.68,
+      "is_strong": false
+    },
+    {
+      "word": "la",
+      "start": 38.68,
+      "end": 38.74,
+      "is_strong": false
+    },
+    {
+      "word": "plus",
+      "start": 38.74,
+      "end": 38.9,
+      "is_strong": false
+    },
+    {
+      "word": "évidente,",
+      "start": 38.9,
+      "end": 39.28,
+      "is_strong": false
+    },
+    {
+      "word": "ça",
+      "start": 39.28,
+      "end": 39.52,
+      "is_strong": false
+    },
+    {
+      "word": "va",
+      "start": 39.52,
+      "end": 39.64,
+      "is_strong": false
+    },
+    {
+      "word": "être",
+      "start": 39.64,
+      "end": 39.78,
+      "is_strong": false
+    },
+    {
+      "word": "de",
+      "start": 39.78,
+      "end": 39.94,
+      "is_strong": false
+    },
+    {
+      "word": "connecter",
+      "start": 39.94,
+      "end": 40.38,
+      "is_strong": false
+    },
+    {
+      "word": "Claude",
+      "start": 40.38,
+      "end": 40.86,
+      "is_strong": false
+    },
+    {
+      "word": "à",
+      "start": 40.86,
+      "end": 41.1,
+      "is_strong": false
+    },
+    {
+      "word": "tes",
+      "start": 41.1,
+      "end": 41.28,
+      "is_strong": false
+    },
+    {
+      "word": "mails.",
+      "start": 41.28,
+      "end": 41.6,
+      "is_strong": false
+    },
+    {
+      "word": "Donc",
+      "start": 41.74,
+      "end": 41.8,
+      "is_strong": false
+    }
+  ]
+}
