@@ -104,9 +104,14 @@ jobs:
             echo '{"version":"2.0","emotion_mode":"WHOLESOME","color_preset":"warm_vibrant","enhance_4k":true,"sharpening":80,"vignette":0.25,"grain_intensity":0.2,"text_defaults":{"font":"Anton, Arial Black, sans-serif","size":96,"color":"#FFFFFF"},"zoom":{"min_scale":1.0,"max_scale":1.3,"on_strong_word":true}}' > delta/F06_RENDER/IN/codex_STYLE.json
           fi
           
-          # Si pas de timing, creer timing par defaut
+          # Si pas de timing, prendre le timing commité dans le repo (D04 OUT) ou creer timing par defaut
           if [ ! -f "delta/F06_RENDER/IN/timing_$(printf '%03d' $CLIP_IDX).json" ]; then
-            echo "{\"clip_index\":$CLIP_IDX,\"words\":[{\"word\":\"test\",\"start\":0,\"end\":1}]}" > delta/F06_RENDER/IN/timing_$(printf '%03d' $CLIP_IDX).json
+            if [ -f "delta/F04_TIMING/OUT/timing_$(printf '%03d' $CLIP_IDX).json" ]; then
+              cp delta/F04_TIMING/OUT/timing_$(printf '%03d' $CLIP_IDX).json delta/F06_RENDER/IN/
+              echo "Timing copie depuis F04_TIMING/OUT (commit repo)"
+            else
+              echo "{\"clip_index\":$CLIP_IDX,\"words\":[{\"word\":\"test\",\"start\":0,\"end\":1}]}" > delta/F06_RENDER/IN/timing_$(printf '%03d' $CLIP_IDX).json
+            fi
           fi
           
           # Merger
