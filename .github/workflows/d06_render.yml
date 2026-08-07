@@ -74,22 +74,13 @@ jobs:
       # ============================================================
       - name: Download D04 Timing artifact
         if: inputs.d04_run_id != ''
+        continue-on-error: true
         uses: dawidd6/action-download-artifact@v6
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           workflow: d04_timing.yml
           run_id: ${{ inputs.d04_run_id }}
           name: d04-output
-          path: delta/F06_RENDER/IN/
-
-      - name: Download D05 Preview artifact (codex_STYLE)
-        if: inputs.d05_run_id != ''
-        uses: dawidd6/action-download-artifact@v6
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          workflow: d05_preview.yml
-          run_id: ${{ inputs.d05_run_id }}
-          name: d05-output
           path: delta/F06_RENDER/IN/
 
       # ============================================================
