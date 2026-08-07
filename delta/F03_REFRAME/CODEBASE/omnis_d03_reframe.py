@@ -105,7 +105,7 @@ def detect_subjects(video_path, mode="auto"):
                 center_x, center_y = 0.5, 0.5
                 if results.detections:
                     d = results.detections[0]
-                    bbox = d.location_data.relative_bounding
+                    bbox = getattr(d.location_data, "relative_bounding_box", None) or getattr(d.location_data, "relative_bounding", None)
                     center_x = bbox.xmin + bbox.width / 2
                     center_y = bbox.ymin + bbox.height / 2
 

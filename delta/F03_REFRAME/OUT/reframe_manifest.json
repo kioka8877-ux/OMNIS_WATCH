@@ -1,0 +1,39 @@
+{
+  "source_video": "video_source.mp4",
+  "moments_reframed": 3,
+  "clips": [
+    {
+      "index": 0,
+      "start_sec": 58.2,
+      "end_sec": 99.96,
+      "duration_sec": 41.75999999999999,
+      "emotion_mode": "surprise",
+      "viral_angle": "Claude repond a 100 questions en meme temps",
+      "reframe_mode": "track",
+      "output": "clips_reframes/clip_000.mp4",
+      "size_mb": 30
+    },
+    {
+      "index": 1,
+      "start_sec": 164.64,
+      "end_sec": 185.08,
+      "duration_sec": 20.440000000000026,
+      "emotion_mode": "wholesome",
+      "viral_angle": "Je pose des questions de vie a Claude",
+      "reframe_mode": "track",
+      "output": "clips_reframes/clip_001.mp4",
+      "size_mb": 13
+    },
+    {
+      "index": 2,
+      "start_sec": 323.24,
+      "end_sec": 358.52,
+      "duration_sec": 35.27999999999997,
+      "emotion_mode": "tension",
+      "viral_angle": "La difference de capacite entre IA et humain",
+      "reframe_mode": "track",
+      "output": "clips_reframes/clip_002.mp4",
+      "size_mb": 29
+    }
+  ]
+}
