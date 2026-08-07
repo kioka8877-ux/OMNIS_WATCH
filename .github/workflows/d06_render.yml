@@ -124,7 +124,18 @@ jobs:
           # La video du clip devient video_coupee.mp4 (source Remotion)
           cp delta/F06_RENDER/IN/clip_$(printf '%03d' $CLIP_IDX).mp4 \
              delta/F06_RENDER/F03A_REMOTION/CODEBASE/public/video_coupee.mp4
-          # Le codex merge devient le codex.json utilise par Remotion
+          # Le codex merge doit etre INJECTE dans src/codexData.js (le composant importe ce module,
+          # pas public/codex.json qui n'est jamais lu)
+          python3 - <<'PYEOF'
+import json
+with open('delta/F06_RENDER/OUT/codex_clip_%(idx)s.json' % {'idx': ${{ matrix.clip_index }}}, 'r', encoding='utf-8') as f:
+    codex = json.load(f)
+with open('delta/F06_RENDER/F03A_REMOTION/CODEBASE/src/codexData.js', 'w', encoding='utf-8') as f:
+    f.write('export const codex = ')
+    json.dump(codex, f, ensure_ascii=False, indent=2)
+    f.write(';\n')
+PYEOF
+          # Copie de secours aussi vers public/codex.json (compatibilité)
           cp delta/F06_RENDER/OUT/codex_clip_$(printf '%03d' $CLIP_IDX).json \
              delta/F06_RENDER/F03A_REMOTION/CODEBASE/public/codex.json
 
