@@ -1,5 +1,5 @@
 {
-  "source_video": "video_source.mp4",
+  "source_video": "video_source.mp4 (25MB/684s, tag video-source-v1)",
   "moments_reframed": 3,
   "clips": [
     {
@@ -11,7 +11,7 @@
       "viral_angle": "Claude repond a 100 questions en meme temps",
       "reframe_mode": "track",
       "output": "clips_reframes/clip_000.mp4",
-      "size_mb": 30
+      "size_mb": 17
     },
     {
       "index": 1,
@@ -22,7 +22,7 @@
       "viral_angle": "Je pose des questions de vie a Claude",
       "reframe_mode": "track",
       "output": "clips_reframes/clip_001.mp4",
-      "size_mb": 13
+      "size_mb": 9
     },
     {
       "index": 2,
@@ -33,11 +33,11 @@
       "viral_angle": "La difference de capacite entre IA et humain",
       "reframe_mode": "track",
       "output": "clips_reframes/clip_002.mp4",
-      "size_mb": 29
+      "size_mb": 13
     }
   ],
   "release": {
-    "tag": "d03-reframe-v1",
-    "url": "https://github.com/kioka8877-ux/OMNIS_WATCH/releases/tag/d03-reframe-v1"
+    "tag": "d03-reframe-v2",
+    "url": "https://github.com/kioka8877-ux/OMNIS_WATCH/releases/tag/d03-reframe-v2"
   }
 }
