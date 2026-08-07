@@ -50,6 +50,33 @@ const DEFAULT_STYLE = {
   }
 };
 
+const buildSegments = (timing) => {
+  if (!timing) return [];
+  if (Array.isArray(timing.segments)) return timing.segments;
+  const words = Array.isArray(timing.words) ? timing.words : [];
+  const segments = [];
+  let current = null;
+  const SENTENCE_MAX_WORDS = 8;
+  for (const w of words) {
+    const word = (w.word || '').trim();
+    if (!word) continue;
+    if (!current) {
+      current = { start: w.start, end: w.end, text: word };
+      continue;
+    }
+    current.text += ' ' + word;
+    current.end = w.end;
+    const endsSentence = /[.!?…»]$/.test(word);
+    const wordCount = current.text.split(' ').length;
+    if (endsSentence || wordCount >= SENTENCE_MAX_WORDS) {
+      segments.push(current);
+      current = null;
+    }
+  }
+  if (current) segments.push(current);
+  return segments;
+};
+
 export default function App() {
   const [style, setStyle] = useState(DEFAULT_STYLE);
   const [activeTab, setActiveTab] = useState('preview');
@@ -306,7 +333,7 @@ export default function App() {
                     }} />
                     {/* Full sentence subtitles with typewriter effect */}
                     {(() => {
-                      const currentSegment = timingJson?.segments?.find(s => 
+                      const currentSegment = buildSegments(timingJson).find(s => 
                         currentTime >= s.start && currentTime <= s.end
                       );
                       if (!currentSegment) return null;
@@ -389,9 +416,9 @@ export default function App() {
               {timingJson && (
                 <div style={{ ...styles.infoBox, marginBottom: '20px' }}>
                   <strong style={{ color: '#00ff88' }}>Timing chargé:</strong><br/>
-                  {timingJson.text_overlays?.length || 0} overlays texte<br/>
-                  {timingJson.zoom_keyframes?.length || 0} keyframes zoom<br/>
-                  {timingJson.sfx_keyframes?.length || 0} SFX
+                  {buildSegments(timingJson).length} segments de sous-titres<br/>
+                  {timingJson.words?.length || 0} mots<br/>
+                  {timingJson.word_count || 0} mots (compteur D04)
                 </div>
               )}
 
