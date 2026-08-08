@@ -451,29 +451,34 @@ export default function App() {
                       boxShadow: `inset 0 0 ${style.vignette * 200}px rgba(0,0,0,${style.vignette})`,
                       pointerEvents: 'none'
                     }} />
-                    {/* Full sentence subtitles with typewriter effect */}
+                    {/* Full sentence subtitles + titre — segment partagé */}
                     {(() => {
                       const currentSegment = buildSegments(timingJson).find(s => 
                         currentTime >= s.start && currentTime <= s.end
                       );
-                      if (!currentSegment) return null;
-                      
-                      const segmentDuration = currentSegment.end - currentSegment.start;
-                      const segmentProgress = Math.min(1, Math.max(0, (currentTime - currentSegment.start) / segmentDuration));
-                      
+                      const segmentDuration = currentSegment ? (currentSegment.end - currentSegment.start) : 1;
+                      const segmentProgress = currentSegment
+                        ? Math.min(1, Math.max(0, (currentTime - currentSegment.start) / segmentDuration))
+                        : 0;
+
+                      return (
+                        <>
+                      {currentSegment && (() => {
                       const fullText = currentSegment.text;
                       const totalChars = fullText.length;
                       
-                      // Speed factor based on animation setting
-                      const speedMap = { fast: 2.0, normal: 1.2, slow: 0.6 };
-                      const speedFactor = speedMap[style.text_defaults.animation] || 1.2;
+                      // Vitesse du typewriter : fraction du segment où le texte est
+                      // 100% affiché. Garantit que la phrase complète (point final inclus)
+                      // s'affiche AVANT la fin du segment, quel que soit le réglage.
+                      const speedMap = { fast: 0.3, normal: 0.6, slow: 0.9 };
+                      const completionFraction = speedMap[style.text_defaults.animation] || 0.6;
                       
                       // Pendant un scrub (recherche), on affiche tout le texte.
                       // Sinon le typewriter se réinitialise depuis zéro à la nouvelle position
                       // → texte invisible ou à moitié tapé.
                       const charsToShow = isSeeking
                         ? totalChars
-                        : Math.floor(segmentProgress * totalChars * speedFactor);
+                        : Math.floor(Math.min(1, segmentProgress / completionFraction) * totalChars);
                       const visibleText = fullText.substring(0, Math.min(charsToShow, totalChars));
                       
                       // Couleur: mot fort → color_strong, sinon couleur texte
@@ -526,6 +531,7 @@ export default function App() {
                         </div>
                       );
                     })()}
+                      )}
                     {/* Titre (bande fond) — actif seulement si le JSON contient un titre */}
                     {(() => {
                       const titleText = getTitleFromTiming(style, timingJson);
@@ -558,13 +564,38 @@ export default function App() {
                         ? `${strokeW}px ${strokeW}px 0 ${strokeC}, -${strokeW}px -${strokeW}px 0 ${strokeC}, ${glowShadow}`
                         : `${strokeW}px ${strokeW}px 0 ${strokeC}, -${strokeW}px -${strokeW}px 0 ${strokeC}`;
                       
+                      // Animation du titre basée sur la progression du segment courant
+                      // (se relance à chaque nouveau segment → effet visible en preview)
+                      const anim = t.animation || 'fade_in';
+                      const progress = segmentProgress;
+                      const words = titleText.split(' ').filter(Boolean);
+                      const wordsPerFrame = 0;
+                      let blockOpacity = 1;
+                      let blockScale = 1;
+                      let shownWords = words.length;
+                      
+                      if (anim === 'word_by_word') {
+                        shownWords = Math.max(1, Math.ceil(progress * words.length * 1.5));
+                      } else if (anim === 'pop') {
+                        blockOpacity = progress < 0.3 ? progress / 0.3 : 1;
+                        blockScale = 0.8 + 0.2 * Math.min(1, progress / 0.3);
+                      } else if (anim === 'fade_in_slow') {
+                        blockOpacity = Math.min(1, progress * 1.5);
+                      } else {
+                        blockOpacity = Math.min(1, progress * 2.5);
+                      }
+                      
+                      const visibleTitle = anim === 'word_by_word'
+                        ? words.slice(0, shownWords).join(' ')
+                        : titleText;
+                      
                       return (
                         <div
                           style={{
                             position: 'absolute',
                             ...posStyle,
                             left: '50%',
-                            transform: 'translateX(-50%)',
+                            transform: `translateX(-50%) scale(${blockScale})`,
                             ...bandStyle,
                             color: t.color || '#FFFFFF',
                             fontSize: `${(t.size || 96) * 0.35}px`,
@@ -577,10 +608,15 @@ export default function App() {
                             pointerEvents: 'none',
                             letterSpacing: t.letter_spacing || '0em',
                             zIndex: 11,
+                            opacity: blockOpacity,
+                            transition: 'opacity 0.1s, transform 0.1s',
                           }}
                         >
-                          {titleText}
+                          {visibleTitle}
                         </div>
+                      );
+                    })()}
+                        </>
                       );
                     })()}
                   </div>
