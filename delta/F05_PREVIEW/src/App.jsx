@@ -196,7 +196,14 @@ export default function App() {
       for (let i = 0; i < keys.length - 1; i++) {
         obj = obj[keys[i]];
       }
-      obj[keys[keys.length - 1]] = value;
+      const lastKey = keys[keys.length - 1];
+      const isObjectValue = typeof value === 'object' && value !== null && !Array.isArray(value);
+      const isObjectCurrent = typeof obj[lastKey] === 'object' && obj[lastKey] !== null && !Array.isArray(obj[lastKey]);
+      if (isObjectValue && isObjectCurrent) {
+        obj[lastKey] = { ...obj[lastKey], ...value };
+      } else {
+        obj[lastKey] = value;
+      }
       return newStyle;
     });
     setExported(false);
@@ -450,22 +457,28 @@ export default function App() {
                       const visibleText = fullText.substring(0, Math.min(charsToShow, totalChars));
                       
                       // Couleur: mot fort → color_strong, sinon couleur texte
+                      const t = style.text_defaults;
                       const textColor = currentSegment.is_strong 
-                        ? (style.text_defaults.color_strong || style.text_defaults.color)
-                        : style.text_defaults.color;
+                        ? (t.color_strong || t.color)
+                        : t.color;
                       
                       // Glow
-                      const glowPx = style.text_defaults.glow_intensity * 4;
+                      const glowPx = (t.glow_intensity || 0) * 4;
                       const glowShadow = glowPx > 0 
                         ? `0 0 ${glowPx}px ${textColor}, 0 0 ${glowPx * 2}px ${textColor}`
                         : '';
                       
                       // Position
-                      const pos = style.text_defaults.position;
+                      const pos = t.position || 'bottom';
                       const posStyle = {
                         top: pos === 'top' ? '15%' : (pos === 'center' ? '45%' : 'auto'),
                         bottom: pos === 'bottom' ? '15%' : 'auto',
                       };
+                      const strokeW = t.stroke_width || 0;
+                      const strokeC = t.stroke_color || '#000000';
+                      const textShadow = glowShadow
+                        ? `${strokeW}px ${strokeW}px 0 ${strokeC}, -${strokeW}px -${strokeW}px 0 ${strokeC}, ${glowShadow}`
+                        : `${strokeW}px ${strokeW}px 0 ${strokeC}, -${strokeW}px -${strokeW}px 0 ${strokeC}`;
                       
                       return (
                         <div
@@ -475,17 +488,15 @@ export default function App() {
                             left: '50%',
                             transform: 'translateX(-50%)',
                             color: textColor,
-                            fontSize: `${style.text_defaults.size * 0.35}px`,
-                            fontFamily: style.text_defaults.font,
+                            fontSize: `${(t.size || 96) * 0.35}px`,
+                            fontFamily: t.font || 'Arial Black, Arial, sans-serif',
                             fontWeight: 'bold',
-                            textShadow: glowShadow
-                              ? `${style.text_defaults.stroke_width}px ${style.text_defaults.stroke_width}px 0 ${style.text_defaults.stroke_color}, -${style.text_defaults.stroke_width}px -${style.text_defaults.stroke_width}px 0 ${style.text_defaults.stroke_color}, ${glowShadow}`
-                              : `${style.text_defaults.stroke_width}px ${style.text_defaults.stroke_width}px 0 ${style.text_defaults.stroke_color}, -${style.text_defaults.stroke_width}px -${style.text_defaults.stroke_width}px 0 ${style.text_defaults.stroke_color}`,
+                            textShadow,
                             textAlign: 'center',
                             whiteSpace: 'normal',
                             maxWidth: '90%',
                             pointerEvents: 'none',
-                            letterSpacing: style.text_defaults.letter_spacing,
+                            letterSpacing: t.letter_spacing || '0em',
                             zIndex: 10,
                             opacity: isSeeking ? 1 : (segmentProgress > 0.1 ? 1 : segmentProgress * 10)
                           }}
@@ -500,7 +511,7 @@ export default function App() {
                       const titleText = getTitleFromTiming(style, timingJson);
                       if (!titleText) return null;
                       
-                      const t = style.title_defaults;
+                      const t = style.title_defaults || {};
                       const bg = t.background || {};
                       const bgEnabled = bg.enabled === true;
                       
@@ -510,7 +521,7 @@ export default function App() {
                         ? `0 0 ${glowPx}px ${t.color}, 0 0 ${glowPx * 2}px ${t.color}`
                         : '';
                       
-                      const pos = t.position;
+                      const pos = t.position || 'center';
                       const posStyle = {
                         top: pos === 'top' ? '8%' : (pos === 'center' ? '40%' : 'auto'),
                         bottom: pos === 'bottom' ? '8%' : 'auto',
@@ -521,6 +532,11 @@ export default function App() {
                         borderRadius: `${bg.radius || 0}px`,
                         padding: `${bg.thickness || 0}px 28px`,
                       } : null;
+                      const strokeW = t.stroke_width || 0;
+                      const strokeC = t.stroke_color || '#000000';
+                      const titleShadow = glowShadow
+                        ? `${strokeW}px ${strokeW}px 0 ${strokeC}, -${strokeW}px -${strokeW}px 0 ${strokeC}, ${glowShadow}`
+                        : `${strokeW}px ${strokeW}px 0 ${strokeC}, -${strokeW}px -${strokeW}px 0 ${strokeC}`;
                       
                       return (
                         <div
@@ -530,18 +546,16 @@ export default function App() {
                             left: '50%',
                             transform: 'translateX(-50%)',
                             ...bandStyle,
-                            color: t.color,
-                            fontSize: `${t.size * 0.35}px`,
-                            fontFamily: t.font,
+                            color: t.color || '#FFFFFF',
+                            fontSize: `${(t.size || 96) * 0.35}px`,
+                            fontFamily: t.font || 'Arial Black, Arial, sans-serif',
                             fontWeight: 'bold',
-                            textShadow: glowShadow
-                              ? `${t.stroke_width}px ${t.stroke_width}px 0 ${t.stroke_color}, -${t.stroke_width}px -${t.stroke_width}px 0 ${t.stroke_color}, ${glowShadow}`
-                              : `${t.stroke_width}px ${t.stroke_width}px 0 ${t.stroke_color}, -${t.stroke_width}px -${t.stroke_width}px 0 ${t.stroke_color}`,
+                            textShadow: titleShadow,
                             textAlign: 'center',
                             whiteSpace: 'normal',
                             maxWidth: '90%',
                             pointerEvents: 'none',
-                            letterSpacing: t.letter_spacing,
+                            letterSpacing: t.letter_spacing || '0em',
                             zIndex: 11,
                           }}
                         >
