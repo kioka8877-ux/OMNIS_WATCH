@@ -221,15 +221,28 @@ const TextOverlay = ({ overlay, frame, fps }) => {
     glow_intensity = 0,
     depth_3d = 0,
     start_frame = 0,
+    background = { enabled: false },
   } = overlay;
 
   const localFrame = frame;
   const words = content.split(' ');
 
+  // Fond (pill) optionnel derrière le texte — désactivé par défaut.
+  // Réservé au TITRE : les sous-titres restent sans fond.
+  const bgEnabled = background && background.enabled;
+  const bgStyle = bgEnabled
+    ? {
+        backgroundColor: background.color || 'rgba(0,0,0,0.5)',
+        padding: background.padding || '16px 28px',
+        borderRadius: background.radius != null ? `${background.radius}px` : '12px',
+        display: 'inline-block',
+      }
+    : null;
+
   // Calculer le timing d'apparition des mots
   // Pour word_by_word : chaque mot apparaît à intervalle régulier
   const totalDuration = (overlay.end_frame || 300) - start_frame;
-  const wordFadeFrames = 8; // frames pour le fade-in d'un mot
+  const wordFadeFrames = 3; // frames pour le fade-in d'un mot (plus rapide → sous-titres visibles)
   let wordsPerFrame;
 
   if (animation === 'word_by_word') {
@@ -314,6 +327,7 @@ const TextOverlay = ({ overlay, frame, fps }) => {
             flexWrap: 'wrap',
             justifyContent: 'center',
             alignItems: 'center',
+            ...(bgStyle || {}),
           }}
         >
           {words.map((word, i) => {
@@ -360,6 +374,7 @@ const TextOverlay = ({ overlay, frame, fps }) => {
           ...baseTextStyle,
           opacity: blockOpacity,
           transform: `scale(${blockScale})`,
+          ...(bgStyle || {}),
         }}
       >
         {/* Couches 3D depth (si depth_3d > 0) */}
