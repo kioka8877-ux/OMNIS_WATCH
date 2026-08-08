@@ -21,6 +21,11 @@ const normalizeColor = (color) => {
   return color;
 };
 
+const getContrastFromFilter = (filter) => {
+  const m = (filter || '').match(/contrast\(([\d.]+)\)/);
+  return m ? parseFloat(m[1]) : 1.0;
+};
+
 /**
  * App — F05 PREVIEW (DELTA MODE)
  * ==============================
@@ -83,6 +88,7 @@ const DEFAULT_STYLE = {
   },
   color_preset: "warm_vibrant",
   color_css_filter: "contrast(1.2) saturate(1.15) brightness(1.05) hue-rotate(3deg)",
+  contrast: 1.2,
   enhance_4k: true,
   sharpening: 80,
   vignette: 0.25,
@@ -205,6 +211,20 @@ export default function App() {
         obj[lastKey] = value;
       }
       return newStyle;
+    });
+    setExported(false);
+  };
+
+  const setContrast = (value) => {
+    setStyle(prevStyle => {
+      const filter = prevStyle.color_css_filter || '';
+      const hasContrast = /contrast\([\d.]+\)/.test(filter);
+      const nextFilter = filter === 'none'
+        ? `contrast(${value})`
+        : hasContrast
+          ? filter.replace(/contrast\([\d.]+\)/, `contrast(${value})`)
+          : `${filter} contrast(${value})`;
+      return { ...prevStyle, color_css_filter: nextFilter, contrast: value };
     });
     setExported(false);
   };
@@ -614,10 +634,14 @@ export default function App() {
             <div style={styles.tabContent}>
               <label style={styles.label}>Mode emotionnel</label>
               <select style={styles.select} value={style.emotion_mode} onChange={(e) => {
-                updateField('emotion_mode', e.target.value);
-                if (presets[e.target.value]) {
-                  Object.entries(presets[e.target.value]).forEach(([k, v]) => updateField(k, v));
+                const mode = e.target.value;
+                updateField('emotion_mode', mode);
+                if (presets[mode]) {
+                  Object.entries(presets[mode]).forEach(([k, v]) => updateField(k, v));
                 }
+                const filter = presets[mode]?.color_css_filter || '';
+                const c = getContrastFromFilter(filter);
+                if (c > 0) updateField('contrast', c);
               }}>
                 <option value="WHOLESOME">Wholesome</option>
                 <option value="DRAMATIC">Dramatique</option>
@@ -635,6 +659,11 @@ export default function App() {
                 // Apply specific filter for argent (black + silver, no blue)
                 if (val === 'argent') {
                   updateField('color_css_filter', 'contrast(1.3) saturate(0.15) brightness(0.85) grayscale(0.8)');
+                  updateField('contrast', 1.3);
+                }
+                if (val === 'none') {
+                  updateField('color_css_filter', 'none');
+                  updateField('contrast', 1);
                 }
               }}>
                 <option value="warm_vibrant">Warm Vibrant</option>
@@ -647,6 +676,9 @@ export default function App() {
 
               <label style={styles.label}>Filter CSS</label>
               <div style={styles.codeBlock}>{style.color_css_filter}</div>
+
+              <label style={styles.label}>Contraste: {Math.round((style.contrast || 1) * 100)}%</label>
+              <input style={styles.slider} type="range" min="80" max="200" step="5" value={Math.round((style.contrast || 1) * 100)} onChange={(e) => setContrast(parseInt(e.target.value) / 100)} />
 
               <label style={styles.label}>Vignette: {Math.round(style.vignette * 100)}%</label>
               <input style={styles.slider} type="range" min="0" max="100" value={Math.round(style.vignette * 100)} onChange={(e) => updateField('vignette', parseInt(e.target.value) / 100)} />
