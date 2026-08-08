@@ -1,5 +1,26 @@
 import React, { useState, useRef } from 'react';
 
+/* Helpers couleur */
+const hexToRgba = (hex, alpha = 1) => {
+  if (!hex) return `rgba(0,0,0,${alpha})`;
+  const h = hex.replace('#', '');
+  if (h.length === 3) return hexToRgba('#' + h.split('').map(c => c + c).join(''), alpha);
+  if (h.length !== 6) return `rgba(0,0,0,${alpha})`;
+  const r = parseInt(h.substring(0, 2), 16);
+  const g = parseInt(h.substring(2, 4), 16);
+  const b = parseInt(h.substring(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+};
+
+const normalizeColor = (color) => {
+  if (!color) return '#000000';
+  const m = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if (m) {
+    return '#' + [m[1], m[2], m[3]].map(v => (+v).toString(16).padStart(2, '0')).join('');
+  }
+  return color;
+};
+
 /**
  * App — F05 PREVIEW (DELTA MODE)
  * ==============================
@@ -14,6 +35,7 @@ const DEFAULT_STYLE = {
   version: "2.0",
   emotion_mode: "WHOLESOME",
   narrative_arc: "setup → context → climax → emotional_peak → action → resolution",
+  title: "",
   video: {
     fps: 30,
     width: 1080,
@@ -23,6 +45,7 @@ const DEFAULT_STYLE = {
     font: "Anton, Arial Black, sans-serif",
     size: 96,
     color: "#FFFFFF",
+    color_strong: "#FFFFFF",
     stroke_color: "#000000",
     stroke_width: 4,
     shadow: "2px 4px 8px rgba(0,0,0,0.9)",
@@ -32,9 +55,30 @@ const DEFAULT_STYLE = {
     depth_3d: 0,
     animation: "word_by_word"
   },
+  title_defaults: {
+    font: "Anton, Arial Black, sans-serif",
+    size: 96,
+    color: "#FFFFFF",
+    color_strong: "#FFFFFF",
+    stroke_color: "#000000",
+    stroke_width: 4,
+    shadow: "2px 4px 8px rgba(0,0,0,0.9)",
+    position: "center",
+    letter_spacing: "0em",
+    glow_intensity: 0,
+    depth_3d: 0,
+    animation: "fade_in",
+    background: {
+      enabled: false,
+      color: "rgba(0,0,0,0.6)",
+      radius: 16,
+      thickness: 20
+    }
+  },
   zoom: {
     min_scale: 1.0,
     max_scale: 1.3,
+    gap_sec: 3,
     on_strong_word: true
   },
   color_preset: "warm_vibrant",
@@ -61,11 +105,12 @@ const buildSegments = (timing) => {
     const word = (w.word || '').trim();
     if (!word) continue;
     if (!current) {
-      current = { start: w.start, end: w.end, text: word };
+      current = { start: w.start, end: w.end, text: word, is_strong: !!w.is_strong };
       continue;
     }
     current.text += ' ' + word;
     current.end = w.end;
+    current.is_strong = current.is_strong || !!w.is_strong;
     const endsSentence = /[.!?…»]$/.test(word);
     const wordCount = current.text.split(' ').length;
     if (endsSentence || wordCount >= SENTENCE_MAX_WORDS) {
@@ -77,6 +122,16 @@ const buildSegments = (timing) => {
   return segments;
 };
 
+const getTitleFromTiming = (styleObj, timing) => {
+  if (styleObj?.title && styleObj.title.trim()) return styleObj.title.trim();
+  if (!timing) return null;
+  if (timing.title) return timing.title;
+  if (Array.isArray(timing.text_overlays)) {
+    const t = timing.text_overlays.find(o => o.role === 'title');
+    if (t) return t.content || t.text || null;
+  }
+  return null;
+};
 export default function App() {
   const [style, setStyle] = useState(DEFAULT_STYLE);
   const [activeTab, setActiveTab] = useState('preview');
@@ -113,6 +168,7 @@ export default function App() {
   const exportMergedCodex = () => {
     const mergedCodex = {
       ...style,
+      title: getTitleFromTiming(style, timingJson),
       text_overlays: timingJson?.text_overlays || [],
       zoom_keyframes: timingJson?.zoom_keyframes || [],
       sfx_keyframes: timingJson?.sfx_keyframes || [],
@@ -160,37 +216,44 @@ export default function App() {
     WHOLESOME: {
       color_preset: "warm_vibrant",
       color_css_filter: "contrast(1.2) saturate(1.15) brightness(1.05) hue-rotate(3deg)",
-      text_defaults: { color: "#FFB6C1", stroke_color: "#8B0000", stroke_width: 3 }
+      text_defaults: { color: "#FFB6C1", color_strong: "#FFD700", stroke_color: "#8B0000", stroke_width: 3 },
+      title_defaults: { color: "#FFFFFF", color_strong: "#FFD700", stroke_color: "#8B0000", stroke_width: 3, background: { enabled: true, color: "rgba(0,0,0,0.6)", radius: 16, thickness: 20 } }
     },
     DRAMATIC: {
       color_preset: "cinematic",
       color_css_filter: "contrast(1.3) saturate(0.9) brightness(0.95)",
-      text_defaults: { color: "#FFFFFF", stroke_color: "#000000", stroke_width: 4 }
+      text_defaults: { color: "#FFFFFF", color_strong: "#FFFFFF", stroke_color: "#000000", stroke_width: 4 },
+      title_defaults: { color: "#FFFFFF", color_strong: "#FFFFFF", stroke_color: "#000000", stroke_width: 4, background: { enabled: true, color: "rgba(0,0,0,0.7)", radius: 12, thickness: 24 } }
     },
     COMEDY: {
       color_preset: "high_contrast",
       color_css_filter: "contrast(1.1) saturate(1.3) brightness(1.1)",
-      text_defaults: { color: "#FFFF00", stroke_color: "#FF4500", stroke_width: 3 }
+      text_defaults: { color: "#FFFF00", color_strong: "#FF4500", stroke_color: "#FF4500", stroke_width: 3 },
+      title_defaults: { color: "#FFFF00", color_strong: "#FF4500", stroke_color: "#FF4500", stroke_width: 3, background: { enabled: false, color: "rgba(0,0,0,0.5)", radius: 12, thickness: 20 } }
     },
     ACTION: {
       color_preset: "high_contrast",
       color_css_filter: "contrast(1.4) saturate(1.2) brightness(1.0)",
-      text_defaults: { color: "#FF4500", stroke_color: "#000000", stroke_width: 4 }
+      text_defaults: { color: "#FF4500", color_strong: "#FFFF00", stroke_color: "#000000", stroke_width: 4 },
+      title_defaults: { color: "#FF4500", color_strong: "#FFFF00", stroke_color: "#000000", stroke_width: 4, background: { enabled: true, color: "rgba(20,20,20,0.75)", radius: 8, thickness: 28 } }
     },
     MYSTERIOUS: {
       color_preset: "cool_moody",
       color_css_filter: "contrast(1.2) saturate(0.8) brightness(0.9) hue-rotate(10deg)",
-      text_defaults: { color: "#9370DB", stroke_color: "#4B0082", stroke_width: 3 }
+      text_defaults: { color: "#9370DB", color_strong: "#DDA0DD", stroke_color: "#4B0082", stroke_width: 3 },
+      title_defaults: { color: "#9370DB", color_strong: "#DDA0DD", stroke_color: "#4B0082", stroke_width: 3, background: { enabled: true, color: "rgba(10,5,30,0.7)", radius: 20, thickness: 22 } }
     },
     MOTIVATION: {
       color_preset: "high_energy",
       color_css_filter: "contrast(1.35) saturate(1.4) brightness(1.1) hue-rotate(-5deg)",
-      text_defaults: { color: "#FFD700", stroke_color: "#000000", stroke_width: 5 }
+      text_defaults: { color: "#FFD700", color_strong: "#FFFFFF", stroke_color: "#000000", stroke_width: 5 },
+      title_defaults: { color: "#FFD700", color_strong: "#FFFFFF", stroke_color: "#000000", stroke_width: 5, background: { enabled: true, color: "rgba(0,0,0,0.65)", radius: 14, thickness: 26 } }
     },
     GRIS: {
       color_preset: "argent",
       color_css_filter: "contrast(1.3) saturate(0.15) brightness(0.85) grayscale(0.8)",
-      text_defaults: { color: "#C0C0C0", stroke_color: "#000000", stroke_width: 4 }
+      text_defaults: { color: "#C0C0C0", color_strong: "#E0E0E0", stroke_color: "#000000", stroke_width: 4 },
+      title_defaults: { color: "#C0C0C0", color_strong: "#E0E0E0", stroke_color: "#000000", stroke_width: 4, background: { enabled: true, color: "rgba(30,30,30,0.7)", radius: 10, thickness: 24 } }
     }
   };
 
@@ -264,6 +327,25 @@ export default function App() {
             <span style={styles.summaryLabel}>Zoom:</span>
             <span style={styles.summaryValue}>x{style.zoom.max_scale}</span>
           </div>
+
+          <div style={styles.summaryItem}>
+            <span style={styles.summaryLabel}>Gap zoom:</span>
+            <span style={styles.summaryValue}>{style.zoom.gap_sec || 3}s</span>
+          </div>
+
+          <div style={styles.summaryItem}>
+            <span style={styles.summaryLabel}>Titre:</span>
+            <span style={{ ...styles.summaryValue, color: getTitleFromTiming(style, timingJson) ? '#00ff88' : '#666' }}>
+              {getTitleFromTiming(style, timingJson) ? '✓ présent' : 'absent'}
+            </span>
+          </div>
+
+          <div style={styles.summaryItem}>
+            <span style={styles.summaryLabel}>Fond titre:</span>
+            <span style={{ ...styles.summaryValue, color: style.title_defaults.background?.enabled ? '#00ff88' : '#888' }}>
+              {style.title_defaults.background?.enabled ? 'ON' : 'OFF'}
+            </span>
+          </div>
         </div>
 
         {/* Panel droit: configuration */}
@@ -273,6 +355,7 @@ export default function App() {
             <button style={activeTab === 'preview' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('preview')}>Preview</button>
             <button style={activeTab === 'style' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('style')}>Style</button>
             <button style={activeTab === 'text' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('text')}>Texte</button>
+            <button style={activeTab === 'title' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('title')}>Titre</button>
             <button style={activeTab === 'video' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('video')}>Video</button>
             <button style={activeTab === 'zoom' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('zoom')}>Zoom</button>
           </div>
@@ -351,10 +434,15 @@ export default function App() {
                       const charsToShow = Math.floor(segmentProgress * totalChars * speedFactor);
                       const visibleText = fullText.substring(0, Math.min(charsToShow, totalChars));
                       
+                      // Couleur: mot fort → color_strong, sinon couleur texte
+                      const textColor = currentSegment.is_strong 
+                        ? (style.text_defaults.color_strong || style.text_defaults.color)
+                        : style.text_defaults.color;
+                      
                       // Glow
                       const glowPx = style.text_defaults.glow_intensity * 4;
                       const glowShadow = glowPx > 0 
-                        ? `0 0 ${glowPx}px ${style.text_defaults.color}, 0 0 ${glowPx * 2}px ${style.text_defaults.color}`
+                        ? `0 0 ${glowPx}px ${textColor}, 0 0 ${glowPx * 2}px ${textColor}`
                         : '';
                       
                       // Position
@@ -371,7 +459,7 @@ export default function App() {
                             ...posStyle,
                             left: '50%',
                             transform: 'translateX(-50%)',
-                            color: style.text_defaults.color,
+                            color: textColor,
                             fontSize: `${style.text_defaults.size * 0.35}px`,
                             fontFamily: style.text_defaults.font,
                             fontWeight: 'bold',
@@ -389,6 +477,60 @@ export default function App() {
                         >
                           {visibleText}
                           {charsToShow < totalChars && <span style={{ opacity: 0.7 }}>|</span>}
+                        </div>
+                      );
+                    })()}
+                    {/* Titre (bande fond) — actif seulement si le JSON contient un titre */}
+                    {(() => {
+                      const titleText = getTitleFromTiming(style, timingJson);
+                      if (!titleText) return null;
+                      
+                      const t = style.title_defaults;
+                      const bg = t.background || {};
+                      const bgEnabled = bg.enabled === true;
+                      
+                      // Fond actif → glow et autres effets annulés (simple bande)
+                      const glowPx = bgEnabled ? 0 : (t.glow_intensity || 0) * 4;
+                      const glowShadow = glowPx > 0
+                        ? `0 0 ${glowPx}px ${t.color}, 0 0 ${glowPx * 2}px ${t.color}`
+                        : '';
+                      
+                      const pos = t.position;
+                      const posStyle = {
+                        top: pos === 'top' ? '8%' : (pos === 'center' ? '40%' : 'auto'),
+                        bottom: pos === 'bottom' ? '8%' : 'auto',
+                      };
+                      
+                      const bandStyle = bgEnabled ? {
+                        backgroundColor: bg.color || 'rgba(0,0,0,0.6)',
+                        borderRadius: `${bg.radius || 0}px`,
+                        padding: `${bg.thickness || 0}px 28px`,
+                      } : null;
+                      
+                      return (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            ...posStyle,
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            ...bandStyle,
+                            color: t.color,
+                            fontSize: `${t.size * 0.35}px`,
+                            fontFamily: t.font,
+                            fontWeight: 'bold',
+                            textShadow: glowShadow
+                              ? `${t.stroke_width}px ${t.stroke_width}px 0 ${t.stroke_color}, -${t.stroke_width}px -${t.stroke_width}px 0 ${t.stroke_color}, ${glowShadow}`
+                              : `${t.stroke_width}px ${t.stroke_width}px 0 ${t.stroke_color}, -${t.stroke_width}px -${t.stroke_width}px 0 ${t.stroke_color}`,
+                            textAlign: 'center',
+                            whiteSpace: 'normal',
+                            maxWidth: '90%',
+                            pointerEvents: 'none',
+                            letterSpacing: t.letter_spacing,
+                            zIndex: 11,
+                          }}
+                        >
+                          {titleText}
                         </div>
                       );
                     })()}
@@ -511,6 +653,23 @@ export default function App() {
               <label style={styles.label}>Couleur texte</label>
               <input style={{ ...styles.colorPicker, width: '100%', height: '40px' }} type="color" value={style.text_defaults.color} onChange={(e) => updateField('text_defaults.color', e.target.value)} />
 
+              <label style={styles.label}>
+                <input type="checkbox" checked={!!style.text_defaults.color_strong && style.text_defaults.color_strong !== style.text_defaults.color} onChange={(e) => {
+                  if (e.target.checked) {
+                    updateField('text_defaults.color_strong', style.text_defaults.color_strong || style.text_defaults.color);
+                  } else {
+                    updateField('text_defaults.color_strong', style.text_defaults.color);
+                  }
+                }} style={{ marginRight: '8px' }} />
+                Mot fort : couleur différente
+              </label>
+              {!!style.text_defaults.color_strong && style.text_defaults.color_strong !== style.text_defaults.color && (
+                <>
+                  <label style={styles.label}>Couleur mot fort</label>
+                  <input style={{ ...styles.colorPicker, width: '100%', height: '40px' }} type="color" value={style.text_defaults.color_strong} onChange={(e) => updateField('text_defaults.color_strong', e.target.value)} />
+                </>
+              )}
+
               <label style={styles.label}>Couleur contour</label>
               <input style={{ ...styles.colorPicker, width: '100%', height: '40px' }} type="color" value={style.text_defaults.stroke_color} onChange={(e) => updateField('text_defaults.stroke_color', e.target.value)} />
 
@@ -548,6 +707,128 @@ export default function App() {
             </div>
           )}
 
+          {/* Title tab */}
+          {activeTab === 'title' && (
+            <div style={styles.tabContent}>
+              <label style={styles.label}>Texte du titre (vide = pas de titre)</label>
+              <input 
+                type="text" 
+                style={{ ...styles.select, width: '100%' }}
+                placeholder="Ex: IL N'EST PAS SEUL"
+                value={style.title || ''}
+                onChange={(e) => updateField('title', e.target.value)}
+              />
+
+              <div style={{ ...styles.infoBox, background: '#1a2a1a', border: '1px solid #2a4a2a' }}>
+                <strong style={{ color: '#00ff88' }}>Le titre n'agit que si le JSON contient un titre</strong><br />
+                (champ <code>title</code> ou overlay <code>role: "title"</code>).<br />
+                S'il y a un fond, le glow et les autres effets sont annulés — simple bande derrière le titre.
+              </div>
+
+              <label style={styles.label}>Police</label>
+              <select style={styles.select} value={style.title_defaults.font} onChange={(e) => updateField('title_defaults.font', e.target.value)}>
+                <option value="Anton, Arial Black, sans-serif">Anton</option>
+                <option value="Impact, Arial Black, sans-serif">Impact</option>
+                <option value="Bebas Neue, Impact, sans-serif">Bebas Neue</option>
+                <option value="Arial Black, Arial, sans-serif">Arial Black</option>
+                <option value="Helvetica Neue, Helvetica, Arial, sans-serif">Helvetica</option>
+              </select>
+
+              <label style={styles.label}>Taille: {style.title_defaults.size}px</label>
+              <input 
+                style={styles.slider} 
+                type="range" 
+                min="20" 
+                max="200" 
+                step="1"
+                value={style.title_defaults.size || 96} 
+                onChange={(e) => updateField('title_defaults.size', Number(e.target.value))} 
+              />
+
+              <label style={styles.label}>Couleur texte</label>
+              <input style={{ ...styles.colorPicker, width: '100%', height: '40px' }} type="color" value={style.title_defaults.color} onChange={(e) => updateField('title_defaults.color', e.target.value)} />
+
+              <label style={styles.label}>
+                <input type="checkbox" checked={!!style.title_defaults.color_strong && style.title_defaults.color_strong !== style.title_defaults.color} onChange={(e) => {
+                  if (e.target.checked) {
+                    updateField('title_defaults.color_strong', style.title_defaults.color_strong || style.title_defaults.color);
+                  } else {
+                    updateField('title_defaults.color_strong', style.title_defaults.color);
+                  }
+                }} style={{ marginRight: '8px' }} />
+                Mot fort : couleur différente
+              </label>
+              {!!style.title_defaults.color_strong && style.title_defaults.color_strong !== style.title_defaults.color && (
+                <>
+                  <label style={styles.label}>Couleur mot fort</label>
+                  <input style={{ ...styles.colorPicker, width: '100%', height: '40px' }} type="color" value={style.title_defaults.color_strong} onChange={(e) => updateField('title_defaults.color_strong', e.target.value)} />
+                </>
+              )}
+
+              <label style={styles.label}>Couleur contour</label>
+              <input style={{ ...styles.colorPicker, width: '100%', height: '40px' }} type="color" value={style.title_defaults.stroke_color} onChange={(e) => updateField('title_defaults.stroke_color', e.target.value)} />
+
+              <label style={styles.label}>Epaisseur contour: {style.title_defaults.stroke_width}px</label>
+              <input style={styles.slider} type="range" min="0" max="10" value={style.title_defaults.stroke_width} onChange={(e) => updateField('title_defaults.stroke_width', parseInt(e.target.value))} />
+
+              <label style={styles.label}>Position</label>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {[['top', 'TOP'], ['center', 'CENTER'], ['bottom', 'BOTTOM']].map(([pos, label]) => (
+                  <button key={pos} style={style.title_defaults.position === pos ? styles.posBtnActive : styles.posBtn} onClick={() => updateField('title_defaults.position', pos)}>{label}</button>
+                ))}
+              </div>
+
+              <label style={styles.label}>Glow: {style.title_defaults.glow_intensity}</label>
+              <input 
+                style={styles.slider} 
+                type="range" 
+                min="0" 
+                max="100" 
+                step="1"
+                value={style.title_defaults.glow_intensity || 0} 
+                onChange={(e) => updateField('title_defaults.glow_intensity', Number(e.target.value))} 
+              />
+
+              <label style={styles.label}>Animation</label>
+              <select 
+                style={styles.select} 
+                value={style.title_defaults.animation || 'fade_in'} 
+                onChange={(e) => updateField('title_defaults.animation', e.target.value)}
+              >
+                <option value="word_by_word">Mot par mot</option>
+                <option value="fade_in">Fade in</option>
+                <option value="fade_in_slow">Fade in lent</option>
+                <option value="pop">Pop</option>
+              </select>
+
+              <div style={{ marginTop: '8px', padding: '12px', background: '#1a1a1a', borderRadius: '8px', border: '1px solid #333' }}>
+                <strong style={{ color: '#00ff88', fontSize: '13px' }}>FOND (bande derrière le titre)</strong>
+
+                <label style={{ ...styles.label, marginTop: '8px', display: 'block' }}>
+                  <input type="checkbox" checked={!!style.title_defaults.background?.enabled} onChange={(e) => updateField('title_defaults.background.enabled', e.target.checked)} style={{ marginRight: '8px' }} />
+                  Activer le fond
+                </label>
+
+                {style.title_defaults.background?.enabled && (
+                  <>
+                    <label style={styles.label}>Couleur du fond</label>
+                    <input style={{ ...styles.colorPicker, width: '100%', height: '40px' }} type="color" value={normalizeColor(style.title_defaults.background.color)} onChange={(e) => updateField('title_defaults.background.color', hexToRgba(e.target.value, 0.6))} />
+
+                    <label style={styles.label}>Arrondi des angles: {style.title_defaults.background.radius}px</label>
+                    <input style={styles.slider} type="range" min="0" max="60" step="1" value={style.title_defaults.background.radius ?? 0} onChange={(e) => updateField('title_defaults.background.radius', parseInt(e.target.value))} />
+
+                    <label style={styles.label}>Épaisseur (hauteur bande): {style.title_defaults.background.thickness}px</label>
+                    <input style={styles.slider} type="range" min="0" max="60" step="1" value={style.title_defaults.background.thickness ?? 0} onChange={(e) => updateField('title_defaults.background.thickness', parseInt(e.target.value))} />
+
+                    <div style={{ fontSize: '11px', color: '#ffcc00', marginTop: '4px' }}>
+                      Fond actif → glow, depth_3d et ombre annulés (simple bande).
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Video tab */}
           {activeTab === 'video' && (
             <div style={styles.tabContent}>
@@ -581,9 +862,13 @@ export default function App() {
               <label style={styles.label}>Zoom max: x{style.zoom.max_scale}</label>
               <input style={styles.slider} type="range" min="100" max="200" value={style.zoom.max_scale * 100} onChange={(e) => updateField('zoom.max_scale', parseInt(e.target.value) / 100)} />
 
+              <label style={styles.label}>1 zoom toutes les: {style.zoom.gap_sec}s</label>
+              <input style={styles.slider} type="range" min="1" max="6" step="1" value={style.zoom.gap_sec || 3} onChange={(e) => updateField('zoom.gap_sec', parseInt(e.target.value))} />
+
               <div style={styles.infoBox}>
                 <strong style={{ color: '#ffcc00' }}>Le zoom sera applique:</strong><br />
                 - Sur mots <code>is_strong: true</code> dans timing.json<br />
+                - Max 1 zoom toutes les {style.zoom.gap_sec || 3}s (le mot fort le plus porteur)<br />
                 - Animation progressive
               </div>
             </div>

@@ -104,6 +104,7 @@ def merge_codex(style, timing, clip_id):
         "version": style.get("version", "2.0"),
         "emotion_mode": style.get("emotion_mode", "WHOLESOME"),
         "narrative_arc": style.get("narrative_arc", ""),
+        "title": timing.get("title"),
         "video": {
             "source": f"clip_{clip_id:03d}.mp4",
             "fps": fps,
@@ -123,11 +124,49 @@ def merge_codex(style, timing, clip_id):
     }
     
     text_defaults = style.get("text_defaults", {})
+    title_defaults = style.get("title_defaults", {})
     zoom_config = style.get("zoom", {})
     sfx_defaults = style.get("sfx_defaults", {})
     
     words = timing.get("words", [])
     log(f"Generation text_overlays: {len(words)} mots")
+    
+    # ── TITRE ─────────────────────────────────────────────────────────────────
+    # Le titre n'existe que si le timing JSON contient un champ "title",
+    # ou si le style (codex_STYLE) en définit un (saisi dans la preview D-F05).
+    # Style: title_defaults. Fond bande optionnel. Si fond actif → glow annulé.
+    title_text = timing.get("title") or (style.get("title") or "").strip() or None
+    if title_text:
+        t_color = title_defaults.get("color", "#FFFFFF")
+        t_color_strong = title_defaults.get("color_strong", t_color)
+        t_bg = title_defaults.get("background", {"enabled": False})
+        title_style = {
+            "font": title_defaults.get("font", "Anton, Arial Black, sans-serif"),
+            "size": title_defaults.get("size", 96),
+            "color": t_color,
+            "color_strong": t_color_strong,
+            "stroke_color": title_defaults.get("stroke_color", "#000000"),
+            "stroke_width": title_defaults.get("stroke_width", 4),
+            "shadow": title_defaults.get("shadow", "2px 4px 8px rgba(0,0,0,0.9)"),
+            "position": title_defaults.get("position", "center"),
+            "letter_spacing": title_defaults.get("letter_spacing", "0em"),
+            "glow_intensity": 0 if t_bg.get("enabled") else title_defaults.get("glow_intensity", 0),
+            "depth_3d": 0 if t_bg.get("enabled") else title_defaults.get("depth_3d", 0),
+            "animation": title_defaults.get("animation", "fade_in"),
+            "role": "title",
+            "background": t_bg
+        }
+        # Titre affiché sur les 2 premières secondes
+        title_dur = min(2.0, (words[0]["start"] if words else 2.0))
+        codex["text_overlays"].append({
+            "id": "txt_title",
+            "content": title_text,
+            "start_frame": 0,
+            "end_frame": max(int(title_dur * fps), int(1 * fps)),
+            "emotion_weight": "title",
+            **title_style
+        })
+        log(f"  + titre: {title_text!r}")
     
     # Regrouper les mots en segments de sous-titres (comme la preview D-F05):
     # max 8 mots ou coupure de phrase, pour un vrai rendu "mot par mot" visible.
@@ -154,7 +193,7 @@ def merge_codex(style, timing, clip_id):
             "letter_spacing": text_defaults.get("letter_spacing", "0em"),
             "glow_intensity": text_defaults.get("glow_intensity", 0),
             "depth_3d": text_defaults.get("depth_3d", 0),
-            "background": text_defaults.get("background", {"enabled": False})
+            "background": {"enabled": False}  # sous-titres sans fond
         }
         
         codex["text_overlays"].append({

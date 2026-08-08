@@ -2,6 +2,7 @@
   "version": "2.0",
   "emotion_mode": "MOTIVATION",
   "narrative_arc": "setup → context → climax → emotional_peak → action → resolution",
+  "title": null,
   "video": {
     "source": "clip_000.mp4",
     "fps": 30,
@@ -28,10 +29,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -52,10 +50,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -76,10 +71,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -100,10 +92,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -124,10 +113,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -148,10 +134,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -172,10 +155,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -196,10 +176,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -220,10 +197,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -244,10 +218,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -268,10 +239,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -292,10 +260,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -316,10 +281,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -340,10 +302,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -364,10 +323,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -388,10 +344,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -412,10 +365,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -436,10 +386,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -460,10 +407,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -484,10 +428,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -508,10 +449,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -532,10 +470,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -556,10 +491,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -580,10 +512,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -604,10 +533,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     },
     {
@@ -628,10 +554,7 @@
       "glow_intensity": 0,
       "depth_3d": 0,
       "background": {
-        "enabled": false,
-        "color": "rgba(0,0,0,0.5)",
-        "padding": "16px 28px",
-        "radius": 12
+        "enabled": false
       }
     }
   ],

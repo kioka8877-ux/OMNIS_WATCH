@@ -239,6 +239,11 @@ const TextOverlay = ({ overlay, frame, fps }) => {
       }
     : null;
 
+  // Fond actif → glow, depth_3d et ombre annulés : simple bande derrière le texte.
+  const effectiveGlow = bgEnabled ? 0 : glow_intensity;
+  const effectiveDepth = bgEnabled ? 0 : depth_3d;
+  const effectiveShadow = bgEnabled ? 'none' : shadow;
+
   // Calculer le timing d'apparition des mots
   // Pour word_by_word : chaque mot apparaît à intervalle régulier
   const totalDuration = (overlay.end_frame || 300) - start_frame;
@@ -255,16 +260,16 @@ const TextOverlay = ({ overlay, frame, fps }) => {
 
   // Construire le glow néon
   const glowLayers = [];
-  if (glow_intensity > 0) {
-    const intensity = glow_intensity / 100;
+  if (effectiveGlow > 0) {
+    const intensity = effectiveGlow / 100;
     const layers = Math.round(intensity * 4); // 0 à 4 couches
     const glowSizes = [3, 6, 12, 20];
     for (let i = 0; i < layers; i++) {
       glowLayers.push(`0 0 ${glowSizes[i]}px ${color}`);
     }
-    glowLayers.push(shadow); // ombre portée noire
+    glowLayers.push(effectiveShadow); // ombre portée noire
   } else {
-    glowLayers.push(shadow);
+    glowLayers.push(effectiveShadow);
   }
   const textShadowStr = glowLayers.join(', ');
 
@@ -274,8 +279,8 @@ const TextOverlay = ({ overlay, frame, fps }) => {
 
   // 3D depth (couches décalées)
   const depthLayers = [];
-  if (depth_3d > 0) {
-    for (let d = 1; d <= depth_3d; d++) {
+  if (effectiveDepth > 0) {
+    for (let d = 1; d <= effectiveDepth; d++) {
       depthLayers.push(d);
     }
   }

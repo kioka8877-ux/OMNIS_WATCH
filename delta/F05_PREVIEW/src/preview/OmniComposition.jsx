@@ -183,10 +183,26 @@ const TextOverlay = ({ overlay, frame, fps }) => {
     glow_intensity = 0,
     depth_3d = 0,
     start_frame = 0,
+    background = { enabled: false },
   } = overlay;
 
   const localFrame = frame - start_frame;
   const words = content.split(' ');
+
+  // Fond (pill) optionnel derrière le texte — réservé au TITRE.
+  // Si fond actif → glow, depth_3d et ombre annulés (simple bande).
+  const bgEnabled = background && background.enabled;
+  const bgStyle = bgEnabled
+    ? {
+        backgroundColor: background.color || 'rgba(0,0,0,0.5)',
+        padding: background.padding || '16px 28px',
+        borderRadius: background.radius != null ? `${background.radius}px` : '12px',
+        display: 'inline-block',
+      }
+    : null;
+  const effectiveGlow = bgEnabled ? 0 : glow_intensity;
+  const effectiveDepth = bgEnabled ? 0 : depth_3d;
+  const effectiveShadow = bgEnabled ? 'none' : shadow;
 
   // Calculer le timing d'apparition des mots
   // Pour word_by_word : chaque mot apparaît à intervalle régulier
@@ -204,16 +220,16 @@ const TextOverlay = ({ overlay, frame, fps }) => {
 
   // Construire le glow néon
   const glowLayers = [];
-  if (glow_intensity > 0) {
-    const intensity = glow_intensity / 100;
+  if (effectiveGlow > 0) {
+    const intensity = effectiveGlow / 100;
     const layers = Math.round(intensity * 4); // 0 à 4 couches
     const glowSizes = [3, 6, 12, 20];
     for (let i = 0; i < layers; i++) {
       glowLayers.push(`0 0 ${glowSizes[i]}px ${color}`);
     }
-    glowLayers.push(shadow); // ombre portée noire
+    glowLayers.push(effectiveShadow); // ombre portée noire
   } else {
-    glowLayers.push(shadow);
+    glowLayers.push(effectiveShadow);
   }
   const textShadowStr = glowLayers.join(', ');
 
@@ -223,8 +239,8 @@ const TextOverlay = ({ overlay, frame, fps }) => {
 
   // 3D depth (couches décalées)
   const depthLayers = [];
-  if (depth_3d > 0) {
-    for (let d = 1; d <= depth_3d; d++) {
+  if (effectiveDepth > 0) {
+    for (let d = 1; d <= effectiveDepth; d++) {
       depthLayers.push(d);
     }
   }
@@ -286,6 +302,7 @@ const TextOverlay = ({ overlay, frame, fps }) => {
             transform: 'none',
             display: 'inline',
             whiteSpace: 'pre-wrap',
+            ...(bgStyle || {}),
           }}
         >
           {words.map((word, i) => {
@@ -360,6 +377,7 @@ const TextOverlay = ({ overlay, frame, fps }) => {
           ...baseTextStyle,
           opacity: blockOpacity,
           transform: `scale(${blockScale})`,
+          ...(bgStyle || {}),
         }}
       >
         {content}
