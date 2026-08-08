@@ -140,6 +140,7 @@ export default function App() {
   const [timingJson, setTimingJson] = useState(null);
   const [previewStyle, setPreviewStyle] = useState('style');
   const [currentTime, setCurrentTime] = useState(0);
+  const [isSeeking, setIsSeeking] = useState(false);
   const videoRef = useRef(null);
 
   const handleVideoUpload = (e) => {
@@ -395,6 +396,14 @@ export default function App() {
                       controls
                       autoPlay
                       loop
+                      onSeeking={() => {
+                        setIsSeeking(true);
+                        setCurrentTime(videoRef.current?.currentTime || 0);
+                      }}
+                      onSeeked={() => {
+                        setIsSeeking(false);
+                        setCurrentTime(videoRef.current?.currentTime || 0);
+                      }}
                       onTimeUpdate={() => setCurrentTime(videoRef.current?.currentTime || 0)}
                       style={{
                         width: '100%',
@@ -432,7 +441,12 @@ export default function App() {
                       const speedMap = { fast: 2.0, normal: 1.2, slow: 0.6 };
                       const speedFactor = speedMap[style.text_defaults.animation] || 1.2;
                       
-                      const charsToShow = Math.floor(segmentProgress * totalChars * speedFactor);
+                      // Pendant un scrub (recherche), on affiche tout le texte.
+                      // Sinon le typewriter se réinitialise depuis zéro à la nouvelle position
+                      // → texte invisible ou à moitié tapé.
+                      const charsToShow = isSeeking
+                        ? totalChars
+                        : Math.floor(segmentProgress * totalChars * speedFactor);
                       const visibleText = fullText.substring(0, Math.min(charsToShow, totalChars));
                       
                       // Couleur: mot fort → color_strong, sinon couleur texte
@@ -473,7 +487,7 @@ export default function App() {
                             pointerEvents: 'none',
                             letterSpacing: style.text_defaults.letter_spacing,
                             zIndex: 10,
-                            opacity: segmentProgress > 0.1 ? 1 : segmentProgress * 10
+                            opacity: isSeeking ? 1 : (segmentProgress > 0.1 ? 1 : segmentProgress * 10)
                           }}
                         >
                           {visibleText}
