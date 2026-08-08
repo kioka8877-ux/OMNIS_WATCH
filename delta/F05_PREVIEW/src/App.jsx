@@ -58,7 +58,8 @@ const DEFAULT_STYLE = {
     letter_spacing: "0em",
     glow_intensity: 0,
     depth_3d: 0,
-    animation: "word_by_word"
+    animation: "word_by_word",
+    typewriter_speed: "normal"
   },
   title_defaults: {
     font: "Anton, Arial Black, sans-serif",
@@ -467,22 +468,33 @@ export default function App() {
                       const fullText = currentSegment.text;
                       const totalChars = fullText.length;
                       
-                      // Vitesse du typewriter : fraction du segment où le texte est
-                      // 100% affiché. Garantit que la phrase complète (point final inclus)
-                      // s'affiche AVANT la fin du segment, quel que soit le réglage.
+                      const t = style.text_defaults;
+                      const anim = t.animation || 'word_by_word';
                       const speedMap = { fast: 0.3, normal: 0.6, slow: 0.9 };
-                      const completionFraction = speedMap[style.text_defaults.animation] || 0.6;
+                      const completionFraction = speedMap[t.typewriter_speed] || 0.6;
                       
-                      // Pendant un scrub (recherche), on affiche tout le texte.
-                      // Sinon le typewriter se réinitialise depuis zéro à la nouvelle position
-                      // → texte invisible ou à moitié tapé.
+                      // Typewriter : fraction du segment où le texte est 100% affiché.
+                      // Garantit que la phrase complète (point final inclus) s'affiche
+                      // AVANT la fin du segment, quel que soit le réglage.
                       const charsToShow = isSeeking
                         ? totalChars
                         : Math.floor(Math.min(1, segmentProgress / completionFraction) * totalChars);
                       const visibleText = fullText.substring(0, Math.min(charsToShow, totalChars));
                       
+                      // Animation d'entrée du bloc complet (fade_in, fade_in_slow, pop)
+                      let blockOpacity = 1;
+                      let blockScale = 1;
+                      if (anim === 'fade_in') {
+                        blockOpacity = Math.min(1, segmentProgress * 2.5);
+                      } else if (anim === 'fade_in_slow') {
+                        blockOpacity = Math.min(1, segmentProgress * 1.5);
+                      } else if (anim === 'pop') {
+                        blockOpacity = segmentProgress < 0.3 ? segmentProgress / 0.3 : 1;
+                        blockScale = 0.8 + 0.2 * Math.min(1, segmentProgress / 0.3);
+                      }
+                      // word_by_word → typewriter classique (blockOpacity/blockScale = 1)
+                      
                       // Couleur: mot fort → color_strong, sinon couleur texte
-                      const t = style.text_defaults;
                       const textColor = currentSegment.is_strong 
                         ? (t.color_strong || t.color)
                         : t.color;
@@ -505,13 +517,17 @@ export default function App() {
                         ? `${strokeW}px ${strokeW}px 0 ${strokeC}, -${strokeW}px -${strokeW}px 0 ${strokeC}, ${glowShadow}`
                         : `${strokeW}px ${strokeW}px 0 ${strokeC}, -${strokeW}px -${strokeW}px 0 ${strokeC}`;
                       
+                      const displayText = anim === 'word_by_word'
+                        ? visibleText
+                        : fullText;
+                      
                       return (
                         <div
                           style={{
                             position: 'absolute',
                             ...posStyle,
                             left: '50%',
-                            transform: 'translateX(-50%)',
+                            transform: `translateX(-50%) scale(${blockScale})`,
                             color: textColor,
                             fontSize: `${(t.size || 96) * 0.35}px`,
                             fontFamily: t.font || 'Arial Black, Arial, sans-serif',
@@ -523,11 +539,14 @@ export default function App() {
                             pointerEvents: 'none',
                             letterSpacing: t.letter_spacing || '0em',
                             zIndex: 10,
-                            opacity: isSeeking ? 1 : (segmentProgress > 0.1 ? 1 : segmentProgress * 10)
+                            opacity: anim === 'word_by_word'
+                              ? (isSeeking ? 1 : (segmentProgress > 0.1 ? 1 : segmentProgress * 10))
+                              : blockOpacity,
+                            transition: 'opacity 0.1s, transform 0.1s',
                           }}
                         >
-                          {visibleText}
-                          {charsToShow < totalChars && <span style={{ opacity: 0.7 }}>|</span>}
+                          {displayText}
+                          {anim === 'word_by_word' && charsToShow < totalChars && <span style={{ opacity: 0.7 }}>|</span>}
                         </div>
                       );
                     })()}
@@ -791,11 +810,23 @@ export default function App() {
                 onChange={(e) => updateField('text_defaults.glow_intensity', Number(e.target.value))} 
               />
 
+              <label style={styles.label}>Animation</label>
+              <select 
+                style={styles.select} 
+                value={style.text_defaults.animation || 'word_by_word'} 
+                onChange={(e) => updateField('text_defaults.animation', e.target.value)}
+              >
+                <option value="word_by_word">Mot par mot (typewriter)</option>
+                <option value="fade_in">Fade in</option>
+                <option value="fade_in_slow">Fade in lent</option>
+                <option value="pop">Pop</option>
+              </select>
+
               <label style={styles.label}>Vitesse typewriter</label>
               <select 
                 style={styles.select} 
-                value={style.text_defaults.animation || 'normal'} 
-                onChange={(e) => updateField('text_defaults.animation', e.target.value)}
+                value={style.text_defaults.typewriter_speed || 'normal'} 
+                onChange={(e) => updateField('text_defaults.typewriter_speed', e.target.value)}
               >
                 <option value="fast">Rapide</option>
                 <option value="normal">Normal</option>
