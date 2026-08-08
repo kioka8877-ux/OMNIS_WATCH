@@ -398,7 +398,8 @@ export default function App() {
                       onTimeUpdate={() => setCurrentTime(videoRef.current?.currentTime || 0)}
                       style={{
                         width: '100%',
-                        maxHeight: '300px',
+                        height: '100%',
+                        objectFit: 'cover',
                         borderRadius: '8px',
                         filter: style.color_css_filter + 
                           (style.enhance_4k ? ' contrast(1.15) saturate(1.2) brightness(1.08)' : ''),
@@ -913,5 +914,5 @@ const styles = {
   exportBtn: { width: '100%', padding: '12px', background: '#1a2a1a', border: '1px solid #2a4a2a', borderRadius: '8px', color: '#88ff88', cursor: 'pointer', fontSize: '14px', fontWeight: 700 },
   exportedBtn: { width: '100%', padding: '12px', background: '#2a4a2a', border: '1px solid #4a8a4a', borderRadius: '8px', color: '#aaffaa', cursor: 'pointer', fontSize: '14px', fontWeight: 700 },
   videoContainer: { marginTop: '20px', overflow: 'hidden', borderRadius: '8px' },
-  videoWrapper: { position: 'relative', display: 'inline-block', width: '100%', overflow: 'hidden' }
+  videoWrapper: { position: 'relative', display: 'inline-block', width: '100%', maxWidth: '300px', aspectRatio: '9 / 16', overflow: 'hidden', borderRadius: '8px' }
 };
